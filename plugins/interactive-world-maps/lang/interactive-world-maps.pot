@@ -1,0 +1,112 @@
+# Copyright (C) 2018 iwm
+# This file is distributed under the same license as the iwm package.
+msgid ""
+msgstr ""
+"Project-Id-Version: iwm\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: *.js\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: ../interactive-world-maps/map.php:378
+msgid "Please Select..."
+msgstr ""
+
+#: ../interactive-world-maps/map.php:822, ../interactive-world-maps/map.php:828, ../interactive-world-maps/map.php:1604, ../interactive-world-maps/map.php:3614
+msgstr ""
+
+#: ../interactive-world-maps/map.php:1506
+msgid "Fill out the form and follow the instructions to create your Interactive Map"
+msgstr ""
+
+#: ../interactive-world-maps/map.php:1626
+msgid "Description"
+msgstr ""
+
+#: ../interactive-world-maps/map.php:1634
+msgid "Visual Settings"
+msgstr ""
+
+#: ../interactive-world-maps/map.php:3597, ../interactive-world-maps/modules/widget.php:18, ../interactive-world-maps/modules/cornerstone/definition.php:11, ../interactive-world-maps/modules/layers/layers-widget.php:20
+msgid "Interactive Map"
+msgstr ""
+
+#: ../interactive-world-maps/map.php:3598
+msgid "Insert map previously created"
+msgstr ""
+
+#: ../interactive-world-maps/map.php:3604
+msgid "Content"
+msgstr ""
+
+#: ../interactive-world-maps/map.php:3611
+msgid "Map to display"
+msgstr ""
+
+#: ../interactive-world-maps/modules/widget.php:16
+msgid "Display a previously created Map"
+msgstr ""
+
+#: ../interactive-world-maps/modules/widget.php:100
+msgid "Please create a map first"
+msgstr ""
+
+#: ../interactive-world-maps/modules/cornerstone/controls.php:13
+msgid "-- Please create a map first --"
+msgstr ""
+
+#: ../interactive-world-maps/modules/cornerstone/controls.php:17, ../interactive-world-maps/modules/layers/layers-widget.php:165
+msgid "-- Please Select --"
+msgstr ""
+
+#: ../interactive-world-maps/modules/cornerstone/controls.php:32
+msgid "Add a title above the map"
+msgstr ""
+
+#: ../interactive-world-maps/modules/cornerstone/controls.php:40
+msgid "Title Color"
+msgstr ""
+
+#: ../interactive-world-maps/modules/cornerstone/controls.php:47
+msgid "Title Alignment"
+msgstr ""
+
+#: ../interactive-world-maps/modules/cornerstone/controls.php:62
+msgid "Choose Map"
+msgstr ""
+
+#: ../interactive-world-maps/modules/cornerstone/controls.php:63
+msgid "Choose which previously created map to display. Will only be visible on live site."
+msgstr ""
+
+#: ../interactive-world-maps/modules/cornerstone/controls.php:72
+msgid "Map Padding"
+msgstr ""
+
+#: ../interactive-world-maps/modules/layers/layers-widget.php:27
+msgid "Display a previously created map"
+msgstr ""
+
+#: ../interactive-world-maps/modules/layers/layers-widget.php:44
+msgid "Map"
+msgstr ""
+
+#: ../interactive-world-maps/modules/layers/layers-widget.php:45
+msgstr ""
+
+#: ../interactive-world-maps/modules/layers/layers-widget.php:181
+msgid "There are no maps to display. Please create a map first."
+msgstr ""
+
+#: ../interactive-world-maps/modules/layers/layers-widget.php:184
+msgid "Add New Map"
+msgstr ""
+
+#: ../interactive-world-maps/modules/layers/layers-widget.php:195
+msgid "Show Map"
+msgstr ""

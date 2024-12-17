@@ -1,0 +1,396 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Advanced Sidebar Menu\n"
+"POT-Creation-Date: 2024-03-24 21:25-0500\n"
+"PO-Revision-Date: 2024-03-24 21:26-0500\n"
+"Last-Translator: Mat Lipe <support@onpointplugins.com>\n"
+"Language-Team: Mat Lipe <support@onpointplugins.com>\n"
+"Language: de_DE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Domain: advanced-sidebar-menu\n"
+"X-Generator: Poedit 2.4.3\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-Flags-xgettext: --add-comments=translators:\n"
+"X-Poedit-WPHeader: advanced-sidebar-menu.php\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;"
+"esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;"
+"_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: *.js\n"
+"X-Poedit-SearchPathExcluded-1: .yarn\n"
+
+#: js/src/components/TransformNotice.tsx:36
+msgid "Blocks are the future of Advanced Sidebar Menu."
+msgstr "Blöcke sind die Zukunft des erweiterten Seitenleistenmenüs."
+
+#: js/src/components/TransformNotice.tsx:42
+msgid "This widget may be transformed into a block."
+msgstr "Dieses Widget kann in einen Block umgewandelt werden."
+
+#. translators: Selected taxonomy single label
+#. translators: Selected post type single label
+#: js/src/gutenberg/blocks/Display.tsx:36 src/Widget/Page.php:139
+#, javascript-format, php-format
+msgid "Display highest level parent %s"
+msgstr "Anzeige der übergeordneten %s der höchsten Ebene"
+
+#. translators: Selected taxonomy single label
+#. translators: Selected taxonomy single label
+#. translators: Selected post type single label
+#: js/src/gutenberg/blocks/Display.tsx:38 src/Widget/Category.php:149
+#: src/Widget/Page.php:150
+#, javascript-format, php-format
+msgid "Display menu when there is only the parent %s"
+msgstr "Menü \"Anzeige\" wird nur die übergeordnete %s"
+
+#. translators: Selected taxonomy plural label
+#. translators: Selected taxonomy plural label
+#. translators: Selected post type plural label
+#: js/src/gutenberg/blocks/Display.tsx:40 src/Widget/Category.php:158
+#: src/Widget/Page.php:160
+#, javascript-format, php-format
+msgid "Always display child %s"
+msgstr "Immer untergeordnete %s anzeigen"
+
+#: js/src/gutenberg/blocks/Display.tsx:71
+msgid "Display"
+msgstr "Anzeige"
+
+#. translators: {select html input}, {post type plural label}
+#. translators: {select html input}, {Selected post type plural label}
+#: js/src/gutenberg/blocks/Display.tsx:91 src/Widget/Category.php:187
+#: src/Widget/Page.php:195
+#, javascript-format, php-format
+msgid "Display %1$s levels of child %2$s"
+msgstr "Anzeigen %1$s Ebenen der %2$s"
+
+#: js/src/gutenberg/blocks/Display.tsx:99 src/Widget/Category.php:172
+#: src/Widget/Page.php:181
+msgid "- All -"
+msgstr "- Alle -"
+
+#. translators: 1: Opening anchor tag, 2: Closing anchor tag
+#: js/src/gutenberg/blocks/ExcludeField.tsx:25
+#, javascript-format
+msgid "For more robust and intuitive exclusions use the %1$sPRO version%2$s."
+msgstr ""
+"Für robustere und intuitivere Ausschlüsse verwenden Sie die %1$sPRO-Version"
+"%2$s."
+
+#. translators: Selected post type plural label
+#. translators: Selected taxonomy plural label
+#. translators: Selected post type plural label
+#: js/src/gutenberg/blocks/ExcludeField.tsx:31 src/Widget/Category.php:273
+#: src/Widget/Page.php:255
+#, javascript-format, php-format
+msgid "%s to exclude (ids, comma separated)"
+msgstr "Auszuschließende %s (IDs), durch Kommas getrennt"
+
+#: js/src/gutenberg/blocks/InfoPanel.tsx:28 src/Notice.php:175
+msgid "Go PRO"
+msgstr "Gehen Sie PRO"
+
+#: js/src/gutenberg/blocks/InfoPanel.tsx:34 src/Notice.php:97
+msgid "Advanced Sidebar Menu PRO"
+msgstr "Advanced Sidebar Menu PRO"
+
+#: js/src/gutenberg/blocks/InfoPanel.tsx:43 src/Notice.php:111
+msgid "And so much more…"
+msgstr "So viel mehr…"
+
+#: js/src/gutenberg/blocks/InfoPanel.tsx:53 src/Notice.php:119
+msgid "Upgrade"
+msgstr "Aktualisierung"
+
+#: js/src/gutenberg/blocks/Preview.tsx:66
+#: js/src/gutenberg/blocks/pages/block.tsx:65 src/Widget/Page.php:55
+msgid "Advanced Sidebar - Pages"
+msgstr "Advanced Sidebar - Seitenmenü"
+
+#: js/src/gutenberg/blocks/Preview.tsx:67
+#: js/src/gutenberg/blocks/Preview.tsx:74
+#: js/src/gutenberg/blocks/Preview.tsx:81
+msgid "No preview available"
+msgstr "Keine Vorschau verfügbar"
+
+#: js/src/gutenberg/blocks/Preview.tsx:73
+#: js/src/gutenberg/blocks/categories/block.tsx:65 src/Widget/Category.php:59
+msgid "Advanced Sidebar - Categories"
+msgstr "Advanced Sidebar - Kategorien"
+
+#: js/src/gutenberg/blocks/Preview.tsx:80
+msgid "Advanced Sidebar - Navigation"
+msgstr "Advanced Sidebar - Navigationsmenü"
+
+#: js/src/gutenberg/blocks/categories/Edit.tsx:57
+#: js/src/gutenberg/blocks/pages/Edit.tsx:62 src/Widget/Category.php:305
+#: src/Widget/Page.php:116 src/Widget/Page.php:286
+msgid "Title"
+msgstr "Titel"
+
+#. translators: Selected taxonomy plural label
+#: js/src/gutenberg/blocks/categories/Edit.tsx:76 src/Widget/Category.php:217
+#, javascript-format, php-format
+msgid "Display %s on single posts"
+msgstr "%s auf einzelne Beiträge anzeigen"
+
+#. translators: Selected taxonomy single label
+#: js/src/gutenberg/blocks/categories/Edit.tsx:91 src/Widget/Category.php:227
+#, javascript-format, php-format
+msgid "Display each single post's %s"
+msgstr "Anzeigen der %s jedes einzelnen Beitrags"
+
+#: js/src/gutenberg/blocks/categories/Edit.tsx:119
+#: js/src/gutenberg/blocks/pages/Edit.tsx:104
+msgid "block documentation"
+msgstr "dokumentation blockieren"
+
+#: js/src/gutenberg/blocks/pages/Edit.tsx:80 src/Widget/Page.php:221
+msgid "Order by"
+msgstr "Sortieren nach"
+
+#: src/Blocks/Categories.php:25 src/Blocks/Pages.php:25
+#: src/Widget/Category.php:52
+msgid ""
+"Creates a menu of all the categories using the parent/child relationship"
+msgstr ""
+"Erstellt ein Menü aller Kategorien, die unter Zugrundelegung der Eltern-Kind-"
+"Beziehung"
+
+#: src/Blocks/Categories.php:65 src/Blocks/Pages.php:58
+msgid "menu"
+msgstr "menü"
+
+#: src/Blocks/Categories.php:66 src/Blocks/Pages.php:59
+msgid "sidebar"
+msgstr "seitenleiste"
+
+#: src/Blocks/Categories.php:67
+msgid "taxonomy"
+msgstr "taxonomie"
+
+#: src/Blocks/Categories.php:68
+msgid "term"
+msgstr "begriff"
+
+#: src/Blocks/Pages.php:60
+msgid "pages"
+msgstr "peiten"
+
+#: src/Core.php:64
+msgid "widget documentation"
+msgstr "widget-dokumentation"
+
+#: src/Core.php:104
+msgid "Documentation"
+msgstr "Dokumentation"
+
+#. translators: Link to PRO plugin {%1$s}[<a href="https://onpointplugins.com/product/advanced-sidebar-menu-pro/">]{%2$s}[</a>]
+#: src/Notice.php:69
+#, php-format
+msgctxt "{<a>}{</a>}"
+msgid ""
+"Advanced Sidebar Menu requires %1$sAdvanced Sidebar Menu PRO%2$s version %3$s"
+"+. Please update or deactivate the PRO version."
+msgstr ""
+"Das Advanced Sidebar Menu erfordert %1$s sAdvanced Sidebar Menu PRO%2$s es "
+"Version %3$s+. Bitte aktualisieren oder deaktivieren Sie die PRO-Version."
+
+#: src/Notice.php:127
+msgid "Preview"
+msgstr "Vorschau"
+
+#: src/Notice.php:160
+msgid "PRO version widget options"
+msgstr "Widget-Optionen für die PRO-Version"
+
+#: src/Notice.php:189
+msgid ""
+"Styling options including borders, bullets, colors, backgrounds, font size "
+"and weight."
+msgstr ""
+"Styling-Optionen wie Rahmen, Aufzählungszeichen, Farben, Hintergründe, "
+"Schriftgröße und -stärke."
+
+#: src/Notice.php:190
+msgid "Accordion menus."
+msgstr "Akkordeon-Menüs."
+
+#: src/Notice.php:191
+msgid "Support for custom navigation menus from Appearance -> Menus."
+msgstr ""
+"Unterstützung für kundenspezifische Navigationsmenüs von Appearance-> Menü."
+
+#: src/Notice.php:192
+msgid "Select and display custom post types and taxonomies."
+msgstr ""
+"Wählen Sie benutzerdefinierte Beitragstypen und Taxonomien aus und zeigen "
+"Sie sie an."
+
+#: src/Notice.php:193
+msgid "Priority support with access to members only support area."
+msgstr ""
+"Prioritätsunterstützung, einschließlich Zugang zum Supportbereich für "
+"Mitglieder."
+
+#: src/Widget/Category.php:118
+msgid "In a new widget"
+msgstr "In einem neuen Widget"
+
+#: src/Widget/Category.php:119
+msgid "In another list in the same widget"
+msgstr "In einer anderen Liste im selben Widget"
+
+#. translators: Selected taxonomy single label
+#: src/Widget/Category.php:140
+#, php-format
+msgid "Display the highest level parent %s"
+msgstr "Anzeige der übergeordneten %s der höchsten Ebene"
+
+#: src/Widget/Page.php:48
+msgid "Creates a menu of all the pages using the parent/child relationship"
+msgstr ""
+"Erstellt ein Menü mit allen Seiten, die die Child / Parent-Beziehung "
+"verwenden"
+
+#: src/Widget/Page.php:115
+msgid "Page Order"
+msgstr "Seitenreihenfolge"
+
+#: src/Widget/Page.php:117
+msgid "Published Date"
+msgstr "Veröffentlichungsdatum"
+
+#. Plugin Name of the plugin/theme
+msgid "Advanced Sidebar Menu"
+msgstr "Advanced Sidebar Menu"
+
+#. Plugin URI of the plugin/theme
+msgid "https://onpointplugins.com/advanced-sidebar-menu/"
+msgstr "https://onpointplugins.com/advanced-sidebar-menu/"
+
+#. Description of the plugin/theme
+msgid ""
+"Creates dynamic menus based on parent/child relationship of your pages or "
+"categories."
+msgstr ""
+"Dynamische Menüs basierend auf Parent/Child-Beziehung Ihrer Seiten oder "
+"Kategorien erstellt."
+
+#. Author of the plugin/theme
+msgid "OnPoint Plugins"
+msgstr "OnPoint Plugins"
+
+#. Author URI of the plugin/theme
+msgid "https://onpointplugins.com"
+msgstr "https://onpointplugins.com"
+
+#~ msgid "And so much more..."
+#~ msgstr "So viel mehr..."
+
+#, javascript-format
+#~ msgid ""
+#~ "%1$s may also be excluded from all menus via the Advanced Sidebar "
+#~ "settings when %3$sediting a %2$s%4$s."
+#~ msgstr ""
+#~ "%1$s können auch über die erweiterten Sidebar-Menüeinstellungen aus allen "
+#~ "Menüs ausgeschlossen werden, wenn %3$sbearbeiten einer %2$s%4$s."
+
+#~ msgid "This block requires WordPress version 5.6!"
+#~ msgstr "Dieser Block erfordert WordPress Version 5.6!"
+
+#~ msgid "Post type"
+#~ msgstr "Beitragstyp"
+
+#~ msgid "Select and display custom taxonomies."
+#~ msgstr "Wählen Sie benutzerdefinierte Taxonomien aus und zeigen Sie sie an."
+
+#, php-format
+#~ msgid "Levels of child %s to display"
+#~ msgstr "Niveau der Kinder %s zu zeigen"
+
+#, php-format
+#~ msgid "Maximum level of child %s to display"
+#~ msgstr "Maximale Höhe der zu zeigestellenden %s Kinder"
+
+#~ msgid "Display highest level parent page"
+#~ msgstr "Zeigt die oberste Seite der obersten Ebene an"
+
+#~ msgid "Display menu when there is only the parent page"
+#~ msgstr "Menü \"Anzeige\" wird nur die übergeordnete Seite"
+
+#~ msgid "Always display child pages"
+#~ msgstr "Immer untergeordnete Seiten anzeigen"
+
+#~ msgid "Display menu when there is only the parent category"
+#~ msgstr "Menü \"Anzeige\" wird nur die übergeordnete Kategorie"
+
+#~ msgid "Always display child categories"
+#~ msgstr "Immer untergeordnete Kategorien anzeigen"
+
+#~ msgid "Categories to exclude (ids), comma separated"
+#~ msgstr "Kategorien ausschließen (Ids), durch Kommata getrennt"
+
+#, php-format
+#~ msgctxt "{<a>}{</a>}"
+#~ msgid ""
+#~ "Upgrade to %1$sAdvanced Sidebar Menu PRO%2$s for these features and so "
+#~ "much more!"
+#~ msgstr ""
+#~ "Upgrade auf %1$sAdvanced Sidebar Menu PRO%2$s für diese Funktionen und "
+#~ "vieles mehr!"
+
+#~ msgid ""
+#~ "Click and drag menu styling including bullets, colors, sizes, block "
+#~ "styles, borders, and border colors."
+#~ msgstr ""
+#~ "Klicken und ziehen Sie das Menü-Styling, einschließlich "
+#~ "Aufzählungszeichen, Farben, Größen, Blockstile, Rahmen und Rahmenfarben."
+
+#~ msgid "Ability to customize each page's link text."
+#~ msgstr "Möglichkeit, den Linktext jeder Seite anzupassen."
+
+#~ msgid "Ability to exclude a page from all menus using a simple checkbox."
+#~ msgstr ""
+#~ "Möglichkeit, eine Seite mit einem einfachen Kontrollkästchen aus allen "
+#~ "Menüs auszuschließen."
+
+#~ msgid ""
+#~ "Number of levels of pages to show when always displayed child pages is "
+#~ "not checked."
+#~ msgstr ""
+#~ "Anzahl der Seitenebenen, die angezeigt werden sollen, wenn immer "
+#~ "untergeordnete Seiten angezeigt werden, ist nicht aktiviert."
+
+#~ msgid ""
+#~ "Option to display the current page’s parents, grandparents, and children "
+#~ "only, as well as siblings options."
+#~ msgstr ""
+#~ "Option, um die Eltern, Großeltern und Kinder der aktuellen Seite "
+#~ "anzuzeigen, sowie Geschwisteroptionen."
+
+#~ msgid "Link ordering for the category widget."
+#~ msgstr "Verknüpfungsreihenfolge für das Kategorie-Widget."
+
+#~ msgid ""
+#~ "Ability to display assigned posts or custom post types under categories."
+#~ msgstr ""
+#~ "Fähigkeit, zugewiesene Beiträge oder benutzerdefinierte Posttypen unter "
+#~ "Kategorien anzuzeigen."
+
+#~ msgid "Ability to display the widgets everywhere the sidebar displays."
+#~ msgstr ""
+#~ "Die Fähigkeit, die Widgets überall in der Sidebar-Anzeige anzuzeigen."
+
+#~ msgid "Use this plugin's default styling"
+#~ msgstr "Verwenden Sie das Standardstyling dieses Plugins"
+
+#~ msgid "Mat Lipe"
+#~ msgstr "Mat Lipe"
+
+#~ msgid "Use this Plugin's Styling"
+#~ msgstr "Benutze das Plugin Styling"

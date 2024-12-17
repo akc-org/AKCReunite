@@ -1,0 +1,46 @@
+#visualization text{cursor:default;stroke-width:0;cursor:pointer}#iwm_custom_css,#iwm_custom_js{width:100%;min-height:100px}
+#default-settings-table,#add-table,#name-table,#iwm-custom-css{padding:10px}#iwm-visit{float:right;padding:20px;font-size:.8em}
+.iwm_stronger{font-weight:bold}#iwm-custom-css input[type=text]{width:100px}#iwm-custom-css input[type=number]{width:80px}
+#iwm-custom-css input#bgimage{width:200px}#iwm-custom-css{display:none;margin-top:10px}
+#default-settings-table-add{padding:10px;margin-top:20px}#default-settings-table-add input[type=text],#name-table input[type=text],#name-table textarea{width:100%}
+#default-settings-table-add input,#name-table input,#name-table textarea{margin:5px 0 0 0}
+#default-settings-table-add td,#name-table td{padding-top:10px}#wp-iwm_hackeditor-wrap{display:none}
+#advanced-table,#populate-automatically-div{display:none}#add-table-advanced,#populate-automatically-div{background-color:#fff;padding:10px;border:1px solid #dfdfdf}
+#add-table-advanced textarea{width:100%;height:200px}.iwm_data_table_warning{padding:10px;margin:20px;background:#f9f9f9;border:1px solid #CCC;line-height:1.5em}
+.automatebutton{padding:5px 10px;border:1px solid #CCC;background:#dfdfdf;display:block;margin:10px;cursor:pointer;-webkit-transition:all 1s;transition:all 1s}
+.automatebuttonsucess{border:1px solid #27ae60;background:#27ae60;color:#FFF}#default-settings-table input[type=text],#add-table input[type=text]{width:100%}
+#default-settings-table th,#add-table th{font-weight:bolder;text-align:left}#add-table td{padding:5px}
+#add-table textarea{width:100%}#add-table input[type="text"],#add-table input[type="button"]{width:100%}
+#region{font-size:.9em}#visualization-wrap{background-color:#f9f9f9;padding:10px;border:1px solid #dfdfdf;width:100%}
+#visualization-wrap-responsive{width:100%;overflow:hidden;display:inline-block;position:relative;list-style:none}
+#visualization-wrap-responsive>div>div{overflow:hidden}#visualization-wrap-responsive:after{padding-top:61.7%;display:block;content:''}
+#iwm-wrap-preview{border:1px solid #CCC;padding:20px;max-width:600px}.iwm_preview_help{vertical-align:top}
+#iwm-control-box{padding:10px;vertical-align:middle;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;-o-user-select:none;user-select:none}
+#iwm-control-box .fa{cursor:pointer}#visualization-wrap-responsive #visualization{position:absolute;top:0;bottom:0;right:0;left:0}
+#iwmexpandcss{cursor:pointer;padding:20px}.data-content-table{width:100%;background-color:#FFF;margin-top:10px}
+.data-content-table td{word-wrap:break-word;max-width:200px}.data-content-table tr:nth-child(even){background-color:#EEE}
+.data-content-table tr:nth-child(odd){background-color:#f9f9f9}#add-table .data-content-table td{padding:0 5px}
+#add-table .fa{cursor:pointer;padding:3px;font-size:1.5em}#add-table .fa-plus-circle{-ms-transform:rotate(45deg);-webkit-transform:rotate(45deg);transform:rotate(45deg);color:#c0392b;opacity:.5}
+#add-table .fa-pencil-square{margin:0 6px 0 3px;opacity:.7;color:#008ec2}#add-table .fa-check-square{color:#27ae60;opacity:.8;margin-right:3px;font-size:2em}
+#add-table .fa-undo{color:#CCC;opacity:.8}#add-table .fa:hover{opacity:1}.data-content-table th{text-align:left;padding:10px;text-transform:uppercase;background-color:#f1f1f1;background-image:-moz-linear-gradient(center top,#f9f9f9,#ececec)}
+.deleteplace{cursor:pointer}.editing-map-entry tr{border:1px solid #F30;background-color:#09c;padding:20px}
+.activeb{background-color:#fff;padding:10px 10px 1px 10px;color:#000;cursor:pointer;margin-left:10px;border-top-width:1px;border-right-width:1px;border-bottom-width:1px;border-left-width:1px;border-top-style:solid;border-right-style:solid;border-bottom-style:solid;border-left-style:solid;border-top-color:#CCC;border-right-color:#CCC;border-bottom-color:#fff;border-left-color:#CCC}
+.inactiveb{background-color:#fff;padding:10px 10px 1px 10px;border:1px solid #CCC;color:#222;cursor:pointer;margin-left:10px;margin-top:-2px}
+#iso-code-msg{padding:10px;margin-bottom:10px;color:#333;font-style:italic;display:block}
+#iwm-api-key-msg{padding:10px;margin-bottom:10px;color:#333;font-style:italic;display:block}
+.iwmsmall{font-size:x-small;color:#666}.iwm-small-help{color:#666;font-style:italic;font-size:11px}
+.colorsample{width:15px;height:15px;float:right}#iwm-message-intro{margin-top:15px;padding:15px;background-color:#fff;border:1px solid #dfdfdf}
+#iwm-message-intro #shc{font-weight:bold;background-color:#f5f5f5;padding:5px}#iwm_message{padding:10px}
+#visit{padding:10px}#custom-action{display:none;padding-bottom:20px;padding:10px}
+#latlondiv{background-color:#fff;padding:5px;border:1px solid #dfdfdf;margin:10px 0}
+#iwm_image_map{padding:10px 0 5px 0}circle{cursor:pointer}#iwm-wrap-preview li{list-style:none !important}
+#iwm-wrap-preview text{stroke-width:0;cursor:pointer}#iwm-wrap-preview img{border:0;padding:0;margin:0;box-shadow:none}
+#iwm-wrap-preview .google-visualization-tooltip{margin:0;padding:5px;color:#444;word-wrap:normal;z-index:9999999999;min-width:75px;font-family:inherit;margin-right:-50px;margin-bottom:-50px;box-shadow:none;-moz-box-shadow:none;-webkit-box-shadow:none}
+#iwm-wrap-preview .google-visualization-tooltip ul,#iwm-wrap-preview .google-visualization-tooltip li,#iwm-wrap-preview .google-visualization-tooltip img{margin:0 !important;padding:0 !important;border:0;outline:0;font-size:100%;line-height:1.5em;font-size:1em;text-decoration:none;vertical-align:baseline;list-style:none}
+#iwm-wrap-preview .google-visualization-tooltip-item-list{list-style-type:none;margin:0;padding:0}
+#iwm-wrap-preview ul.google-visualization-tooltip-item-list{list-style:none;margin:0;padding:0}
+#iwm-wrap-preview li.google-visualization-tooltip-item{list-style:none;margin:0;padding:0}
+#iwm-wrap-preview .google-visualization-tooltip-item *{margin:0;padding:0;list-style:none}
+#iwm-wrap-preview .google-visualization-tooltip-item-list #iwm-wrap-preview .google-visualization-tooltip-item:first-child{list-style:none;margin:0;padding:0}
+#available-widgets [class*=iwm] .widget-title:before{content:"\f319"}
+/*# sourceMappingURL=admin.min.css.map */

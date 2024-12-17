@@ -1,0 +1,51 @@
+version: '2'
+
+services:
+   db:
+     platform: linux/x86_64
+     image: mysql:5.7
+     volumes:
+       - db_data-motd:/var/lib/mysql
+     restart: always
+     ports:
+       - "3312:3306"
+     environment:
+       MYSQL_ROOT_PASSWORD: wordpress
+       MYSQL_DATABASE: motd
+
+   redis:
+     image: redis:5.0.4
+     # command: ["redis-server", "--appendonly", "yes"]
+     hostname: redis
+     restart: always
+     ports:
+      - 6379:6379
+     volumes:
+      - redis_data-motd:/data
+
+   wordpress:
+     depends_on:
+       - db
+       - redis
+     links:
+       - redis
+     build:
+       context: ./
+       dockerfile: ./.docker/Dockerfile
+     working_dir: /var/www/html
+     volumes:
+       - ./:/var/www/html/wp-content
+     ports:
+       - "80:80"
+     restart: always
+     environment:
+       WORDPRESS_DB_HOST: db:3306
+       WORDPRESS_DB_NAME: motd
+       WORDPRESS_DB_USER: root
+       WORDPRESS_DB_PASSWORD: wordpress
+       ENV: local
+       WORDPRESS_DEBUG: 0
+
+volumes:
+    db_data-motd:
+    redis_data-motd:

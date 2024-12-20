@@ -116,13 +116,13 @@ class Onetrust_settings {
 		$id = get_option( 'Onetrust_container_id', true );
 		if ( $id && '' !== $id ) {
 			echo '<!-- OneTrust Cookies Consent Notice start for akcreunite.org -->
-
-            <script src="https://cdn.cookielaw.org/scripttemplates/otSDKStub.js"  type="text/javascript" charset="UTF-8" data-domain-script="' . $id . '" ></script>
+            <script type="text/javascript" src="https://cdn.cookielaw.org/consent/' . $id . '/OtAutoBlock.js" ></script>
+            <script src="https://cdn.cookielaw.org/consent/' . $id . '/otSDKStub.js"  type="text/javascript" charset="UTF-8" data-domain-script="' . $id . '" ></script>
             <script type="text/javascript">
             function OptanonWrapper() { }
             </script>
-            <!-- OneTrust Cookies Consent Notice end for akcreunite.org -->
-            ';
+
+            <!-- OneTrust Cookies Consent Notice end for akcreunite.org -->';
 		}
 	}
 }

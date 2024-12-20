@@ -121,8 +121,8 @@ class Onetrust_settings {
             <script type="text/javascript">
             function OptanonWrapper() { }
             </script>
-
-            <!-- OneTrust Cookies Consent Notice end for akcreunite.org -->';
+            <!-- OneTrust Cookies Consent Notice end for akcreunite.org -->
+            ';
 		}
 	}
 }

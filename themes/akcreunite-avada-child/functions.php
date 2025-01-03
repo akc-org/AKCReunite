@@ -22,3 +22,4 @@ add_action( 'wp_enqueue_scripts', 'child_theme_enqueue_styles' );
 * _____________________________
 */
 require_once __DIR__ . '/functions/init.php';
+

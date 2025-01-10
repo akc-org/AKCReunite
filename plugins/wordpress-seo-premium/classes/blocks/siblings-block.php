@@ -1,6 +1,5 @@
 <?php
 
-// phpcs:ignore Yoast.NamingConventions.NamespaceName.Invalid
 namespace Yoast\WP\SEO\Integrations\Blocks;
 
 use Yoast\WP\SEO\Models\Indexable;
@@ -10,7 +9,7 @@ use Yoast\WP\SEO\Repositories\Indexable_Repository;
 /**
  * Siblings block class
  */
-class Siblings_Block extends Dynamic_Block {
+class Siblings_Block extends Dynamic_Block_V3 {
 
 	/**
 	 * The name of the block.
@@ -40,6 +39,8 @@ class Siblings_Block extends Dynamic_Block {
 	 */
 	public function __construct( Indexable_Repository $indexable_repository ) {
 		$this->indexable_repository = $indexable_repository;
+
+		$this->base_path = \WPSEO_PREMIUM_PATH . 'assets/blocks/dynamic-blocks/';
 	}
 
 	/**
@@ -59,8 +60,8 @@ class Siblings_Block extends Dynamic_Block {
 			[ \get_the_ID() ]
 		);
 
-		$links = array_map(
-			static function( Indexable $indexable ) {
+		$links = \array_map(
+			static function ( Indexable $indexable ) {
 				return [
 					'title'     => $indexable->breadcrumb_title,
 					'permalink' => $indexable->permalink,
@@ -78,7 +79,7 @@ class Siblings_Block extends Dynamic_Block {
 			$class_name .= ' ' . \esc_attr( $attributes['className'] );
 		}
 
-		$presenter = new Url_List_Presenter( $links, $class_name );
+		$presenter = new Url_List_Presenter( $links, $class_name, $this->should_link_target_blank() );
 
 		return $presenter->present();
 	}

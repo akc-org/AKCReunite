@@ -115,18 +115,13 @@ class Onetrust_settings {
 	public function Onetrust_embed() {
 		$id = get_option( 'Onetrust_container_id', true );
 		if ( $id && '' !== $id ) {
-			echo '<!-- OneTrust Cookies Consent Notice start for akcreunite.org -->
-            <script src="https://cdn.cookielaw.org/consent/' . $id . '/otSDKStub.js"  type="text/javascript" charset="UTF-8" data-domain-script="' . $id . '" ></script>
-            <script type="text/javascript">
+			echo "<!-- OneTrust Cookies Consent Notice start for akcreunite.org -->
+            <script src='https://cdn.cookielaw.org/scripttemplates/otSDKStub.js'  type='text/javascript' charset='UTF-8' data-domain-script=$id></script>
+            <script type='text/javascript'>
             function OptanonWrapper() { }
             </script>
-			<style>
-				body div#ot-sdk-btn-floating {
-				display: block !important;
-			}
-			</style>
             <!-- OneTrust Cookies Consent Notice end for akcreunite.org -->
-            ';
+            ";
 		}
 	}
 }

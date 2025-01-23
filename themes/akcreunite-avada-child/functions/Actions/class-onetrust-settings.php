@@ -120,6 +120,11 @@ class Onetrust_settings {
             <script type='text/javascript'>
             function OptanonWrapper() { }
             </script>
+			<style>
+				body div#ot-sdk-btn-floating {
+				display: block !important;
+			}
+			</style>
             <!-- OneTrust Cookies Consent Notice end for akcreunite.org -->
             ";
 		}

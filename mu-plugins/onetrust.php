@@ -19,50 +19,66 @@
 * Text Domain: akc
 * License:     GPL-2.0+
 **/
- 
-if (!defined('ABSPATH') ) {
+
+if (!defined('ABSPATH')) {
     exit;
 }
- 
-// <script> objects that contain a key from this dictionary will be modifed ie: the type will be set to text/plain and the value will be added as a class
+
+// <script> objects that contain a key from this dictionary will be modified, i.e., the type will be set to text/plain and the value will be added as a class
 $dictionary = array(
-    '<blank>'                                     => 'optanon-category-C0001',
-    'googleapis'                                  => 'optanon-category-C0004',
-    'google'                                      => 'optanon-category-C0002',
-    'gmap'                                        => 'optanon-category-C0004',
-    'blueconic'                                   => 'optanon-category-C0004',
-    'akc-ga'                                      => 'optanon-category-C0004',
-    'facebook'                                    => 'optanon-category-C0005',
-    'youtube'                                     => 'optanon-category-C0005',
+    '<blank>' => 'optanon-category-C0001',
+    'googleapis' => 'optanon-category-C0004',
+    'google' => 'optanon-category-C0002',
+    'gmap' => 'optanon-category-C0004',
+    'blueconic' => 'optanon-category-C0004',
+    'akc-ga' => 'optanon-category-C0004',
+    'facebook' => 'optanon-category-C0004',
+    'youtube' => 'optanon-category-C0004',
+    'vimeo' => 'optanon-category-C0004',
+    'mailchimp' => 'optanon-category-C0004',
+    'wp-goal-tracker' => 'optanon-category-C0004',
+    'wp-goal-tracker-ga-js-extra' => 'optanon-category-C0004',
+    'www-widgetapi-script' => 'optanon-category-C0004',
+    'bing' => 'optanon-category-C0004',
     // Add more keys and their corresponding classes as needed
 );
- 
- 
+
 function modify_script_attributes() {
     ob_start();
 }
 add_action('wp_enqueue_scripts', 'modify_script_attributes', 1);
- 
+
 function add_custom_script_attributes() {
     global $dictionary;
     $output = ob_get_clean();
- 
+
     // Use regex to find all <script> tags
     $output = preg_replace_callback(
         '/<script([^>]*)>(.*?)<\/script>/is',
         function ($matches) use ($dictionary) {
             $attributes = $matches[1];
             $src = '';
- 
+            $id = '';
+
             // Extract the src attribute if it exists
             if (preg_match('/src=[\'"]?([^\'" ]+)[\'"]?/', $attributes, $srcMatch)) {
                 $src = $srcMatch[1]; // Get the src value
             }
- 
-            // Check if the src contains any key of the dictionary
+
+            // Extract the id attribute if it exists
+            if (preg_match('/id=[\'"]?([^\'" ]+)[\'"]?/', $attributes, $idMatch)) {
+                $id = $idMatch[1]; // Get the id value
+            }
+
+            // Concatenate id to src if both are found
+            if ($src && $id) {
+                $src .= $id;
+            }
+
+            // Check if the src (now including the id) contains any key from the dictionary
             foreach ($dictionary as $key => $value) {
-                // if the key appears in the src
-                if (strpos($src, $key) !== false) { // Check if the src contains the key
+                // if the key appears in the src (which may now include the id)
+                if (strpos($src, $key) !== false) {
                     // Set or modify the type attribute
                     if (strpos($attributes, 'type=') === false) {
                         $attributes .= ' type="text/plain"'; // Append if it doesn't exist
@@ -70,7 +86,7 @@ function add_custom_script_attributes() {
                         // Modify existing type attribute
                         $attributes = preg_replace('/type=[\'"]?[^\'" ]*[\'"]?/', 'type="text/plain"', $attributes);
                     }
- 
+
                     // Add the dictionary value as a class
                     if (strpos($attributes, 'class=') === false) {
                         $attributes .= ' class="' . esc_attr($value) . '"';
@@ -78,25 +94,21 @@ function add_custom_script_attributes() {
                         // Append to existing classes
                         $attributes = preg_replace('/class=[\'"]?([^\'"]*)[\'"]?/', 'class="$1 ' . esc_attr($value) . '"', $attributes);
                     }
- 
+
                     break; // No need to check other keys once a match is found
                 }
             }
- 
+
             return "<script$attributes>{$matches[2]}</script>";
         },
         $output
     );
- 
+
     echo $output;
 }
 add_action('wp_footer', 'add_custom_script_attributes', 99);
 
-
-
-
-
 function test_load() {
-    echo '<script src="https://google.com/cookie-loader.js"></script>';
+    echo '<script src="https://google.com/cookie-loader.js" id="custom-id"></script>';
 }
 add_action('wp_enqueue_scripts', 'test_load');

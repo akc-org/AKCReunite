@@ -1,0 +1,1 @@
+<?php // GA is loaded in the Goal Tracker plugin

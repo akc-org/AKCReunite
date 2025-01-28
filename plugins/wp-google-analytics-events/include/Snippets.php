@@ -44,7 +44,7 @@ EOF;
 				$anonymize_ip_string = (isset($anonymize_ip) && $anonymize_ip) ? "{ 'anonymize_ip': true }" : "{ 'anonymize_ip': false }";
 				echo <<<EOF
 <!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=$id"></script>
+<script type="text/plain" class="optanon-category-C0004" async src="https://www.googletagmanager.com/gtag/js?id=$id"></script>
 <script>
     window.dataLayer = window.dataLayer || [];
     function gtag() {

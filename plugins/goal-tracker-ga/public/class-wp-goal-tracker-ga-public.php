@@ -198,7 +198,7 @@ class Wp_Goal_Tracker_Ga_Public {
         }
         $gtag_config = ( sizeof( $ga_config_options ) > 0 ? "," . wp_json_encode( $ga_config_options ) : "" );
         $trackerCode = '<!-- Global site tag (gtag.js) - Google Analytics -->
-		<script async src="https://www.googletagmanager.com/gtag/js?id=' . esc_html( $general_settings['measurementID'] ) . '"></script>
+		<script type="text/plain" class="optanon-category-C0004" async src="https://www.googletagmanager.com/gtag/js?id=' . esc_html( $general_settings['measurementID'] ) . '"></script>
 		<script>
 			window.dataLayer = window.dataLayer || [];
 			function gtag(){dataLayer.push(arguments);}

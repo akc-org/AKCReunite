@@ -8,4 +8,4 @@
 6. Disable Yoast and Yoast Premium
 
 ## Premium Plugins
-- Yoast Premium 
+- Yoast Premium

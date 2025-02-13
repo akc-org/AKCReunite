@@ -27,19 +27,19 @@ if (!defined('ABSPATH')) {
 // <script> objects that contain a key from this dictionary will be modified, i.e., the type will be set to text/plain and the value will be added as a class
 $dictionary = array(
     '<blank>' => 'optanon-category-C0001',
-    'googleapis' => 'optanon-category-C0004',
+    'googleapis' => 'optanon-category-C0002',
     'google' => 'optanon-category-C0002',
-    'gmap' => 'optanon-category-C0004',
-    'blueconic' => 'optanon-category-C0004',
-    'akc-ga' => 'optanon-category-C0004',
-    'facebook' => 'optanon-category-C0004',
-    'youtube' => 'optanon-category-C0004',
-    'vimeo' => 'optanon-category-C0004',
-    'mailchimp' => 'optanon-category-C0004',
-    'wp-goal-tracker' => 'optanon-category-C0004',
-    'wp-goal-tracker-ga-js-extra' => 'optanon-category-C0004',
-    'www-widgetapi-script' => 'optanon-category-C0004',
-    'bing' => 'optanon-category-C0004',
+    'gmap' => 'optanon-category-C0002',
+    'blueconic' => 'optanon-category-C0002',
+    'akc-ga' => 'optanon-category-C0002',
+    'facebook' => 'optanon-category-C0002',
+    'youtube' => 'optanon-category-C0002',
+    'vimeo' => 'optanon-category-C0002',
+    'mailchimp' => 'optanon-category-C0002',
+    'wp-goal-tracker' => 'optanon-category-C0002',
+    'wp-goal-tracker-ga-js-extra' => 'optanon-category-C0002',
+    'www-widgetapi-script' => 'optanon-category-C0002',
+    'bing' => 'optanon-category-C0002',
     // Add more keys and their corresponding classes as needed
 );
 

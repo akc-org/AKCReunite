@@ -187,6 +187,11 @@ if ( ! class_exists( 'Hustle_Modules_Common_Admin_Ajax' ) ) :
 		 * @since 4.0.0
 		 */
 		public function preview_module() {
+			check_ajax_referer( 'hustle-preview', 'nonce' );
+
+			if ( ! current_user_can( 'hustle_create' ) ) {
+				wp_send_json_error( __( 'You do not have permission to preview this module.', 'hustle' ) );
+			}
 
 			// TODO: check nonce.
 			Hustle_Renderer_Abstract::ajax_load_module();

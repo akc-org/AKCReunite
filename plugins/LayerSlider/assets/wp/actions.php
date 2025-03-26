@@ -263,6 +263,7 @@ add_action('init', function() {
 		add_action('wp_ajax_ls_get_taxonomies', 'ls_get_taxonomies');
 		add_action('wp_ajax_ls_upload_from_url', 'ls_upload_from_url');
 		add_action('wp_ajax_ls_store_opened', 'ls_store_opened');
+		add_action('wp_ajax_ls_addons_opened', 'ls_addons_opened');
 		add_action('wp_ajax_ls_create_slider_group', 'ls_create_slider_group');
 		add_action('wp_ajax_ls_add_slider_to_group', 'ls_add_slider_to_group');
 		add_action('wp_ajax_ls_rename_slider_group', 'ls_rename_slider_group');
@@ -276,14 +277,13 @@ add_action('init', function() {
 		add_action('wp_ajax_ls_download_object', 'ls_download_object');
 		add_action('wp_ajax_ls_assets_remote_download', 'ls_assets_remote_download');
 		add_action('wp_ajax_ls_assets_remote_search', 'ls_assets_remote_search');
-
-		add_action( 'wp_ajax_ls_get_popup_markup', 'ls_get_popup_markup' );
 	}
 
 	// ADMIN PUBLIC AJAX FUNCTIONS
 	add_action('wp_ajax_ls_slider_library_contents', 'ls_slider_library_contents');
 
-	// FRONT-END AJAX FUNCTIONS
+	// POPUP FUNCTIONS
+	add_action( 'wp_ajax_ls_get_popup_markup', 'ls_get_popup_markup' );
 	add_action( 'wp_ajax_nopriv_ls_get_popup_markup', 'ls_get_popup_markup' );
 });
 
@@ -446,7 +446,17 @@ function ls_delete_slider_group() {
 
 // Template store last viewed
 function ls_store_opened() {
-	update_user_meta(get_current_user_id(), 'ls-store-last-viewed', date('Y-m-d'));
+	update_user_meta( get_current_user_id(), 'ls-store-last-viewed', date('Y-m-d'));
+	exit;
+}
+
+function ls_addons_opened() {
+
+	if( ! wp_verify_nonce( $_GET['nonce'], 'ls-dashboard-nonce') ) {
+		die( json_encode( [ 'success' => false ] ) );
+	}
+
+	update_user_meta( get_current_user_id(), 'ls-addons-last-version', LS_ADDONS_VERSION );
 	exit;
 }
 
@@ -657,6 +667,7 @@ function ls_save_plugin_settings() {
 		// Troubleshooting
 		'clear_3rd_party_caches',
 		'admin_no_conflict_mode',
+		'fix_optimizer_issues',
 		'rocketscript_ignore',
 		'load_all_js_files',
 		'gsap_sandboxing',
@@ -670,6 +681,7 @@ function ls_save_plugin_settings() {
 		'enable_play_by_scroll',
 		'wpml_string_translation',
 		'wpml_media_translation',
+		'wpml_auto_cleanup',
 
 		// Project Defaults
 		'use_srcset',
@@ -913,8 +925,11 @@ function ls_save_slider() {
 	extract( ls_prepare_save_data( $data ) );
 
 	// WPML
-	if( has_action( 'wpml_register_single_string' ) && get_option('ls_wpml_string_translation', true ) ) {
-		layerslider_register_wpml_strings( $id, $data );
+	if( ls_should_use_string_translation() ) {
+
+		// Get published version
+		$published = LS_Sliders::find( $id );
+		layerslider_register_wpml_strings( $id, $data, $published['data'] );
 	}
 
 	// Save draft
@@ -951,7 +966,7 @@ function ls_publish_slider() {
 	extract( ls_prepare_save_data( $data ) );
 
 	// WPML
-	if( has_action( 'wpml_register_single_string' ) && get_option('ls_wpml_string_translation', true ) ) {
+	if( ls_should_use_string_translation() ) {
 		layerslider_register_wpml_strings( $id, $data );
 	}
 
@@ -1211,11 +1226,11 @@ function ls_import_online() {
 
 	$name 			= $_GET['name'];
 	$slider 		= urlencode( $_GET['slider'] );
-	$category 	= ! empty( $_GET['category'] ) ? urlencode( $_GET['category'] ) : '';
+	$category 		= ! empty( $_GET['category'] ) ? urlencode( $_GET['category'] ) : '';
 	$remoteURL 		= LS_REPO_BASE_URL.'sliders/download.php?slider='.$slider.'&collection='.$category;
-
-	$uploads 		= wp_upload_dir();
-	$downloadPath 	= $uploads['basedir'].'/lsimport.zip';
+	$fileName 		= sanitize_file_name( $slider );
+	$tmpFolder 		= LS_FileSystem::createUniqueTmpFolder( $fileName.'_zip' );
+	$downloadPath 	= $tmpFolder . '/'.$fileName.'.zip';
 
 	// Download package
 	$zip 			= $GLOBALS['LS_AutoUpdate']->sendApiRequest( $remoteURL );
@@ -1273,12 +1288,13 @@ function ls_import_online() {
 
 	// Load importUtil & import the slider
 	require_once LS_ROOT_PATH.'/classes/class.ls.importutil.php';
-	$import = new LS_ImportUtil( $downloadPath, null, $name );
+	$import = new LS_ImportUtil( $downloadPath, null, $name, true );
 	$id = $import->lastImportId;
 	$sliderCount = (int)$import->sliderCount;
 
 	// Remove package
-	unlink( $downloadPath );
+	LS_FileSystem::deleteDir( $tmpFolder );
+	LS_FileSystem::cleanupTmpFiles();
 
 	$url = admin_url('admin.php?page=layerslider&action=edit&id='.$id);
 
@@ -1761,39 +1777,96 @@ function layerslider_convert_urls($arr) {
 	return $arr;
 }
 
-
-function layerslider_register_wpml_strings( $sliderID, $data ) {
+function layerslider_register_wpml_strings( $sliderID, $data, $publishedData = null ) {
 
 	$currentLang = apply_filters( 'wpml_current_language', NULL );
+	$createdWith = ! empty( $data['properties']['createdWith'] ) ? $data['properties']['createdWith'] : null;
+	$importVersion = ! empty( $data['properties']['importVersion'] ) ? $data['properties']['importVersion'] : null;
+	$shouldUseStringPackages = ls_should_use_wpml_string_packages( $createdWith, $importVersion );
+	$shouldCleanup = ls_should_auto_cleanup_translation_strings();
+	$package = [
+		'kind'  	=> LS_WPML_SP_TITLE,
+		'kind_slug' => LS_WPML_SP_SLUG,
+		'name'  	=> "project-{$sliderID}",
+		'title' 	=> apply_filters('ls_slider_title', stripslashes( $data['properties']['title'] ), 40 ) . ' (#'.$sliderID.')',
+		'view_link' => admin_url('admin.php?page=layerslider&action=edit&id='.$sliderID),
+		'edit_link' => admin_url('admin.php?page=layerslider&action=edit&id='.$sliderID)
+	];
 
-	if(!empty($data['layers']) && is_array($data['layers'])) {
-		foreach($data['layers'] as $slideIndex => $slide) {
 
-			if(!empty($slide['sublayers']) && is_array($slide['sublayers'])) {
-				foreach($slide['sublayers'] as $layerIndex => $layer) {
+	if( $shouldUseStringPackages && $shouldCleanup ) {
+		do_action( 'wpml_start_string_package_registration', $package );
+	}
 
-					if( empty( $layer['html'] ) ) {
-						continue;
+	// First register strings from the published version in case of a draft
+	if( ! empty( $publishedData['layers'] ) && is_array( $publishedData['layers'] ) ) {
+		layerslider_do_register_wpml_strings( $publishedData, $sliderID, $currentLang, $createdWith, $shouldUseStringPackages, $package );
+	}
+
+	// Normal registration routine
+	if( ! empty( $data['layers'] ) && is_array( $data['layers'] ) ) {
+		layerslider_do_register_wpml_strings( $data, $sliderID, $currentLang, $createdWith, $shouldUseStringPackages, $package );
+	}
+
+	if( $shouldUseStringPackages && $shouldCleanup ) {
+		do_action( 'wpml_delete_unused_package_strings', $package );
+	}
+}
+
+function layerslider_do_register_wpml_strings( $data, $sliderID, $currentLang, $createdWith, $shouldUseStringPackages, $package ) {
+
+	foreach($data['layers'] as $slideIndex => $slide) {
+
+		if(!empty($slide['sublayers']) && is_array($slide['sublayers'])) {
+			foreach($slide['sublayers'] as $layerIndex => $layer) {
+
+				if( ! empty( $layer['media'] ) && $layer['media'] === 'img' ) {
+					continue;
+				}
+
+				// v7.14.2: WPML String Packages support for new projects
+				if( ! empty( $layer['uuid'] ) && $shouldUseStringPackages ) {
+
+					if( ! empty( $layer['html'] ) ) {
+						$stringName = ls_wpml_get_string_title( $layer['html'], $slideIndex, $slide, $layerIndex, $layer, 'html' );
+						do_action( 'wpml_register_string', $layer['html'], $layer['uuid'].'-html', $package, $stringName, 'LINE' );
 					}
 
-					if( ! empty( $layer['media'] ) && $layer['media'] === 'img' ) {
-						continue;
+					if( ! empty( $layer['affixBefore'] ) ) {
+						$stringName = ls_wpml_get_string_title( $layer['affixBefore'], $slideIndex, $slide, $layerIndex, $layer, 'affix-before' );
+						do_action( 'wpml_register_string', $layer['affixBefore'], $layer['uuid'].'-affix-before', $package, $stringName, 'LINE' );
 					}
 
-					// Check 'createdWith' property to decide which WPML implementation
-					// should we use. This property was added in v6.5.5 along with the
-					// new WPML implementation, so no version comparison required.
-					if( ! empty( $layer['uuid'] ) && ! empty( $data['properties']['createdWith'] ) ) {
-
-						$string_name = "slider-{$sliderID}-layer-{$layer['uuid']}-html";
-						do_action( 'wpml_register_single_string', 'LayerSlider Sliders', $string_name, $layer['html'], false, $currentLang );
-
-					// Old implementation
-					} else {
-
-						$string_name = '<'.$layer['type'].':'.substr(sha1($layer['html']), 0, 10).'> layer on slide #'.($slideIndex+1).' in slider #'.$sliderID.'';
-						do_action( 'wpml_register_single_string', 'LayerSlider WP', $string_name, $layer['html'], false, $currentLang );
+					if( ! empty( $layer['affixAfter'] ) ) {
+						$stringName = ls_wpml_get_string_title( $layer['affixAfter'], $slideIndex, $slide, $layerIndex, $layer, 'affix-after' );
+						do_action( 'wpml_register_string', $layer['affixAfter'], $layer['uuid'].'-affix-after', $package, $stringName, 'LINE' );
 					}
+
+
+				// Check 'createdWith' property to decide which WPML implementation
+				// should we use. This property was added in v6.5.5 along with the
+				// new WPML implementation, so no version comparison required.
+				} elseif( ! empty( $layer['uuid'] ) && ! empty( $data['properties']['createdWith'] ) ) {
+
+					$string_name = "slider-{$sliderID}-layer-{$layer['uuid']}";
+
+					if( ! empty( $layer['html'] ) ) {
+						do_action( 'wpml_register_single_string', 'LayerSlider Sliders', $string_name.'-html', $layer['html'], false, $currentLang );
+					}
+
+					if( ! empty( $layer['affixBefore'] ) ) {
+						do_action( 'wpml_register_single_string', 'LayerSlider Sliders', $string_name.'-affix-before', $layer['affixBefore'], false, $currentLang );
+					}
+
+					if( ! empty( $layer['affixAfter'] ) ) {
+						do_action( 'wpml_register_single_string', 'LayerSlider Sliders', $string_name.'-affix-after', $layer['affixAfter'], false, $currentLang );
+					}
+
+				// Old implementation
+				} elseif( ! empty( $layer['html'] ) ) {
+
+					$string_name = '<'.$layer['type'].':'.substr(sha1($layer['html']), 0, 10).'> layer on slide #'.($slideIndex+1).' in slider #'.$sliderID.'';
+					do_action( 'wpml_register_single_string', 'LayerSlider WP', $string_name, $layer['html'], false, $currentLang );
 				}
 			}
 		}

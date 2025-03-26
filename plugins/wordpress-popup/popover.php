@@ -10,14 +10,14 @@
  * Plugin Name: Hustle
  * Plugin URI: https://wordpress.org/plugins/wordpress-popup/
  * Description: Start collecting email addresses and quickly grow your mailing list with big bold pop-ups, slide-ins, widgets, or in post opt-in forms.
- * Version: 7.8.5
+ * Version: 7.8.6
  * Author: WPMU DEV
  * Author URI: https://wpmudev.com
- * Tested up to: 6.6
+ * Tested up to: 6.7
  * Requires at least: 6.4
  * Requires PHP: 7.4
  * Text Domain: hustle
- * 
+ *
  */
 
 // +----------------------------------------------------------------------+
@@ -137,7 +137,7 @@ if ( ! class_exists( 'Opt_In' ) ) {
 	 */
 	class Opt_In {
 
-		const VERSION = '7.8.5';
+		const VERSION = '7.8.6';
 
 		const VIEWS_FOLDER = 'views';
 
@@ -202,7 +202,7 @@ if ( ! class_exists( 'Opt_In' ) ) {
 			self::$vendor_path      = self::$plugin_path . 'vendor/';
 			self::$template_path    = trailingslashit( dirname( __FILE__ ) ) . 'views/';
 
-			$this->load_text_domain();
+			add_action( 'after_setup_theme', array( $this, 'load_text_domain' ) );
 
 			// check caps.
 			add_action( 'admin_init', array( $this, 'hustle_check_caps' ), 999 );

@@ -16,7 +16,7 @@
  * Plugin Name:       Goal Tracker
  * Plugin URI:        https://www.wpgoaltracker.com/goal-tracker-ga
  * Description:       Custom Event Tracking for Google Analytics GA4
- * Version:           1.1.4
+ * Version:           1.1.6
  * Author:            pinewise
  * Author URI:        https://www.wpgoaltracker.com
  * License:           GPL-2.0+
@@ -80,8 +80,8 @@ gtg_fs()->add_filter( 'plugin_icon', 'gtg_fs_custom_icon' );
  */
 define( 'WP_CUSTOM_EVENTS_TRACKER_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WP_CUSTOM_EVENTS_TRACKER_URL', plugin_dir_url( __FILE__ ) );
-define( 'WP_CUSTOM_EVENTS_TRACKER_VERSION', '1.1.4' );
-define( 'WP_CUSTOM_EVENTS_TRACKER_DB_VERSION', '1.1.4' );
+define( 'WP_CUSTOM_EVENTS_TRACKER_VERSION', '1.1.6' );
+define( 'WP_CUSTOM_EVENTS_TRACKER_DB_VERSION', '1.1.6' );
 /**
  * The code that runs during plugin activation.
  * This action is documented in includes/class-wp-goal-tracker-ga-activator.php

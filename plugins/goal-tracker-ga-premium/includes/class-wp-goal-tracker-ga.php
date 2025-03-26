@@ -323,7 +323,7 @@ class Wp_Goal_Tracker_Ga
 
             # it is the first DB convert from version 1.0.0 to 1.0.2
 
-            $options[ "db_version" ] = "1.1.4"; # set the db_version param for the first time
+            $options[ "db_version" ] = "1.1.6"; # set the db_version param for the first time
 
             # move general settings parameters from the options root to a "general_settings" array.
             $general_settings = array();

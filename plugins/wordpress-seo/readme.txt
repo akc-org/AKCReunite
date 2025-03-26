@@ -5,7 +5,7 @@ License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl.html
 Tags: SEO, XML sitemap, Content analysis, Readability, Schema
 Tested up to: 6.7
-Stable tag: 24.2
+Stable tag: 24.7
 Requires PHP: 7.2.5
 
 Improve your WordPress SEO: Write better content and have a fully optimized WordPress site using the Yoast SEO plugin.
@@ -274,46 +274,43 @@ Your question has most likely been answered on our help center: [yoast.com/help/
 
 == Changelog ==
 
-= 24.2 =
+= 24.7 =
 
-Release date: 2025-01-07
+Release date: 2025-03-18
 
-Yoast SEO 24.2 brings more enhancements and bugfixes. [Find more information about our software releases and updates here](https://yoa.st/release-7-1-25).
-
-#### Enhancements
-
-* Improves the tooltips accessibility in the related keyphrase suggestions modal.
-
-#### Bugfixes
-
-* Fixes a bug where a deprecation message would appear in PHP 8+ when saving a post containing images with invalid sources. Props to [kkmuffme](https://github.com/kkmuffme).
-* Fixes a bug where a TypeError would occur when checking for capabilities of SEO Manager user role when the roles were not passed as an array. Props to [kfeinUI](https://github.com/kfeinUI).
-* Fixes a bug where styles on buttons, intent badge and modal links would not adjust the direction when on RTL view.
-
-#### Other
-
-* Changes the title text on the Yoast installation success page.
-* Fixes a console warning about ReactDOM.render being no longer supported in React 18.
-
-= 24.1 =
-
-Release date: 2024-12-18
-
-Yoast SEO 24.1 adds the Yoast SEO Dashboard to monitor your site's SEO performance in one overview. Find more about Yoast SEO 24.1 in [our release post](https://yoa.st/release-18-12-24)!
+Yoast SEO 24.7 brings more enhancements and bugfixes. [Find more information about our software releases and updates here](https://yoa.st/releases).
 
 #### Enhancements
 
-* Introduces the Yoast Dashboard, a place where site administrators can check the SEO and Readability performance of the site's posts.
-* Adds `Not analyzed` as an option in the readability filter in the posts page.
-* Enhances the existing `Needs improvement` option in the readability filter in the posts page, to include posts that don't have enough content as well.
+* Improves the accuracy of assessments measuring character count for Japanese texts by removing common punctuation from the count.
 
 #### Bugfixes
 
-* Fixes a bug where posts that have been set to explicitly not be noindexed and had no keyword set would not appear in the relevant SEO filter in the posts page.
+* Fixes a bug where the help beacon would be displayed over table pagination on the bulk editor page.
 
 #### Other
 
-* Improves the translatability of feedback for the _paragraph length_ and the _sentence length_ assessments.
+* Improves the feedback strings of the _subheading distribution_ assessment for better translatability.
+* Removes extra span tags in the Post/Page overview. Props to [dilipbheda](https://github.com/dilipbheda).
+
+= 24.6 =
+
+Release date: 2025-03-04
+
+Yoast SEO 24.6 brings more enhancements and bugfixes. [Find more information about our software releases and updates here](https://yoa.st/releases).
+
+#### Enhancements
+
+* Provides support for the Optimized Markup feature in Elementor.
+* Removes the breadcrumbs from the Search snippet preview in Mobile mode.
+
+#### Bugfixes
+
+* Fixes a bug where invalid inner blocks would be removed when saving a post in the block editor.
+
+#### Other
+
+* Sets the minimum supported WordPress version to 6.6.
 
 = Earlier versions =
 For the changelog of earlier versions, please refer to [the changelog on yoast.com](https://yoa.st/yoast-seo-changelog).

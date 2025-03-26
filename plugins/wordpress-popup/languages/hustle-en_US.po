@@ -1,12 +1,12 @@
-# Copyright (C) 2024 Hustle 7.8.5
-# This file is distributed under the same license as the Hustle 7.8.5 package.
+# Copyright (C) 2024 Hustle 7.8.6
+# This file is distributed under the same license as the Hustle 7.8.6 package.
 msgid ""
 msgstr ""
-"Project-Id-Version: Hustle 7.8.5\n"
+"Project-Id-Version: Hustle 7.8.6\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-08-05 06:46+0000\n"
+"POT-Creation-Date: 2024-11-25 11:01+0000\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
 "X-Poedit-SearchPath-0: .\n"
@@ -224,15 +224,15 @@ msgstr ""
 msgid "Module successfully imported."
 msgstr ""
 
-#: inc/class-hustle-module-page-abstract.php:609, inc/hustle-modules-common-admin-ajax.php:347
+#: inc/class-hustle-module-page-abstract.php:609, inc/hustle-modules-common-admin-ajax.php:352
 msgid "Module successfully duplicated."
 msgstr ""
 
-#: inc/class-hustle-module-page-abstract.php:610, inc/hustle-modules-common-admin-ajax.php:638
+#: inc/class-hustle-module-page-abstract.php:610, inc/hustle-modules-common-admin-ajax.php:643
 msgid "Module's tracking data successfully reset."
 msgstr ""
 
-#: inc/class-hustle-module-page-abstract.php:611, inc/hustle-modules-common-admin-ajax.php:673
+#: inc/class-hustle-module-page-abstract.php:611, inc/hustle-modules-common-admin-ajax.php:678
 msgid "Module's Email List successfully purged."
 msgstr ""
 
@@ -1079,92 +1079,96 @@ msgid "Something went wrong while creating your pop-up. Please try again."
 msgstr ""
 
 #: inc/hustle-modules-common-admin-ajax.php:193
+msgid "You do not have permission to preview this module."
+msgstr ""
+
+#: inc/hustle-modules-common-admin-ajax.php:198
 msgid "Invalid module type"
 msgstr ""
 
-#: inc/hustle-modules-common-admin-ajax.php:232
+#: inc/hustle-modules-common-admin-ajax.php:237
 msgid "Invalid module."
 msgstr ""
 
-#: inc/hustle-modules-common-admin-ajax.php:267
+#: inc/hustle-modules-common-admin-ajax.php:272
 msgid "Invalid action."
 msgstr ""
 
-#: inc/hustle-modules-common-admin-ajax.php:271
+#: inc/hustle-modules-common-admin-ajax.php:276
 msgid "You don't have enough permission to do this."
 msgstr ""
 
-#: inc/hustle-modules-common-admin-ajax.php:305
+#: inc/hustle-modules-common-admin-ajax.php:310
 msgid "Module published successfully"
 msgstr ""
 
-#: inc/hustle-modules-common-admin-ajax.php:302
+#: inc/hustle-modules-common-admin-ajax.php:307
 msgid "Module unpublished"
 msgstr ""
 
-#: inc/hustle-modules-common-admin-ajax.php:376
+#: inc/hustle-modules-common-admin-ajax.php:381
 msgid "The module's type is not valid."
 msgstr ""
 
 #. translators: error message
-#: inc/hustle-modules-common-admin-ajax.php:402
+#: inc/hustle-modules-common-admin-ajax.php:407
 msgid "Error: %s"
 msgstr ""
 
-#: inc/hustle-modules-common-admin-ajax.php:398
+#: inc/hustle-modules-common-admin-ajax.php:403
 msgid "The file is required"
 msgstr ""
 
-#: inc/hustle-modules-common-admin-ajax.php:413
+#: inc/hustle-modules-common-admin-ajax.php:418
 msgid "The file could not be uploaded.check your upload folder permissions."
 msgstr ""
 
-#: inc/hustle-modules-common-admin-ajax.php:416
+#: inc/hustle-modules-common-admin-ajax.php:421
 msgid "The file can't be empty"
 msgstr ""
 
-#: inc/hustle-modules-common-admin-ajax.php:428
+#: inc/hustle-modules-common-admin-ajax.php:433
 msgid "The file must be a JSON string."
 msgstr ""
 
-#: inc/hustle-modules-common-admin-ajax.php:433
+#: inc/hustle-modules-common-admin-ajax.php:438
 msgid "The file is either invalid or doesn't have any configurations. Please check your file or upload another file."
 msgstr ""
 
-#: inc/hustle-modules-common-admin-ajax.php:444
+#: inc/hustle-modules-common-admin-ajax.php:449
 msgid "You can't import Social Sharing modules into other module types."
 msgstr ""
 
-#: inc/hustle-modules-common-admin-ajax.php:440
+#: inc/hustle-modules-common-admin-ajax.php:445
 msgid "You can't import modules of other than \"Social Sharing\" type into Social Sharing modules."
 msgstr ""
 
 #. translators: module name
-#: inc/hustle-modules-common-admin-ajax.php:598
+#: inc/hustle-modules-common-admin-ajax.php:603
 msgid "Tracking updated on %s"
 msgstr ""
 
-#: inc/hustle-modules-common-admin-ajax.php:583
+#: inc/hustle-modules-common-admin-ajax.php:588
 msgid "Tracking is disabled on %s"
 msgstr ""
 
-#: inc/hustle-modules-common-admin-ajax.php:584
+#: inc/hustle-modules-common-admin-ajax.php:589
 msgid "Tracking is enabled on %s"
 msgstr ""
 
-#: inc/hustle-modules-common-admin-ajax.php:706
+#: inc/hustle-modules-common-admin-ajax.php:711
 msgid "Please select the settings to import."
 msgstr ""
 
-#: inc/hustle-modules-common-admin-ajax.php:740
+#: inc/hustle-modules-common-admin-ajax.php:745
 msgid "Access denied. You do not have permission to perform this action."
 msgstr ""
 
-#: inc/hustle-modules-common-admin-ajax.php:827
+#: inc/hustle-modules-common-admin-ajax.php:832
 msgid "Creating a new module went wrong"
 msgstr ""
 
-#: inc/hustle-modules-common-admin-ajax.php:839, inc/hustle-modules-common-admin-ajax.php:907
+#: inc/hustle-modules-common-admin-ajax.php:844, inc/hustle-modules-common-admin-ajax.php:912
 msgid "Failed"
 msgstr ""
 
@@ -2740,7 +2744,7 @@ msgid "%s failure notice."
 msgstr ""
 
 #. translators: Plugin name
-#: inc/front/class-hustle-module-preview.php:131
+#: inc/front/class-hustle-module-preview.php:132
 msgid "%s Preview"
 msgstr ""
 
@@ -2748,51 +2752,59 @@ msgstr ""
 msgid "Invalid module ID!"
 msgstr ""
 
-#: inc/front/hustle-module-front-ajax.php:114, inc/front/hustle-module-front-ajax.php:1042, inc/front/hustle-module-front-ajax.php:1085, inc/provider/class-hustle-provider-admin-ajax.php:488, inc/provider/class-hustle-provider-admin-ajax.php:556
+#: inc/front/hustle-module-front-ajax.php:114, inc/front/hustle-module-front-ajax.php:1051, inc/front/hustle-module-front-ajax.php:1094, inc/provider/class-hustle-provider-admin-ajax.php:488, inc/provider/class-hustle-provider-admin-ajax.php:556
 msgid "Invalid module!"
 msgstr ""
 
-#: inc/front/hustle-module-front-ajax.php:295
+#: inc/front/hustle-module-front-ajax.php:262
+msgid "Invalid module"
+msgstr ""
+
+#: inc/front/hustle-module-front-ajax.php:266
+msgid "Module is not active"
+msgstr ""
+
+#: inc/front/hustle-module-front-ajax.php:304
 msgid "Error saving form"
 msgstr ""
 
-#: inc/front/hustle-module-front-ajax.php:558
+#: inc/front/hustle-module-front-ajax.php:567
 msgid "reCAPTCHA must be verified to submit the form."
 msgstr ""
 
-#: inc/front/hustle-module-front-ajax.php:586
+#: inc/front/hustle-module-front-ajax.php:595
 msgid "reCAPTCHA validation failed. Please try again."
 msgstr ""
 
-#: inc/front/hustle-module-front-ajax.php:596
+#: inc/front/hustle-module-front-ajax.php:605
 msgid "reCAPTCHA validation failed. The score is too low."
 msgstr ""
 
-#: inc/front/hustle-module-front-ajax.php:825, inc/providers/constantcontact/hustle-constantcontact-form-hooks.php:76, inc/providers/mailchimp/hustle-mailchimp-api.php:395, inc/providers/mailchimp/hustle-mailchimp-form-hooks.php:201, inc/providers/mailerlite/hustle-mailerlite-form-hooks.php:161, inc/providers/sendy/hustle-sendy.php:168
+#: inc/front/hustle-module-front-ajax.php:834, inc/providers/constantcontact/hustle-constantcontact-form-hooks.php:76, inc/providers/mailchimp/hustle-mailchimp-api.php:395, inc/providers/mailchimp/hustle-mailchimp-form-hooks.php:201, inc/providers/mailerlite/hustle-mailerlite-form-hooks.php:161, inc/providers/sendy/hustle-sendy.php:168
 msgid "Something went wrong."
 msgstr ""
 
-#: inc/front/hustle-module-front-ajax.php:1015
+#: inc/front/hustle-module-front-ajax.php:1024
 msgid "K"
 msgstr ""
 
-#: inc/front/hustle-module-front-ajax.php:1016
+#: inc/front/hustle-module-front-ajax.php:1025
 msgid "M"
 msgstr ""
 
-#: inc/front/hustle-module-front-ajax.php:1037
+#: inc/front/hustle-module-front-ajax.php:1046
 msgid "Invalid Request!"
 msgstr ""
 
-#: inc/front/hustle-module-front-ajax.php:1060, inc/front/hustle-module-front-ajax.php:1104
+#: inc/front/hustle-module-front-ajax.php:1069, inc/front/hustle-module-front-ajax.php:1113
 msgid "Stats Successfully saved"
 msgstr ""
 
-#: inc/front/hustle-module-front-ajax.php:1058, inc/front/hustle-module-front-ajax.php:1102
+#: inc/front/hustle-module-front-ajax.php:1067, inc/front/hustle-module-front-ajax.php:1111
 msgid "Error saving stats"
 msgstr ""
 
-#: inc/front/hustle-module-front-ajax.php:1080
+#: inc/front/hustle-module-front-ajax.php:1089
 msgid "Invalid Request: Module id invalid"
 msgstr ""
 

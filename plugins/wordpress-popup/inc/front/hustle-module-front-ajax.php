@@ -256,6 +256,15 @@ class Hustle_Module_Front_Ajax {
 			return;
 		}
 		$module_id = sanitize_text_field( wp_unslash( $_POST['data']['module_id'] ) );// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$module    = new Hustle_Module_Model( $module_id );
+
+		if ( is_wp_error( $module ) || ! $module instanceof Hustle_Module_Model || ! property_exists( $module, 'active' ) ) {
+			wp_send_json_error( __( 'Invalid module', 'hustle' ) );
+		}
+
+		if ( ! $module->active ) {
+			wp_send_json_error( __( 'Module is not active', 'hustle' ) );
+		}
 
 		// Action called before full form submit.
 		do_action( 'hustle_form_before_handle_submit', $module_id );

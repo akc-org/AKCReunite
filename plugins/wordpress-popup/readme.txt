@@ -1,14 +1,14 @@
 === Hustle - Email Marketing, Lead Generation, Optins, Popups ===
 Plugin Name: Hustle - Email Marketing, Lead Generation, Opt-ins, Popups
-Version: 7.8.5
+Version: 7.8.6
 Author: WPMU DEV
 Author URI: https://wpmudev.com/
 Contributors: WPMUDEV
 Tags: marketing, popup, optin, newsletter, subscription form, email, advertise, signup, mailing list, wordpress popup plugin, popup maker, pop-up, opt-in
 Requires at least: 6.4
-Tested up to: 6.6
+Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 7.8.5
+Stable tag: 7.8.6
 
 Setup email optin forms, popups, newsletter forms & subscription forms to generate email leads with the best marketing popup builder
 
@@ -21,7 +21,7 @@ Hustle lets you easily grow your mailing list or display targeted ads across you
 
 **Access unlimited pop-ups, slide-ins, and social shares from the start with [Hustle Pro](https://wpmudev.com/project/hustle/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=hustle-readme-above-the-fold&utm_content=hustle_pro).**
 
-Level up immediately with unlimited campaign creation + access to the full suite of WPMU DEV performance and marketing plugins. [Learn more about Pro](https://wpmudev.com/project/hustle/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=hustle-readme-above-the-fold&utm_content=learn_more). 
+Level up immediately with unlimited campaign creation + access to the full suite of WPMU DEV performance and marketing plugins. [Learn more about Pro](https://wpmudev.com/project/hustle/?utm_source=wordpress.org&utm_medium=readme&utm_campaign=hustle-readme-above-the-fold&utm_content=learn_more).
 
 [youtube https://www.youtube.com/watch?v=oKgRSUdjcNg&feature=youtu.be]
 
@@ -189,9 +189,15 @@ We take plugin security incredibly seriously; if you have a bug or vulnerability
 
 == Changelog ==
 
+= 7.8.6 ( 2024-11-25 )
+
+- Fix: Notice for _load_textdomain_just_in_time called incorrectly
+- Fix: Security hardening
+
 = 7.8.5 ( 2024-08-05 )
 
 - Fix: XSS Security vulnerability
+
 
 = 7.8.4 ( 2024-03-07 ) =
 
@@ -207,7 +213,7 @@ We take plugin security incredibly seriously; if you have a bug or vulnerability
  - Fix: Size of summary box logo
 
 
-= 7.8.2 ( 2023-10-03 ) =
+= 10.8.2 ( 2023-10-03 ) =
 
  - Fix: ConstantContact authentification.
  - Fix: Cannot edit or add hyperlink
@@ -219,14 +225,14 @@ We take plugin security incredibly seriously; if you have a bug or vulnerability
  - Enhance: Remove mascot images
 
 
-= 7.8.1 ( 2023-08-24 ) =
+= 10.8.1 ( 2023-08-24 ) =
 
 - Enhance: Set up a redirect URL for Hubspot
 - Fix: Issues with Hustle ActiveCampaign integration
 - Fix: Bullet Points are not showing on the success message
 
 
-= 7.8.0 ( 2023-06-27 ) =
+= 10.8.0 ( 2023-06-27 ) =
 
 - Enhance: Require PHP 7.4 as the minimum supported version
 - Enhance: Prevent XSS vulnerability in translations
@@ -237,23 +243,9 @@ We take plugin security incredibly seriously; if you have a bug or vulnerability
 - Fix: Issue with Close button on iOS
 
 
-= 7.7.1 ( 2023-06-07 ) =
+= 10.7.1 ( 2023-06-07 ) =
 
 - Enhance: Performance improvements.
-
-
-= 7.7.0 ( 2023-04-10 ) =
-
-- New: Ability to display modules N times per day/week/month/year
-- New: Make whole module a clickable CTA
-- Enhance: White Labeling plugin name
-- Enhance: Module accessibility
-- Enhance: Conditional visibility for modules with CTA when 2 buttons are used
-- Enhance: Allow customizing Close Button size
-- Enhance: Compatibility with PHP 8.2
-- Fix: W3C issue with style sheets
-- Fix: Compatibility issue with ACF Pro plugin
-- Fix: Divi theme issue - Triggering module using link ID does not work
 
 [Changelog for previous versions](https://wpmudev.com/project/hustle/#view-changelog).
 

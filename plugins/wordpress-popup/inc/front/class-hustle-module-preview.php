@@ -59,6 +59,7 @@ class Hustle_Module_Preview {
 
 		$vars = array(
 			'ajaxurl'         => admin_url( 'admin-ajax.php', is_ssl() ? 'https' : 'http' ),
+			'nonce'           => wp_create_nonce( 'hustle-preview' ),
 			'days_and_months' => array(
 				'days_full'    => Hustle_Time_Helper::get_week_days(),
 				'days_short'   => Hustle_Time_Helper::get_week_days( 'short' ),

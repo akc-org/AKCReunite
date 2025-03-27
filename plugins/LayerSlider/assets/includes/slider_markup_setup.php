@@ -66,7 +66,7 @@ if(isset($slides['properties']['autoPauseSlideshow'])) {
 // Get global background image by attachment ID (if any)
 if( ! empty( $slides['properties']['props']['globalBGImageId'] ) ) {
 
-	if( has_filter('wpml_object_id') && get_option('ls_wpml_media_translation', true ) ) {
+	if( ls_should_use_media_translation() ) {
 		$slides['properties']['props']['globalBGImageId'] = apply_filters('wpml_object_id', $slides['properties']['props']['globalBGImageId'], 'attachment', true );
 	}
 
@@ -121,6 +121,7 @@ if(isset($slides['layers']) && is_array($slides['layers'])) {
 		}
 
 		$slider['slides'][$slidekey] = apply_filters('ls_parse_defaults', $lsDefaults['slides'], $slide['properties']);
+		$slider['slides'][$slidekey]['countdowns'] = ! empty( $slide['countdowns'] ) ? $slide['countdowns'] : [];
 
 		if(isset($slide['sublayers']) && is_array($slide['sublayers'])) {
 

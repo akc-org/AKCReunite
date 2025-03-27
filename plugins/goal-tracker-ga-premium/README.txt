@@ -1,10 +1,10 @@
-=== Goal Tracker - Custom Event Tracking for GA4 ===
-Contributors:    yuvalo, asafo
+n=== Goal Tracker - Custom Event Tracking for GA4 ===
+Contributors: yuvalo, asafo, freemius
 Donate link: https://www.wpgoaltracker.com
 Tags: analytics, events, wordpress, ga4
 Requires at least: 5.5
-Tested up to: 6.5.2
-Stable tag: 1.1.4
+Tested up to: 6.7.1
+Stable tag: 1.1.6
 Requires PHP: 5.6.20
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -75,7 +75,16 @@ If you have any questions or suggestions or need help setting up the plugin, you
 1. Upload the plugin files to the `/wp-content/plugins/wp-goal-tracker-ga` directory, or install the plugin through the WordPress plugins screen directly.
 2. Activate the plugin through the 'Plugins' screen in WordPress
 
- == Changelog ==
+== Changelog ==
+
+= 1.1.5 - 2025-02-09 =
+Security updates
+
+
+1. Package Updates
+= 1.1.5 - 2024-10-31 =
+1. Package Updates
+
 = 1.1.4 - 2024-05-02 =
 1. Updating third party libraries
 

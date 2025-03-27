@@ -2,7 +2,7 @@
 /*
 	* Style settings of LayerSlider
 	*
-	* (c) 2011-2024 George Krupa, John Gera & Kreatura Media
+	* (c) 2011-2025 George Krupa, John Gera & Kreatura Media
 	*
 	* LayerSlider home:		https://layerslider.com/
 	* Licensing:			https://layerslider.com/licensing/
@@ -393,6 +393,13 @@
 		font-size: var( --ls-affix-fs, 1em );
 		font-family: var( --ls-affix-ff, inherit );
 		font-weight: var( --ls-affix-fw, inherit );
+	}
+
+	.ls-l[data-prefix]:before,
+	.ls-layer[data-prefix]:before,
+	.ls-l[data-suffix]:after,
+	.ls-layer[data-suffix]:after {
+		display: var( --ls-affix-nl, inline-block );
 	}
 
 	.ls-l[data-prefix].ls-affix-float:before,

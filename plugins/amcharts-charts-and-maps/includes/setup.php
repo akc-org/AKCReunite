@@ -13,10 +13,7 @@ function amcharts_register_cpt() {
   
   // Determine capability_type for the CPT
   $settings = get_option( 'amcharts_options', array() );
-  $capability_type = $settings[ 'capability_type' ];
-  if ( empty($capability_type) ) {
-    $capability_type = 'page';
-  }
+  $capability_type = isset( $settings[ 'capability_type' ] ) ? $settings[ 'capability_type' ] : 'page';
   
   $labels = array( 
     'name'                => __( 'Charts &amp; Maps', 'amcharts' ),
@@ -287,7 +284,7 @@ function amcharts_wp_footer () {
 add_filter( 'template_include', 'amcharts_preview_template', 99 );
 function amcharts_preview_template( $template ) {
   
-  if ( isset( $_GET['amcharts_preview'] ) )
+  if ( isset( $_GET['amcharts_preview'] ) && wp_verify_nonce( $_GET['nonce'], AMCHARTS_NONCE ))
     $template = AMCHARTS_DIR . '/includes/preview.php';
 
   return $template;

@@ -47,6 +47,7 @@ class AWB_Maintenance_Mode {
 	 * @return void
 	 */
 	private function __construct() {
+		add_action( 'admin_bar_menu', [ $this, 'site_mode_badge' ], 32 );
 
 		if ( '' !== Avada()->settings->get( 'maintenance_mode' ) ) {
 			add_action( ( is_admin() ? 'init' : 'template_redirect' ), [ $this, 'init' ] );
@@ -55,6 +56,54 @@ class AWB_Maintenance_Mode {
 			add_action( 'wp', [ $this, 'change_post_id' ] );
 		}
 	}
+
+	/**
+	 * Add site mode badge to WP admin bar.
+	 *
+	 * @since 7.11.11
+	 * @access public
+	 * @param WP_Admin_Bar $wp_admin_bar The WP_Admin_Bar instance.
+	 * @return void
+	 */
+	public function site_mode_badge( $wp_admin_bar ) {
+		$labels = [
+			'coming_soon'           => __( 'Coming Soon', 'Avada' ),
+			'maintenance'           => __( 'Maintenance', 'Avada' ),
+			'live'                  => __( 'Live', 'Avada' ),
+			'woo_store_coming_soon' => __( 'Woo: Store Coming Soon', 'Avada' ),
+			'woo_coming_soon'       => __( 'Woo: Coming Soon', 'Avada' ),
+		];
+
+		$key   = Avada()->settings->get( 'maintenance_mode' ) ? Avada()->settings->get( 'maintenance_mode' ) : 'live';
+		$link  = admin_url( 'themes.php?page=avada_options#heading_maintenance' );
+		$class = 'awb-site-mode-badge-avada ';
+
+		if ( class_exists( 'Woocommerce' ) ) {
+			$wp_admin_bar->remove_node( 'woocommerce-site-visibility-badge' );
+
+			if ( 'live' === $key && 'yes' === get_option( 'woocommerce_coming_soon' ) ) {
+				if ( 'yes' === get_option( 'woocommerce_store_pages_only' ) ) {
+					$key = 'woo_store_coming_soon';
+				} else {
+					$key = 'woo_coming_soon';
+				}
+
+				$link  = admin_url( 'admin.php?page=wc-settings&tab=site-visibility' );
+				$class = '';
+			}
+		}
+
+		$args = [
+			'id'    => 'awb-site-mode',
+			'title' => apply_filters( 'awb_site_mode_title', $labels[ $key ] ),
+			'href'  => $link,
+			'meta'  => [
+				'class' => $class . 'awb-site-mode-badge-' . str_replace( [ 'woo_', 'woo_store', '_' ], [ '', '', '-' ], $key ),
+			],
+		];
+		$wp_admin_bar->add_node( $args );
+	}
+
 
 	/**
 	 * Creates or returns an instance of this class.
@@ -106,9 +155,7 @@ class AWB_Maintenance_Mode {
 			add_action( 'awb_maintenance_footer', [ $this, 'add_footer' ] );
 
 			ob_start();
-			header( 'Content-type: text/html; charset=' . $charset );
-			header( 'Cache-Control: no-cache' );
-			header( 'Pragma: no-cache' );
+			nocache_headers();
 
 			if ( 'maintenance' === Avada()->settings->get( 'maintenance_mode' ) ) {
 				header( $protocol . ' ' . $status_code . ' Service Unavailable', true, $status_code );
@@ -230,12 +277,13 @@ class AWB_Maintenance_Mode {
 				$css .= sanitize_textarea_field( $saved_custom_css );
 			}
 		} else {
-			$css .= '.awb-maintenance-page #main { padding: 0; background: none; overflow: visible; }';
+			$css .= '.awb-maintenance-page #wrapper { background: none; }';
+			$css .= '.awb-maintenance-page #main { margin-top: -15vh; padding: 0; background: none; overflow: visible; }';
 			$css .= '.awb-maintenance-page { display: flex; align-items: center; justify-content: center; overflow-y: hidden; margin: 0; height: 100vh; }';
-			$css .= '.awb-maintenance-content .post-content { display: flex; flex-flow: column; align-items: center; margin-top: -15vh; margin-bottom: 0; }';
+			$css .= '.awb-maintenance-content .post-content { display: flex; flex-flow: column; align-items: center; margin-bottom: 0; }';
 			$css .= '.ua-safari-13 .awb-maintenance-content .post-content, .ua-safari-14 .awb-maintenance-content .post-content, .ua-safari-15 .awb-maintenance-content .post-content { margin-top: 0; }';
 			$css .= '.awb-maintenance-site-name { font-size: 1.5em; }';
-			$css .= '.awb-maintenance-heading { margin: 0.25em 0 0 0; font-size: 3em; }';
+			$css .= '.awb-maintenance-heading { margin: 0.25em 0 0 0; font-size: 3em; text-align: center; }';
 		}
 
 		$css = apply_filters( 'awb_maintenance_css', $css );
@@ -411,7 +459,7 @@ class AWB_Maintenance_Mode {
 			foreach ( $excluded as $slug ) {
 				$slug = trim( $slug );
 
-				if ( ! empty( $slug ) && ( $current_url === $slug || strstr( $current_url, $slug ) ) ) {
+				if ( ! empty( $slug ) && ( trailingslashit( $current_url ) === trailingslashit( $slug ) || ( $slug !== get_site_url() && strstr( $current_url, $slug ) ) ) ) {
 					return true;
 				}
 			}

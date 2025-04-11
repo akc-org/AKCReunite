@@ -80,6 +80,12 @@ class Avada_Page_Options {
 		if ( isset( $_GET['force-migrate-po'] ) && $_GET['force-migrate-po'] ) { // phpcs:ignore WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput
 			add_action( 'wp', [ $this, 'trigger_migration' ] );
 		}
+
+		// Add code field filters.
+		add_filter( 'fusion_google_analytics', [ $this, 'add_po_tracking_code' ], 15 );
+		add_filter( 'avada_space_head', [ $this, 'add_po_space_head_close' ], 15 );
+		add_filter( 'awb_space_body_open', [ $this, 'add_po_space_body_open' ], 15 );
+		add_filter( 'awb_space_body_close', [ $this, 'add_po_space_body_close' ], 15 );
 	}
 
 	/**
@@ -111,38 +117,61 @@ class Avada_Page_Options {
 		if ( isset( $req['search'] ) ) {
 			$search = trim( sanitize_text_field( wp_unslash( $req['search'] ) ) );
 
-			// Terms search.
-			if ( isset( $params['taxonomy'] ) ) {
-				$terms = get_terms(
-					[
-						'taxonomy'   => $params['taxonomy'],
-						'hide_empty' => false,
-						'name__like' => $search,
-					]
-				);
-				foreach ( $terms as $term ) {
-					$return_data['results'][] = [
-						'id'   => $use_slugs ? urldecode( $term->slug ) : $term->term_id,
-						'text' => $term->name,
-					];
-				}
-			}
+			// Search for all terms of all taxonomies.
+			if ( isset( $params['all_terms'] ) ) {
+				$taxonomies = get_taxonomies( [ 'public' => true ], 'objects' );
 
-			// Post types search.
-			if ( isset( $params['post_type'] ) ) {
-				$args           = [
-					's'         => $search, // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
-					'post_type' => $params['post_type']['name'],
-				];
-				$search_results = fusion_cached_query( $args );
-				if ( $search_results->have_posts() ) {
-					global $post;
-					while ( $search_results->have_posts() ) {
-						$search_results->the_post();
+				foreach ( $taxonomies  as $taxonomy ) {
+					$terms = get_terms(
+						[
+							'taxonomy'   => $taxonomy->name,
+							'hide_empty' => false,
+							'name__like' => $search,
+						]
+					);
+
+					foreach ( $terms as $term ) {
 						$return_data['results'][] = [
-							'id'   => esc_attr( $post->ID ),
-							'text' => esc_html( get_the_title( $post->ID ) ),
+							'id'   => $use_slugs ? urldecode( $taxonomy->name ) . '|' . urldecode( $term->slug ) : urldecode( $taxonomy->name ) . '|' . $term->term_id,
+							'text' => $taxonomy->labels->name . ': ' . $term->name,
 						];
+					}
+				}
+			} else {
+
+				// Terms search.
+				if ( isset( $params['taxonomy'] ) ) {
+					$terms = get_terms(
+						[
+							'taxonomy'   => $params['taxonomy'],
+							'hide_empty' => false,
+							'name__like' => $search,
+						]
+					);
+					foreach ( $terms as $term ) {
+						$return_data['results'][] = [
+							'id'   => $use_slugs ? urldecode( $term->slug ) : $term->term_id,
+							'text' => $term->name,
+						];
+					}
+				}
+
+				// Post types search.
+				if ( isset( $params['post_type'] ) ) {
+					$args           = [
+						's'         => $search, // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+						'post_type' => $params['post_type']['name'],
+					];
+					$search_results = fusion_cached_query( $args );
+					if ( $search_results->have_posts() ) {
+						global $post;
+						while ( $search_results->have_posts() ) {
+							$search_results->the_post();
+							$return_data['results'][] = [
+								'id'   => esc_attr( $post->ID ),
+								'text' => esc_html( get_the_title( $post->ID ) ),
+							];
+						}
 					}
 				}
 			}
@@ -151,6 +180,26 @@ class Avada_Page_Options {
 		// Get labels.
 		if ( isset( $req['labels'] ) ) {
 			$labels = $req['labels']; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+
+			// Search for all terms of all taxonomies.
+			if ( isset( $params['all_terms'] ) ) {
+				foreach ( $labels as $key => $label_id ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+					$taxonomy_and_term = explode( '|', $label_id );
+
+					$taxonomy = get_taxonomy( $taxonomy_and_term[0] );
+
+					$term = $use_slugs ? get_term_by( 'slug', $taxonomy_and_term[1], $taxonomy_and_term[0] ) : get_term( $taxonomy_and_term[1], $taxonomy_and_term[0] );
+
+					if ( ! is_object( $term ) ) {
+						continue;
+					}
+
+					$return_data['labels'][] = [
+						'id'   => $label_id,
+						'text' => $taxonomy->labels->name . ': ' . $term->name,
+					];
+				}
+			}
 
 			// Terms search.
 			if ( isset( $params['taxonomy'] ) ) {
@@ -459,6 +508,70 @@ class Avada_Page_Options {
 			new Fusion_Deprecate_Pyre_PO();
 		}
 	}
+
+	/**
+	 * Add Po tracking code.
+	 *
+	 * @access public
+	 * @since 7.11.14
+	 * @param string $code The tracking code.
+	 * @return string
+	 */
+	public function add_po_tracking_code( $code ) {	
+		global $post;
+
+		$po_code = isset( $post->ID ) ? fusion_data()->post_meta( $post->ID )->get( 'tracking_code' ) : '';
+
+		return $code . $po_code;
+	}
+
+	/**
+	 * Add Po before </head> code.
+	 *
+	 * @access public
+	 * @since 7.11.14
+	 * @param string $code The before </head> code.
+	 * @return string
+	 */
+	public function add_po_space_head_close( $code ) {	
+		global $post;
+
+		$po_code = isset( $post->ID ) ? fusion_data()->post_meta( $post->ID )->get( 'space_head_close' ) : '';
+
+		return $code . $po_code;
+	}
+	
+	/**
+	 * Add Po after <body> code.
+	 *
+	 * @access public
+	 * @since 7.11.14
+	 * @param string $code The tracking code.
+	 * @return string
+	 */
+	public function add_po_space_body_open( $code ) {	
+		global $post;
+
+		$po_code = isset( $post->ID ) ? fusion_data()->post_meta( $post->ID )->get( 'space_body_open' ) : '';
+
+		return $code . $po_code;
+	}
+	
+	/**
+	 * Add Po before </head> code.
+	 *
+	 * @access public
+	 * @since 7.11.14
+	 * @param string $code The tracking code.
+	 * @return string
+	 */
+	public function add_po_space_body_close( $code ) {	
+		global $post;
+
+		$po_code = isset( $post->ID ) ? fusion_data()->post_meta( $post->ID )->get( 'space_body_close' ) : '';
+
+		return $code . $po_code;
+	}	
 }
 
 /* Omit closing PHP tag to avoid "Headers already sent" issues. */

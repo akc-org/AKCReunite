@@ -70,6 +70,48 @@
 #wpadminbar #wp-admin-bar-fb-edit > .ab-item:before {
   top: 4px;
 }
+#wpadminbar #wp-admin-bar-awb-site-mode {
+  display: flex;
+  align-items: center;
+  height: 32px;
+}
+#wpadminbar #wp-admin-bar-awb-site-mode > .ab-item {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25em 0.5em;
+  height: 14px;
+  border-radius: 0.35em;
+  line-height: 1;
+  transition: opacity 0.2s ease-in-out;
+}
+#wpadminbar #wp-admin-bar-awb-site-mode > .ab-item:hover,
+#wpadminbar #wp-admin-bar-awb-site-mode > .ab-itemfocus {
+  opacity: 0.9;
+}
+#wpadminbar .awb-site-mode-badge-avada > .ab-item:before {
+  content: "\e936";
+  padding: 0;
+  font-size: 12px;
+  font-family: "icomoon";
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  color: #f0f0f1 !important;
+}
+#wpadminbar .awb-site-mode-badge-live > .ab-item {
+  background-color: #65bc7b !important;
+  color: #f0f0f1 !important;
+}
+#wpadminbar .awb-site-mode-badge-coming-soon > .ab-item {
+  background-color: #198fd9 !important;
+  color: #f0f0f1 !important;
+}
+#wpadminbar .awb-site-mode-badge-maintenance > .ab-item {
+  background-color: #dc3232 !important;
+  color: #f0f0f1 !important;
+}
 #wpadminbar #wp-admin-bar-fb-edit .ab-item {
   height: auto;
 }
@@ -129,6 +171,11 @@
 }
 .menu-item-handle .item-title {
   margin-right: 4em;
+}
+@media screen and (max-width: 782px) {
+  #wpadminbar #wp-admin-bar-awb-site-mode {
+    display: none;
+  }
 }
 .metabox-prefs .avada-logo,
 .postbox .hndle .avada-logo {
@@ -1056,6 +1103,9 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   margin-right: 8px;
+}
+.pyre_metabox_tabs a[href^="code_fields"] {
+  display: none;
 }
 .pyre_metabox_tabs a[href^="sliders"]:before {
   content: "\e902";
@@ -2082,6 +2132,9 @@ ul#adminmenu > li.toplevel_page_avada.current > a.current:after {
   .wp-list-table .is-expanded td.tf_thumbnail {
     display: none !important;
   }
+}
+.wp-list-table .column-menu_order {
+  width: 5.5em;
 }
 .post-php .ui-widget-overlay {
   position: fixed;

@@ -74,7 +74,7 @@ final class AWB_Google_Recaptcha {
 		$recaptcha_error = ( isset( $_GET['recaptcha_error'] ) && '' !== $_GET['recaptcha_error'] ) ? sanitize_text_field( wp_unslash( $_GET['recaptcha_error'] ) ) : '';  // phpcs:ignore WordPress.Security.NonceVerification
 		$type            = ( isset( $_GET['type'] ) && '' !== $_GET['type'] ) ? sanitize_text_field( wp_unslash( $_GET['type'] ) ) : '';  // phpcs:ignore WordPress.Security.NonceVerification	
 		if ( $recaptcha_error && $type ) {
-			echo do_shortcode( '[fusion_alert margin_top="20px" type="' . $type . '"]' . $recaptcha_error . '[/fusion_alert]' );
+			echo do_shortcode( '[fusion_alert margin_top="20px" type="' . esc_attr( strip_shortcodes( $type ) ) . '"]' . esc_html( strip_shortcodes( $recaptcha_error ) ) . '[/fusion_alert]' );
 		}
 	}
 

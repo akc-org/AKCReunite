@@ -29,12 +29,45 @@ class Avada_Slider_Revolution {
 		add_action( 'admin_init', [ $this, 'add_custom_slider_styles' ] );
 		add_action( 'admin_init', [ $this, 'disable_slider_revolution_notice' ] );
 
+		// Live editor Element rendering.
+		add_action( 'awb_before_ajax_shortcode_render', [ $this, 'set_sr_globals_loaded_by_editor' ] );
+		add_action( 'awb_after_ajax_shortcode_render', [ $this, 'reset_sr_globals_loaded_by_editor' ] );
+
 		add_filter( 'revslider_get_slider_wrapper_div', [ $this, 'open_slider_wrapper' ] );
 		add_filter( 'revslider_close_slider_wrapper_div', [ $this, 'close_slider_wrapper' ] );
 
 		add_action( 'revslider_add_slider_to_stage_post', [ $this, 'maybe_close_slider_wrapper' ], 10, 2 );
 	}
 
+	/**
+	 * Set the loaded_by_editor var of the $SR_GLOBALS.
+	 *
+	 * @access public
+	 * @since 7.11.10
+	 * @param string $shortcode The name of the rendered shortcode.
+	 * @return void
+	 */
+	public function set_sr_globals_loaded_by_editor( $shortcode ) {
+		if ( false !== strpos( $shortcode, 'rev_slider' ) ) { 
+			global $SR_GLOBALS;
+			$SR_GLOBALS['loaded_by_editor'] = true;
+		}
+	}
+
+	/**
+	 * Reet the loaded_by_editor var of the $SR_GLOBALS.
+	 *
+	 * @access public
+	 * @since 7.11.10
+	 * @param string $shortcode The name of the rendered shortcode.
+	 * @return void
+	 */
+	public function reset_sr_globals_loaded_by_editor( $shortcode ) {
+		if ( false !== strpos( $shortcode, 'rev_slider' ) ) { 
+			global $SR_GLOBALS;
+			$SR_GLOBALS['loaded_by_editor'] = false;
+		}
+	}
 
 	/**
 	 * Add custom slider revolution styles.

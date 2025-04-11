@@ -109,19 +109,20 @@ class Avada_Woocommerce {
 			add_action( 'woocommerce_after_shop_loop_item', [ $this, 'template_loop_add_to_cart' ], 10 );
 			add_action( 'woocommerce_after_shop_loop_item', [ $this, 'show_details_button' ], 15 );
 
-			// Badges, open wrapper.
-			add_action( 'woocommerce_before_shop_loop_item_title', [ $this, 'open_badges_wrapper' ], 6 );
-
-			// Out of stock.
-			add_action( 'woocommerce_before_shop_loop_item_title', [ $this, 'show_product_loop_outofstock_flash' ], 7 );
-
-			// Sale.
-			remove_action( 'woocommerce_before_shop_loop_item_title', 'woocommerce_show_product_loop_sale_flash', 10 );
-			add_action( 'woocommerce_before_shop_loop_item_title', 'woocommerce_show_product_loop_sale_flash', 7 );
-
-			// Badges, close wrapper.
-			add_action( 'woocommerce_before_shop_loop_item_title', [ $this, 'close_badges_wrapper' ], 8 );
 		}
+
+		// Badges, open wrapper.
+		add_action( 'woocommerce_before_shop_loop_item_title', [ $this, 'open_badges_wrapper' ], 6 );
+
+		// Out of stock.
+		add_action( 'woocommerce_before_shop_loop_item_title', [ $this, 'show_product_loop_outofstock_flash' ], 7 );
+
+		// Sale.
+		remove_action( 'woocommerce_before_shop_loop_item_title', 'woocommerce_show_product_loop_sale_flash', 10 );
+		add_action( 'woocommerce_before_shop_loop_item_title', 'woocommerce_show_product_loop_sale_flash', 7 );
+
+		// Badges, close wrapper.
+		add_action( 'woocommerce_before_shop_loop_item_title', [ $this, 'close_badges_wrapper' ], 8 );      
 
 		add_action( 'woocommerce_after_shop_loop_item', [ $this, 'after_shop_item_buttons' ], 20 );
 
@@ -173,6 +174,8 @@ class Avada_Woocommerce {
 		add_action( 'woocommerce_single_product_summary', [ $this, 'single_product_summary_open' ], 1 );
 		add_action( 'woocommerce_single_product_summary', [ $this, 'single_product_summary_close' ], 100 );
 
+		add_filter( 'woocommerce_gallery_image_html_attachment_image_params', [ $this, 'adjust_woocommerce_gallery_image_html_attachment_image_params' ] );
+
 		add_action( 'woocommerce_reset_variations_link', [ $this, 'add_single_variation_markup' ] );
 
 		add_action( 'woocommerce_after_single_product_summary', [ $this, 'after_single_product_summary' ], 15 );
@@ -220,9 +223,16 @@ class Avada_Woocommerce {
 		if ( Avada()->settings->get( 'woocommerce_single_ajax_cart' ) ) {
 			$is_xhr = isset( $_SERVER['HTTP_X_REQUESTED_WITH'] ) && 'xmlhttprequest' === strtolower( $_SERVER['HTTP_X_REQUESTED_WITH'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
 
-			// Force disabled WC Redirect to cart page settings.
-			if ( $is_xhr && 'yes' === get_option( 'woocommerce_cart_redirect_after_add' ) ) {
-				add_filter( 'woocommerce_add_to_cart_redirect', 'wp_get_referer' );
+			if ( $is_xhr ) {
+				if ( has_filter( 'woocommerce_add_to_cart_redirect' ) ) {
+
+					// Disable a post add to cart redirect from a third party plugin.
+					add_filter( 'woocommerce_add_to_cart_redirect', '__return_false', PHP_INT_MAX );
+				} elseif ( 'yes' === get_option( 'woocommerce_cart_redirect_after_add' ) ) {
+
+					// Disable the Woo native redirct to cart if set in Woo settings.
+					add_filter( 'woocommerce_add_to_cart_redirect', 'wp_get_referer' );
+				}
 			}
 		}
 	}
@@ -395,7 +405,7 @@ class Avada_Woocommerce {
 			);
 		}
 
-		if ( is_product() && Avada()->settings->get( 'woocommerce_single_ajax_cart' ) ) {
+		if ( ( is_product() || Avada()->settings->get( 'woocommerce_enable_quick_view' ) ) && Avada()->settings->get( 'woocommerce_single_ajax_cart' ) ) {
 			Fusion_Dynamic_JS::enqueue_script(
 				'avada-woocommerce-single',
 				$js_folder_url . '/general/avada-woocommerce-single.js',
@@ -763,19 +773,21 @@ class Avada_Woocommerce {
 			if ( $product && ( ( $product->is_purchasable() && $product->is_in_stock() ) || $product->is_type( 'external' ) || $product->is_type( 'auction' ) ) ) {
 
 				$defaults = [
-					'quantity'   => 1,
-					'class'      => implode(
+					'quantity'              => 1,
+					'class'                 => implode(
 						' ',
 						array_filter(
 							[
 								'button',
+								wc_wp_theme_get_element_class_name( 'button' ), // escaped in the template.
 								'product_type_' . $product->get_type(),
 								$product->is_purchasable() && $product->is_in_stock() ? 'add_to_cart_button' : '',
-								$product->supports( 'ajax_add_to_cart' ) ? 'ajax_add_to_cart' : '',
+								$product->supports( 'ajax_add_to_cart' ) && $product->is_purchasable() && $product->is_in_stock() ? 'ajax_add_to_cart' : '',                                
 							]
 						)
 					),
-					'attributes' => [
+					'aria-describedby_text' => $product->add_to_cart_aria_describedby(),
+					'attributes'            => [
 						'data-product_id'  => $product->get_id(),
 						'data-product_sku' => $product->get_sku(),
 						'aria-label'       => $product->add_to_cart_description(),
@@ -784,6 +796,10 @@ class Avada_Woocommerce {
 				];
 
 				$args = apply_filters( 'woocommerce_loop_add_to_cart_args', wp_parse_args( $args, $defaults ), $product );
+
+				if ( ! empty( $args['attributes']['aria-describedby'] ) ) {
+					$args['attributes']['aria-describedby'] = wp_strip_all_tags( $args['attributes']['aria-describedby'] );
+				}               
 
 				if ( isset( $args['attributes']['aria-label'] ) ) {
 					$args['attributes']['aria-label'] = wp_strip_all_tags( $args['attributes']['aria-label'] );
@@ -1696,6 +1712,24 @@ class Avada_Woocommerce {
 	}
 
 	/**
+	 * Adds skip lazyload attribute to the Woo product gallery image.
+	 *
+	 * @access public
+	 * @since 7.11.14
+	 * @param array $params The image params.
+	 * @return array the updated params array
+	 */	
+	public function adjust_woocommerce_gallery_image_html_attachment_image_params( $params ) {
+		global $product;
+
+		if ( $product->is_type( 'variable' ) ) {
+			$params['skip-lazyload'] = true;
+		}
+
+		return $params;
+	}	
+
+	/**
 	 * Markup to add after the summary on single products.
 	 *
 	 * @access public
@@ -2016,13 +2050,15 @@ class Avada_Woocommerce {
 			$post       = get_post( $product_id ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride
 			$product    = wc_get_product( $product_id );
 
-			ob_start();
+			if ( current_user_can( 'read_private_posts' ) || 'publish' === $product->get_status() ) {
+				ob_start();
 
-			get_template_part( 'templates/wc-quick-view-product' );
+				get_template_part( 'templates/wc-quick-view-product' );
 
-			$output = ob_get_contents();
-			ob_end_clean();
-			echo $output; // phpcs:ignore WordPress.Security.EscapeOutput
+				$output = ob_get_contents();
+				ob_end_clean();
+				echo $output; // phpcs:ignore WordPress.Security.EscapeOutput
+			}
 		}
 
 		wp_die();

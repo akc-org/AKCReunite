@@ -158,7 +158,7 @@ if ( ! class_exists( 'Avada_Megamenu_Framework' ) ) {
 					'label'       => esc_attr__( 'Mega Menu', 'Avada' ),
 					'choices'     => $choices,
 					/* translators: %s: URL. */
-					'description' => sprintf( __( 'Select to use created content as the mega menu dropdown. To create a mega menu, visit the <a href="%s" target="_blank">Avada Library</a>. Sub-menu items added to a parent mega menu item, will be rendered on mobile only, as replacement of the mega menu content.', 'Avada' ), admin_url( 'admin.php?page=avada-library' ) ),
+					'description' => sprintf( __( 'Select a pre-created mega menu item from the Avada Library, that should be displayed. To create a new mega menu, visit the <a href="%s" target="_blank">Avada Library</a>. Mega menus are disabled on menus in mobile mode and are replaced by sub-menu items that have been added to a parent mega menu item.', 'Avada' ), admin_url( 'admin.php?page=avada-library' ) ),
 					'type'        => 'select',
 					'default'     => '0',
 					'save_id'     => 'fusion_megamenu_select',
@@ -382,7 +382,7 @@ if ( ! class_exists( 'Avada_Megamenu_Framework' ) ) {
 			$off_canvas_items           = [ '' => __( 'Select Off Canvas', 'Avada' ) ];
 			$off_canvas_available_items = [];
 
-			if ( 25 > wp_count_posts( 'awb_off_canvas' )->publish ) {
+			if ( property_exists( wp_count_posts( 'awb_off_canvas' ), 'publish' ) && 25 > wp_count_posts( 'awb_off_canvas' )->publish ) {
 				$off_canvas_field_type      = 'select';
 				$off_canvas_available_items = class_exists( 'AWB_Off_Canvas_Front_End' ) ? AWB_Off_Canvas_Front_End()->get_available_items() : [];
 			}

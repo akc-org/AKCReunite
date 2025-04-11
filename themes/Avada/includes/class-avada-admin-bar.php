@@ -157,7 +157,9 @@ class Avada_Admin_Bar {
 		global $submenu;
 
 		// Change Avada to Dashboard.
-		$submenu['avada'][0][0] = esc_html__( 'Dashboard', 'Avada' ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride
+		if ( isset( $submenu['avada'][0][0] ) ) {
+			$submenu['avada'][0][0] = esc_html__( 'Dashboard', 'Avada' ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride
+		}
 
 		if ( isset( $submenu['themes.php'] ) && ! empty( $submenu['themes.php'] ) ) {
 			foreach ( $submenu['themes.php'] as $key => $value ) {
@@ -173,11 +175,10 @@ class Avada_Admin_Bar {
 
 			// Reorder items in the array.
 			$submenu['themes.php'] = array_values( $submenu['themes.php'] ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride
+
+			// Remove TGMPA menu from Appearance.
+			remove_submenu_page( 'themes.php', 'install-required-plugins' );            
 		}
-
-		// Remove TGMPA menu from Appearance.
-		remove_submenu_page( 'themes.php', 'install-required-plugins' );
-
 	}
 }
 

@@ -131,7 +131,7 @@ class Avada_Layout {
 				$sidebar_1_width = Avada()->settings->get( 'sidebar_2_1_width' );
 				$sidebar_2_width = Avada()->settings->get( 'sidebar_2_2_width' );
 			}
-		} elseif ( ! AWB_Widget_Framework()->has_sidebar() && ( is_page_template( 'side-navigation.php' ) || ( is_singular( 'tribe_events' ) && 'sidebar' === Avada()->settings->get( 'ec_meta_layout' ) ) ) ) {
+		} elseif ( ! AWB_Widget_Framework()->has_sidebar() && ( is_page_template( 'side-navigation.php' ) || Avada_EventsCalendar::has_legacy_meta_sidebar() ) ) {
 			if ( 'tribe_events' === get_post_type( $c_page_id ) ) {
 				$sidebar_1_width = Avada()->settings->get( 'ec_sidebar_width' );
 			} else {

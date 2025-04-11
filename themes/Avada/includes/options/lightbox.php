@@ -242,6 +242,36 @@ function avada_options_section_lightbox( $sections ) {
 					],
 				],
 			],
+			'lightbox_loop'             => [
+				'label'       => esc_html__( 'Loop Lightbox Gallery', 'Avada' ),
+				'description' => esc_html__( 'Turn on to loop the lightbox gallery.', 'Avada' ),
+				'id'          => 'lightbox_loop',
+				'default'     => '0',
+				'type'        => 'switch',
+				'required'    => [
+					[
+						'setting'  => 'status_lightbox',
+						'operator' => '==',
+						'value'    => '1',
+					],
+				],
+				'output'      => [
+					// This is for the fusionLightboxVars.lightbox_loop var.
+					[
+						'element'           => 'helperElement',
+						'property'          => 'dummy',
+						'js_callback'       => [
+							'fusionGlobalScriptSet',
+							[
+								'globalVar' => 'fusionLightboxVars',
+								'id'        => 'lightbox_loop',
+								'trigger'   => [ 'avadaLightBoxInitializeLightbox' ],
+							],
+						],
+						'sanitize_callback' => '__return_empty_string',
+					],
+				],
+			],
 			'lightbox_autoplay'         => [
 				'label'       => esc_html__( 'Autoplay the Lightbox Gallery', 'Avada' ),
 				'description' => esc_html__( 'Turn on to autoplay the lightbox gallery.', 'Avada' ),

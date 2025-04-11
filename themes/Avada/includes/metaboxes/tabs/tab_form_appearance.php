@@ -21,7 +21,7 @@ function avada_page_options_tab_form_appearance( $sections ) {
 		'alt_icon' => 'fusiona-customize',
 		'id'       => 'form_appearance',
 		'fields'   => [
-			'preview_width'            => [
+			'preview_width'                    => [
 				'label'       => esc_attr__( 'Preview Width', 'Avada' ),
 				/* translators: Additional description (defaults). */
 				'description' => __( 'Select the width to preview the form at in the live editor. <strong>NOTE:</strong> This is only used for previewing purposes.', 'fusion-builder' ),
@@ -39,7 +39,7 @@ function avada_page_options_tab_form_appearance( $sections ) {
 					'step' => '1',
 				],
 			],
-			'preview_background_color' => [
+			'preview_background_color'         => [
 				'type'        => 'color-alpha',
 				'label'       => esc_html__( 'Preview Background Color', 'fusion-builder' ),
 				'description' => __( 'Choose a background color for the form preview in live editor. <strong>NOTE:</strong> This is only used for previewing purposes.', 'fusion-builder' ),
@@ -50,7 +50,7 @@ function avada_page_options_tab_form_appearance( $sections ) {
 					'fusion-content-preview-background-color',
 				],
 			],
-			'label_position'           => [
+			'label_position'                   => [
 				'type'        => 'radio-buttonset',
 				'label'       => esc_html__( 'Label Position', 'fusion-builder' ),
 				'description' => esc_html__( 'Make a selection for form input fields labels position.', 'fusion-builder' ),
@@ -66,7 +66,7 @@ function avada_page_options_tab_form_appearance( $sections ) {
 					'fusion-rerender-form-inputs',
 				],
 			],
-			'label_font_size'          => [
+			'label_font_size'                  => [
 				'type'        => 'text',
 				'label'       => esc_html__( 'Label Font Size', 'fusion-builder' ),
 				/* translators: Additional description (defaults). */
@@ -78,7 +78,22 @@ function avada_page_options_tab_form_appearance( $sections ) {
 					'fusion-form-styles',
 				],
 			],
-			'tooltip_text_color'       => [
+			'required_field_symbol_decoration' => [
+				'type'        => 'radio-buttonset',
+				'label'       => esc_html__( 'Required Field Symbol Decoration', 'Avada' ),
+				'description' => esc_html__( 'Choose if you want to display the required field symbol text decoration or not.', 'Avada' ),
+				'id'          => 'required_field_symbol_decoration',
+				'default'     => 'yes',
+				'choices'     => [
+					'yes' => esc_html__( 'Yes', 'Avada' ),
+					'no'  => esc_html__( 'No', 'Avada' ),
+				],
+				'transport'   => 'postMessage',
+				'events'      => [
+					'fusion-form-styles',
+				],              
+			],
+			'tooltip_text_color'               => [
 				'type'        => 'color-alpha',
 				'label'       => esc_html__( 'Tooltip Text Color', 'fusion-builder' ),
 				'description' => esc_html__( 'Controls the text color of the field tooltip.', 'fusion-builder' ),
@@ -89,7 +104,7 @@ function avada_page_options_tab_form_appearance( $sections ) {
 					'fusion-form-styles',
 				],
 			],
-			'tooltip_background_color' => [
+			'tooltip_background_color'         => [
 				'type'        => 'color-alpha',
 				'label'       => esc_html__( 'Tooltip Background Color', 'fusion-builder' ),
 				'description' => esc_html__( 'Controls the background color of the field tooltip.', 'fusion-builder' ),
@@ -100,7 +115,7 @@ function avada_page_options_tab_form_appearance( $sections ) {
 					'fusion-form-styles',
 				],
 			],
-			'field_margin'             => [
+			'field_margin'                     => [
 				'type'             => 'dimensions',
 				'label'            => esc_html__( 'Field Margin', 'fusion-builder' ),
 				'remove_from_atts' => true,
@@ -116,7 +131,7 @@ function avada_page_options_tab_form_appearance( $sections ) {
 					'fusion-form-styles',
 				],
 			],
-			'form_input_height'        => [
+			'form_input_height'                => [
 				'type'        => 'text',
 				'label'       => esc_html__( 'Field Height', 'fusion-builder' ),
 				/* translators: Additional description (defaults). */
@@ -131,7 +146,7 @@ function avada_page_options_tab_form_appearance( $sections ) {
 					'fusion-form-styles',
 				],
 			],
-			'form_font_size'           => [
+			'form_font_size'                   => [
 				'type'        => 'text',
 				'label'       => esc_html__( 'Field Font Size', 'fusion-builder' ),
 				/* translators: Additional description (defaults). */
@@ -146,7 +161,7 @@ function avada_page_options_tab_form_appearance( $sections ) {
 					'fusion-form-styles',
 				],
 			],
-			'form_bg_color'            => [
+			'form_bg_color'                    => [
 				'type'        => 'color-alpha',
 				'label'       => esc_html__( 'Field Background Color', 'fusion-builder' ),
 				/* translators: Additional description (defaults). */
@@ -162,7 +177,7 @@ function avada_page_options_tab_form_appearance( $sections ) {
 					'fusion-form-styles',
 				],
 			],
-			'form_text_color'          => [
+			'form_text_color'                  => [
 				'type'        => 'color-alpha',
 				'label'       => esc_html__( 'Field Text Color', 'fusion-builder' ),
 				/* translators: Additional description (defaults). */
@@ -178,7 +193,7 @@ function avada_page_options_tab_form_appearance( $sections ) {
 					'fusion-form-styles',
 				],
 			],
-			'form_label_color'         => [
+			'form_label_color'                 => [
 				'type'        => 'color-alpha',
 				'label'       => esc_html__( 'Field Label Color', 'fusion-builder' ),
 				/* translators: Additional description (defaults). */
@@ -195,7 +210,7 @@ function avada_page_options_tab_form_appearance( $sections ) {
 					'fusion-form-styles',
 				],
 			],
-			'form_placeholder_color'   => [
+			'form_placeholder_color'           => [
 				'type'        => 'color-alpha',
 				'label'       => esc_html__( 'Field Placeholder Color', 'fusion-builder' ),
 				/* translators: Additional description (defaults). */
@@ -208,7 +223,7 @@ function avada_page_options_tab_form_appearance( $sections ) {
 					'fusion-form-styles',
 				],
 			],
-			'form_border_width'        => [
+			'form_border_width'                => [
 				'type'        => 'dimensions',
 				'label'       => esc_html__( 'Field Border Size', 'fusion-builder' ),
 				/* translators: Additional description (defaults). */
@@ -235,7 +250,7 @@ function avada_page_options_tab_form_appearance( $sections ) {
 					'fusion-form-styles',
 				],
 			],
-			'form_border_color'        => [
+			'form_border_color'                => [
 				'type'        => 'color-alpha',
 				'label'       => esc_html__( 'Field Border Color', 'fusion-builder' ),
 				/* translators: Additional description (defaults). */
@@ -251,7 +266,7 @@ function avada_page_options_tab_form_appearance( $sections ) {
 					'fusion-form-styles',
 				],
 			],
-			'form_focus_border_color'  => [
+			'form_focus_border_color'          => [
 				'label'       => esc_html__( 'Form Border Color On Focus', 'Avada' ),
 				/* translators: Additional description (defaults). */
 				'description' => sprintf( esc_html__( 'Controls the border color of the form input field on focus. %s', 'Avada' ), Avada()->settings->get_default_description( 'form_focus_border_color' ) ),
@@ -266,7 +281,7 @@ function avada_page_options_tab_form_appearance( $sections ) {
 					'fusion-form-styles',
 				],
 			],
-			'form_border_radius'       => [
+			'form_border_radius'               => [
 				'type'        => 'slider',
 				'label'       => esc_html__( 'Field Border Radius', 'fusion-builder' ),
 				/* translators: Additional description (defaults). */

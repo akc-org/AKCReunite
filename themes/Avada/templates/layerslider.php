@@ -19,9 +19,6 @@ if ( strtolower( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $ls_tabl
 	$ls_slider = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}layerslider WHERE id = %d ORDER BY date_c DESC LIMIT 1", (int) $id ), ARRAY_A );
 	$ls_slider = json_decode( $ls_slider['data'], true );
 	?>
-	<style type="text/css">
-		#layerslider-container{max-width:<?php echo esc_attr( $ls_slider['properties']['width'] ); ?>;}
-	</style>
 	<div id="layerslider-container">
 		<div id="layerslider-wrapper">
 			<?php if ( 'avada' === $ls_slider['properties']['skin'] ) : ?>

@@ -55,3 +55,48 @@
 .to-top-left #toTop {
   left: 75px;
 }
+.awb-to-top-progress {
+  display: none;
+}
+.awb-to-top-scroll-progress #toTop {
+  display: flex;
+  justify-content: center;
+  background: none;
+}
+.awb-to-top-scroll-progress #toTop:before {
+  z-index: 1;
+}
+.awb-to-top-scroll-progress #toTop:hover,
+.awb-to-top-scroll-progress #toTop:active,
+.awb-to-top-scroll-progress #toTop:focus {
+  background: none;
+}
+.awb-to-top-scroll-progress .awb-to-top-progress {
+  display: block;
+  position: absolute;
+  top: -2.2px;
+  left: -2.2px;
+}
+.awb-to-top-scroll-progress .awb-to-top-progress rect {
+  stroke-width: 4;
+  fill: transparent;
+  transition: fill 0.2s ease-in-out, stroke 0.2s ease-in-out;
+  rx: var(--totop_border_radius);
+  ry: var(--totop_border_radius);
+}
+.awb-to-top-scroll-progress .awb-to-top-progress .awb-scale {
+  fill: var(--totop_background);
+}
+.awb-to-top-scroll-progress .awb-to-top-progress .awb-progress {
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  stroke: var(--totop_background_hover);
+}
+.awb-to-top-scroll-progress:hover .awb-to-top-progress .awb-scale {
+  stroke: var(--totop_background_hover) !important;
+  fill: var(--totop_background_hover);
+}
+.awb-to-top-scroll-progress:active .awb-to-top-progress .awb-scale,
+.awb-to-top-scroll-progress:focus .awb-to-top-progress .awb-scale {
+  fill: var(--totop_background);
+}

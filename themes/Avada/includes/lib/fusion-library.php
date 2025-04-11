@@ -5,10 +5,10 @@
  * Plugin Name: Fusion Library
  * Plugin URI: https://avada.com
  * Description: Fusion library plugin.
- * Version: 3.11.9
+ * Version: 3.11.15
  * Author: ThemeFusion
  * Author URI: https://avada.com
- * Requires PHP: 5.6
+ * Requires PHP: 7.4
  *
  * @package Fusion-Library
  * @version 3.9.1
@@ -27,7 +27,7 @@ if ( ! defined( 'FUSION_UPDATES_URL' ) ) {
 	define( 'FUSION_UPDATES_URL', 'https://updates.theme-fusion.com' );
 }
 // Don't use a constant, we need this as a simple var.
-$current_version = '3.11.9';
+$current_version = '3.11.15';
 global $fusion_library_latest_version;
 
 if ( ! $fusion_library_latest_version || version_compare( $current_version, $fusion_library_latest_version ) >= 0 ) {

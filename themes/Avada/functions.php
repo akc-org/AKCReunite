@@ -15,15 +15,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( ! defined( 'AVADA_VERSION' ) ) {
-	define( 'AVADA_VERSION', '7.11.9' );
+	define( 'AVADA_VERSION', '7.11.15' );
 }
 
 if ( ! defined( 'AVADA_MIN_PHP_VER_REQUIRED' ) ) {
-	define( 'AVADA_MIN_PHP_VER_REQUIRED', '5.6' );
+	define( 'AVADA_MIN_PHP_VER_REQUIRED', '7.4' );
 }
 
 if ( ! defined( 'AVADA_MIN_WP_VER_REQUIRED' ) ) {
-	define( 'AVADA_MIN_WP_VER_REQUIRED', '4.9' );
+	define( 'AVADA_MIN_WP_VER_REQUIRED', '5.7' );
 }
 
 // Developer mode.

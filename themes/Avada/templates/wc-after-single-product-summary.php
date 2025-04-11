@@ -25,7 +25,7 @@
 			</a>
 		</li>
 		<li class="twitter">
-			<a href="https://twitter.com/share?text=<?php the_title_attribute(); ?>&amp;url=<?php echo rawurlencode( get_permalink() ); ?>" target="_blank"<?php echo $nofollow; // phpcs:ignore WordPress.Security.EscapeOutput ?>>
+			<a href="https://x.com/intent/post?text=<?php the_title_attribute(); ?>&amp;url=<?php echo rawurlencode( get_permalink() ); ?>" target="_blank"<?php echo $nofollow; // phpcs:ignore WordPress.Security.EscapeOutput ?>>
 				<i class="fontawesome-icon medium circle-yes awb-icon-twitter" aria-hidden="true"></i>
 				<div class="fusion-woo-social-share-text">
 					<span><?php esc_html_e( 'Tweet This Product', 'Avada' ); ?></span>

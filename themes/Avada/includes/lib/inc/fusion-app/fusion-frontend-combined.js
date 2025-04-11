@@ -722,6 +722,12 @@ var FusionPageBuilder = FusionPageBuilder || {};
 				} );
 
 				jQuery( 'body' ).addClass( 'fusion-builder-module-settings-' + viewPorts[ viewport ] );
+
+				jQuery( '#fb-preview' )[ 0 ].contentWindow.jQuery( 'body' ).removeClass( function ( index, className ) {
+					return ( className.match( /(^|\s)awb-le-viewport-S+/g ) || [] ).join( ' ' );
+				} );
+			
+				jQuery( '#fb-preview' )[ 0 ].contentWindow.jQuery( 'body' ).addClass( 'awb-le-viewport-' + viewPorts[ viewport ] );
 			}
 
 		} );
@@ -2651,7 +2657,7 @@ var FusionPageBuilder = FusionPageBuilder || {};
 		checkKey: function( event ) {
 
 			// If disabled.
-			if ( ( 'undefined' !== typeof FusionApp && 'undefined' !== typeof FusionApp.preferencesData && 'off' === FusionApp.preferencesData.keyboard_shortcuts ) ) {
+			if ( ( 'undefined' !== typeof FusionApp && 'undefined' !== typeof FusionApp.preferencesData && 'undefined' !== typeof FusionApp.preferencesData.keyboard_shortcuts && 'off' === FusionApp.preferencesData.keyboard_shortcuts ) ) {
 				return;
 			}
 
@@ -2697,28 +2703,16 @@ var FusionPageBuilder = FusionPageBuilder || {};
 						jQuery( '.fusion-builder-preview-desktop' ).trigger( 'click' );
 						break;
 
-						// Key 2 for mobile view portrait.
+						// Key 2 for mobile view.
 					case 50:
 						event.preventDefault();
 						jQuery( '.fusion-builder-preview-mobile.portrait' ).trigger( 'click' );
 						break;
 
-						// Key 3 for mobile view landscape.
+						// Key 4 for tablet view.
 					case 51:
 						event.preventDefault();
-						jQuery( '.fusion-builder-preview-mobile.landscape' ).trigger( 'click' );
-						break;
-
-						// Key 4 for tablet view portrait.
-					case 52:
-						event.preventDefault();
 						jQuery( '.fusion-builder-preview-tablet.portrait' ).trigger( 'click' );
-						break;
-
-						// Key 5 for tablet view landscape.
-					case 53:
-						event.preventDefault();
-						jQuery( '.fusion-builder-preview-tablet.landscape' ).trigger( 'click' );
 						break;
 
 						// Key D to clear layout.
@@ -2770,7 +2764,7 @@ var FusionPageBuilder = FusionPageBuilder || {};
 						// Key S to save, click rather than save directly so that animations occur.
 					case 83:
 						event.preventDefault();
-						if ( 0 === jQuery( 'body' ).find( '.ui-dialog' ).length && ! FusionApp.sidebarView.panelIsOpen() ) {
+						if ( 0 === jQuery( 'body' ).find( '.ui-dialog' ).length ) {
 							jQuery( '.fusion-builder-save-template' ).trigger( 'click' );
 						}
 						break;
@@ -10258,12 +10252,21 @@ FusionPageBuilder.options.fusionEditor = {
 
 						// If it is a placeholder, add an on focus listener.
 						if ( jQuery( '#' + textareaID ).data( 'placeholder' ) ) {
-							window.tinyMCE.get( textareaID ).on( 'focus', function() {
+							window.tinyMCE.get( textareaID ).on( 'focus', function( event ) {
+								const textareaHadFocus = jQuery( event.target.targetElm ).hasClass( 'awb-had-focus' ),
+									switchButtonInputHadFocus = jQuery( event.target.targetElm ).closest( '#wp-' + textareaID + '-wrap' ).prev().hasClass( 'awb-had-focus' );
+								
 								$theContent = window.tinyMCE.get( textareaID ).getContent();
 								$theContent = jQuery( '<div/>' ).html( $theContent ).text();
-								if ( $theContent === jQuery( '#' + textareaID ).data( 'placeholder' ) ) {
+
+								// The flags make sure that laceholder content isn't wiped out through WP's efault behaviour.
+								if ( $theContent === jQuery( event.target.targetElm ).data( 'placeholder' ) && ( ( ! textareaHadFocus && ! switchButtonInputHadFocus ) || ( textareaHadFocus && switchButtonInputHadFocus ) ) ) {
 									window.tinyMCE.get( textareaID ).setContent( '' );
 								}
+
+								if ( ! jQuery( event.target.targetElm ).hasClass( 'awb-had-focus' ) ) {
+									jQuery( event.target.targetElm ).addClass( 'awb-had-focus' );
+								}								
 							} );
 						}
 						window.tinyMCE.get( textareaID ).on( 'keyup change', function() {
@@ -10277,16 +10280,24 @@ FusionPageBuilder.options.fusionEditor = {
 					textareaID = $contentTextarea.attr( 'id' );
 
 					setTimeout( function() {
-
 						$contentTextarea.wp_editor( content, textareaID, allowGenerator );
 
 						// If it is a placeholder, add an on focus listener.
 						if ( jQuery( '#' + textareaID ).data( 'placeholder' ) ) {
-							window.tinyMCE.get( textareaID ).on( 'focus', function() {
+							window.tinyMCE.get( textareaID ).on( 'focus', function( event ) {
+								const textareaHadFocus = jQuery( event.target.targetElm ).hasClass( 'awb-had-focus' ),
+									switchButtonInputHadFocus = jQuery( event.target.targetElm ).closest( '#wp-' + textareaID + '-wrap' ).prev().hasClass( 'awb-had-focus' );
+
 								$theContent = window.tinyMCE.get( textareaID ).getContent();
 								$theContent = jQuery( '<div/>' ).html( $theContent ).text();
-								if ( $theContent === jQuery( '#' + textareaID ).data( 'placeholder' ) ) {
+
+								// The flags make sure that laceholder content isn't wiped out through WP's efault behaviour.
+								if ( $theContent === jQuery( event.target.targetElm ).data( 'placeholder' ) && ( ( ! textareaHadFocus && ! switchButtonInputHadFocus ) || ( textareaHadFocus && switchButtonInputHadFocus ) ) ) {
 									window.tinyMCE.get( textareaID ).setContent( '' );
+								}
+
+								if ( ! jQuery( event.target.targetElm ).hasClass( 'awb-had-focus' ) ) {
+									jQuery( event.target.targetElm ).addClass( 'awb-had-focus' );
 								}
 							} );
 						}
@@ -10578,6 +10589,30 @@ FusionPageBuilder.options.fusionIconPicker = {
 						$scopedContainer.find( '.fusion-iconpicker-icon > span' ).attr( 'class', inputValue );
 					}
 				} );
+
+				// Copy icon name to clipboard.
+				$container.find( '.icon_preview' ).on( 'contextmenu', function( event ) {
+					const iconName = jQuery( this ).children( 'i' ).attr( 'class' );
+
+					if ( 'clipboard' in navigator ) {
+						navigator.clipboard.writeText( iconName );
+					} else {
+						const textArea = document.createElement('textarea');
+						textArea.value = iconName;
+						textArea.style.opacity = 0;
+						document.body.appendChild( textArea );
+						textArea.focus();
+						textArea.select();
+		
+						const success = document.execCommand( 'copy' );
+						document.body.removeChild( textArea );
+					}
+		
+					jQuery( this ).fadeOut( 100 );
+					jQuery( this ).fadeIn( 100 );
+		
+					return false;
+				} );				
 
 				// Icon Search bar
 				$search.on( 'change paste keyup', function() {
@@ -13673,7 +13708,7 @@ FASElement.prototype.renderOptions = function() {
 	}
 
 	_.each( this.options, function( option ) {
-		var theID =  self.prefix + '-' + option.id;
+		var theID =  self.prefix + '-' + option.id.replace( '|', '__' );
 		var checked = option.checked ? 'checked' : '';
 		var arrayOption = ( self.notArrayFormat ? '' : '[]' );
 		var $option = jQuery( '<input type="checkbox" id="' + theID + '" name="' + self.fieldId + arrayOption + '" value="' + option.id + '" data-label="' + option.text + '" class="fusion-select-option" ' + checked + '><label for="' + theID + '" class="fusion-select-label">' + option.text + '</label>' );
@@ -13806,32 +13841,48 @@ FusionPageBuilder.options = FusionPageBuilder.options || {};
 
 FusionPageBuilder.options.fusionConnectedSortable = {
 	optionConnectedSortable: function( $element ) {
-		var $sortable;
-		$sortable = $element.find( '.fusion-connected-sortable' );
+		let $sortable = $element.find( '.fusion-connected-sortable' );
+
 		$sortable.sortable( {
 			connectWith: '.fusion-connected-sortable',
 
 			stop: function() {
-				var $enabled = $element.find( '.fusion-connected-sortable-enabled' ),
-					$container = $element.find( '.fusion-builder-option.connected_sortable' ),
-					sortOrder     = '';
-				$enabled.children( '.fusion-connected-sortable-option' ).each( function() {
-					sortOrder += jQuery( this ).data( 'value' ) + ',';
-				} );
-
-				sortOrder = sortOrder.slice( 0, -1 );
-
-				$container.find( '.fusion-connected-sortable' ).each( function() {
-					if ( jQuery( this ).find( 'li' ).length ) {
-						jQuery( this ).removeClass( 'empty' );
-					} else {
-						jQuery( this ).addClass( 'empty' );
-					}
-				} );
-
-				$container.find( '.sort-order' ).val( sortOrder ).trigger( 'change' );
-			}
+				updateSortables();
+			},			
 		} ).disableSelection();
+
+		$sortable.find( 'li' ).on( 'dblclick', function() {
+			if ( jQuery( this ).parent().hasClass( 'fusion-connected-sortable-enabled' ) ) {
+				$element.find( '.fusion-connected-sortable-disabled' ).prepend( this );
+			} else {
+				$element.find( '.fusion-connected-sortable-enabled' ).append( this );
+			}
+
+			updateSortables();
+		} );
+
+		function updateSortables() {
+			console.log("updateSortables");
+			var $enabled   = $element.find( '.fusion-connected-sortable-enabled' ),
+				$container = $element.find( '.fusion-builder-option.connected_sortable' ),
+				sortOrder  = '';
+
+			$enabled.children( '.fusion-connected-sortable-option' ).each( function() {
+				sortOrder += jQuery( this ).data( 'value' ) + ',';
+			} );
+
+			sortOrder = sortOrder.slice( 0, -1 );
+
+			$container.find( '.fusion-connected-sortable' ).each( function() {
+				if ( jQuery( this ).find( 'li' ).length ) {
+					jQuery( this ).removeClass( 'empty' );
+				} else {
+					jQuery( this ).addClass( 'empty' );
+				}
+			} );
+
+			$container.find( '.sort-order' ).val( sortOrder ).trigger( 'change' );
+		}
 	}
 };
 ;var FusionPageBuilder = FusionPageBuilder || {};
@@ -13981,10 +14032,10 @@ var fusionSanitize = {
 	 *
 	 * @param {string} themeOption - Global Option ID.
 	 * @param {string} pageOption - Page option ID.
-	 * @param {number} postID - Post/Page ID.
+	 * @param {string} subSetting - A sub setting name for the main option.
 	 * @return {string} - Global Option or page option value.
 	 */
-	getOption: function( themeOption, pageOption ) {
+	getOption: function( themeOption, pageOption, subSetting ) {
 		var self     = this,
 			themeVal = '',
 			pageVal  = '';
@@ -13998,6 +14049,10 @@ var fusionSanitize = {
 					themeVal = self.getSettings()[ val.theme ];
 				}
 			} );
+		}
+
+		if ( subSetting && themeVal && 'undefined' !== themeVal[ subSetting ] ) {
+			themeVal = themeVal[ subSetting ];
 		}
 
 		// Get the page value.
@@ -14019,6 +14074,10 @@ var fusionSanitize = {
 				}
 			}
 		} );
+
+		if ( subSetting && pageVal && 'undefined' !== pageVal[ subSetting ] ) {
+			pageVal = pageVal[ subSetting ];
+		}
 
 		if ( themeOption && pageOption && 'default' !== pageVal && ! _.isEmpty( pageVal ) ) {
 			return pageVal;

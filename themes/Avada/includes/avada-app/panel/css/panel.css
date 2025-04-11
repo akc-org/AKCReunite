@@ -68,6 +68,9 @@
   margin: 0;
   font-size: 12px;
 }
+.fusion-builder-panel-main #photo-listing {
+  height: auto;
+}
 #customizer-content {
   max-width: 100%;
   height: 100%;

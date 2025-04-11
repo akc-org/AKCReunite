@@ -87,6 +87,8 @@ class Avada_Privacy_Embeds {
 		$this->set_embed_types();
 		$this->set_consents();
 
+		add_action( 'after_setup_theme', [ $this, 'set_embed_types_names'] );
+
 		add_action( 'init', [ $this, 'init' ] );
 
 	}
@@ -275,27 +277,27 @@ class Avada_Privacy_Embeds {
 			[
 				'youtube'    => [
 					'search' => 'youtube.com',
-					'label'  => esc_attr__( 'YouTube', 'Avada' ),
+					'label'  => '',
 				],
 				'vimeo'      => [
 					'search' => 'vimeo.com',
-					'label'  => esc_attr__( 'Vimeo', 'Avada' ),
+					'label'  => '',
 				],
 				'soundcloud' => [
 					'search' => 'soundcloud.com',
-					'label'  => esc_attr__( 'SoundCloud', 'Avada' ),
+					'label'  => '',
 				],
 				'facebook'   => [
 					'search' => 'facebook.com',
-					'label'  => esc_attr__( 'Facebook', 'Avada' ),
+					'label'  => '',
 				],
 				'flickr'     => [
 					'search' => 'flickr.com',
-					'label'  => esc_attr__( 'Flickr', 'Avada' ),
+					'label'  => '',
 				],
 				'twitter'    => [
 					'search' => 'twitter.com',
-					'label'  => esc_attr__( 'X', 'Avada' ),
+					'label'  => '',
 				],
 				'gmaps'      => [
 					'search' => [
@@ -303,14 +305,43 @@ class Avada_Privacy_Embeds {
 						'infobox_packed',
 						'google.com/maps/embed',
 					],
-					'label'  => esc_attr__( 'Google Maps', 'Avada' ),
+					'label'  => '',
 				],
 				'tracking'   => [
 					'search' => [],
-					'label'  => esc_attr__( 'Tracking Cookies', 'Avada' ),
+					'label'  => '',
 				],
 			]
 		);
+		$this->embed_defaults = $this->embed_types;
+	}
+
+	/**
+	 * Sets the labels of embed types. Needs to be done on after_setup_theme to avoid text domain PHP notice.
+	 *
+	 * @access  public
+	 * @since   7.11.15
+	 * @return  void
+	 */	
+	public function set_embed_types_names() {
+		$types_and_names = [
+			'youtube'    => esc_html__( 'YouTube', 'Avada' ),
+			'vimeo'      => esc_html__( 'Vimeo', 'Avada' ),
+			'soundcloud' => esc_html__( 'SoundCloud', 'Avada' ),
+			'facebook'   => esc_html__( 'Facebook', 'Avada' ),
+			'flickr'     => esc_html__( 'Flickr', 'Avada' ),
+			'twitter'    => esc_html__( 'X', 'Avada' ),
+			'gmaps'      => esc_html__( 'Google Maps', 'Avada' ),
+			'tracking'   => esc_html__( 'Tracking Cookies', 'Avada' ),
+		];
+
+		foreach( $this->embed_types as $key => $data ) {
+			if ( isset( $types_and_names[ $key ] ) ) {
+				$this->embed_types[ $key ]['label'] = $types_and_names[ $key ];
+			}
+		}
+
+		$this->embed_types    = apply_filters( 'fusion_privacy_embeds', $this->embed_types );
 		$this->embed_defaults = $this->embed_types;
 	}
 
@@ -787,7 +818,8 @@ class Avada_Privacy_Embeds {
 						continue;
 					}
 
-					$facade = str_replace( '<' . $src, '<priv-fac-' . $src . ' class="fusion-hidden" data-privacy-type="' . $type . '"', $facade );
+					$loading_class = false !== strpos( $src, 'youtube' ) ? ' lty-load' : '';
+					$facade = str_replace( '<' . $src, '<priv-fac-' . $src . ' class="fusion-hidden' . $loading_class . '" data-privacy-type="' . $type . '"', $facade );
 					$facade = str_replace( '</' . $src, '</priv-fac-' . $src, $facade );
 
 					$facade_width  = false;
@@ -955,7 +987,7 @@ class Avada_Privacy_Embeds {
 	 *
 	 * @access  public
 	 * @since   5.6
-	 * @param   string $content Content you want to replace script tags..
+	 * @param   string $content Content you want to replace script tags.
 	 * @return  string
 	 */
 	public function tracking_script_replace( $content ) {
@@ -1004,7 +1036,7 @@ class Avada_Privacy_Embeds {
 			$content = '<div class="fusion-privacy-label">' . $content . '</div>';
 
 			$html .= apply_filters( 'avada_embeds_consent_text', $content, $label, $type );
-			$html .= '<a href="" data-privacy-type="' . $type . '" class="fusion-button button-default fusion-button-default-size button fusion-privacy-consent">' . esc_html__( 'I Accept', 'Avada' ) . '</a>';
+			$html .= '<button data-privacy-type="' . $type . '" class="fusion-button button-default fusion-button-default-size button fusion-privacy-consent">' . esc_html__( 'I Accept', 'Avada' ) . '</button>';
 			$html .= '</div></div>';
 
 			return $html;

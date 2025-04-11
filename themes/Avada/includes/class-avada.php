@@ -423,7 +423,7 @@ class Avada {
 		}
 
 		$previous_version = get_option( 'avada_previous_version', false );
-		if ( Avada()->registration->is_registered() && ! empty( $previous_versions ) ) {
+		if ( Avada()->registration->is_registered() && ! empty( $previous_version ) ) {
 			$api_url .= '&version=' . AVADA_VERSION;
 		}
 

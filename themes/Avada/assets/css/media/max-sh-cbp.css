@@ -378,6 +378,6 @@ body .shortcode-tabs .tab-hold .tabs li {
 .fusion-body:not(.avada-has-page-title-mobile-height-auto) .fusion-page-title-bar:not(.fusion-tb-page-title-bar) {
   min-height: calc(var(--page_title_mobile_height) - 10px);
 }
-.avada-has-breadcrumb-mobile-hidden.fusion-body .fusion-page-title-bar .fusion-breadcrumbs {
+.avada-has-breadcrumb-mobile-hidden.fusion-body .avada-page-titlebar-wrapper .fusion-breadcrumbs {
   display: none;
 }

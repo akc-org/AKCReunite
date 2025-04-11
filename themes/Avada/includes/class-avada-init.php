@@ -72,6 +72,7 @@ class Avada_Init {
 
 		if ( ! is_admin() ) {
 			add_filter( 'pre_get_posts', [ $this, 'modify_search_filter' ] );
+			add_filter( 'posts_search', [ $this, 'add_woo_product_sku_search' ], 510, 2 );
 			add_filter( 'pre_get_posts', [ $this, 'empty_search_filter' ] );
 			add_filter( 'posts_search', [ $this, 'limit_search_to_title_only' ], 500, 2 );
 			add_filter( 'search_form_after_fields', [ $this, 'force_product_archive_load' ] );
@@ -89,6 +90,8 @@ class Avada_Init {
 		add_action( 'wp_ajax_nopriv_live_search_retrieve_posts', [ $this, 'live_search_retrieve_posts' ] );
 
 		add_filter( 'fusion_google_maps_api_key', 'normalize_whitespace' );
+
+		
 	}
 
 	/**
@@ -231,7 +234,7 @@ class Avada_Init {
 
 		foreach ( $image_sizes as $size => $params ) {
 			if ( ! is_array( $available_image_size ) || in_array( $size, $available_image_size ) ) {
-				add_image_size( $size, implode( ',', $params ) );
+				add_image_size( $size, $params[0], $params[1], $params[2] );
 			}
 		}
 	}
@@ -491,7 +494,6 @@ class Avada_Init {
 	 * @return void.
 	 */
 	public function live_search_retrieve_posts() {
-
 		if ( isset( $_POST['post_type'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
 			if ( 1 === count( $_POST['post_type'] ) && isset( $_POST['post_type'][0] ) && 'any' === $_POST['post_type'][0] ) { // phpcs:ignore WordPress.Security.NonceVerification
 				$post_types = 'any';
@@ -534,11 +536,40 @@ class Avada_Init {
 			$search_results = fusion_cached_query( $args );
 		}
 
-		$result_suggestions = [];
-		if ( $search_results->have_posts() ) {
-			$display_post_type      = isset( $_POST['display_post_type'] ) ? (bool) wp_unslash( $_POST['display_post_type'] ) : true; // phpcs:ignore WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput
-			$display_featured_image = isset( $_POST['show_feat_img'] ) ? (bool) wp_unslash( $_POST['show_feat_img'] ) : true; // phpcs:ignore WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput
+		$display_post_type      = isset( $_POST['display_post_type'] ) ? (bool) wp_unslash( $_POST['display_post_type'] ) : true; // phpcs:ignore WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput
+		$display_featured_image = isset( $_POST['show_feat_img'] ) ? (bool) wp_unslash( $_POST['show_feat_img'] ) : true; // phpcs:ignore WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput		
+		$result_suggestions     = [];
 
+		// Add WooCommerce product SKU search.
+		$add_woo_product_skus = isset( $_POST['add_woo_product_skus'] ) ? $_POST['add_woo_product_skus'] : Avada()->settings->get( 'search_add_woo_product_skus' ); // phpcs:ignore WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput
+		if ( class_exists( 'WooCommerce' )  && ( 'any' === $args['post_type'] || ( is_array( $args['post_type'] ) && in_array( 'product', $args['post_type'] ) ) ) && '1' === $add_woo_product_skus ) {
+			$product_id = wc_get_product_id_by_sku( $args['s'] );
+				
+			if ( $product_id ) {
+				$product = wc_get_product( $product_id );
+
+				if ( is_object( $product ) && $product->is_type( 'variation' ) ) {
+					$product_id = $product->get_parent_id();
+				}
+
+				$post_type = '';
+				if ( $display_post_type ) {
+					$post_type_obj = get_post_type_object( get_post_type( $product_id ) );
+					$post_type     = ( $post_type_obj ) ? $post_type_obj->labels->singular_name : $post_type;
+				}				
+			
+				$result_suggestions[] = [
+					'id'        => esc_attr( $product_id ),
+					'type'      => $post_type,
+					'title'     => get_the_title( $product_id ),
+					'post_url'  => get_the_permalink( $product_id ),
+					'image_url' => $display_featured_image ? get_the_post_thumbnail_url( $product_id, 'recent-works-thumbnail' ) : '',
+				];
+
+			}
+		}
+
+		if ( $search_results->have_posts() ) {
 			while ( $search_results->have_posts() ) {
 				$search_results->the_post();
 				global $post;
@@ -612,7 +643,7 @@ class Avada_Init {
 		$n          = ! empty( $query_vars['exact'] ) ? '' : '%';
 		$search     = '';
 		$searchand  = '';
-
+		
 		foreach ( (array) $query_vars['search_terms'] as $term ) {
 			$term      = esc_sql( $wpdb->esc_like( $term ) );
 			$search   .= "{$searchand}($wpdb->posts.post_title LIKE '{$n}{$term}{$n}')";
@@ -620,7 +651,7 @@ class Avada_Init {
 		}
 
 		if ( ! empty( $search ) ) {
-			$search = " AND ({$search}) ";
+			$search = " AND (({$search})) ";
 
 			if ( ! is_user_logged_in() ) {
 				$search .= " AND ($wpdb->posts.post_password = '') ";
@@ -629,6 +660,45 @@ class Avada_Init {
 
 		return $search;
 	}
+
+	/**
+	 * Modifies the search SQL query to add WooCommerce product SKUs.
+	 *
+	 * @since 7.11.14
+	 * @access public
+	 * @param string $search   Search SQL for WHERE clause.
+	 * @param object $wp_query The search query.
+	 * @return string $where The modified clause.
+	 */	
+	public function add_woo_product_sku_search( $search, $query ) {
+		global $wpdb;
+
+		$search_results_post_types = $this->get_search_results_post_types();
+
+		$add_woo_product_skus = Avada()->settings->get( 'search_add_woo_product_skus' );
+
+		// If there's an URL override replace the settings value.
+		if ( isset( $_GET['add_woo_product_skus'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
+			$add_woo_product_skus = $_GET['add_woo_product_skus']; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput, WordPress.Security.NonceVerification
+		}		
+
+		if ( class_exists( 'WooCommerce' ) && is_search() && $query->is_search && ( ! empty( $query->query['s'] ) ) && '1' === $add_woo_product_skus && ( ( is_array( $search_results_post_types ) &&  in_array( 'product', $search_results_post_types ) ) || 'any' === $search_results_post_types ) ) {
+
+			$product_id = wc_get_product_id_by_sku( $query->query_vars['s'] );
+			
+			if ( $product_id ) {
+				$product = wc_get_product( $product_id );
+
+				if ( is_object( $product ) && $product->is_type( 'variation' ) ) {
+					$product_id = $product->get_parent_id();
+				}
+
+				$search = str_replace( 'AND (((', "AND (({$wpdb->posts}.ID IN (" . $product_id . ")) OR ((", $search );  
+			}
+		}
+
+		return $search;   
+	 }			
 
 	/**
 	 * Modifies the search filter.
@@ -651,6 +721,7 @@ class Avada_Init {
 
 			$query->set( 'post_type', $this->get_search_results_post_types() );
 		}
+
 		return $query;
 	}
 
@@ -702,7 +773,7 @@ class Avada_Init {
 		 * a user would have to gain access to the database
 		 * in which case this is the least of your worries.
 		 */
-		echo Avada()->settings->get( 'space_body' ); // phpcs:ignore WordPress.Security.EscapeOutput
+		echo apply_filters( 'awb_space_body_close', Avada()->settings->get( 'space_body' ) ); // phpcs:ignore WordPress.Security.EscapeOutput
 	}
 
 	/**

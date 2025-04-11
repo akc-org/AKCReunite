@@ -87,6 +87,7 @@ class Avada_Admin {
 		add_action( 'admin_init', [ $this, 'admin_init' ] );
 		add_action( 'admin_init', [ $this, 'init_permalink_settings' ] );
 		add_action( 'admin_init', [ $this, 'save_permalink_settings' ] );
+		add_action( 'admin_init', [ $this, 'add_columns_to_post_tables' ] );
 		add_action( 'admin_menu', [ $this, 'admin_menu' ] );
 		add_action( 'admin_menu', [ $this, 'edit_admin_menus' ], 999 );
 		add_action( 'admin_enqueue_scripts', [ $this, 'admin_scripts' ] );
@@ -267,7 +268,9 @@ class Avada_Admin {
 		global $submenu;
 
 		// Change Avada to Dashboard.
-		$submenu['avada'][0][0] = esc_html__( 'Dashboard', 'Avada' ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride
+		if ( isset( $submenu['avada'][0][0] ) ) {
+			$submenu['avada'][0][0] = esc_html__( 'Dashboard', 'Avada' ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride
+		}
 
 		if ( isset( $submenu['themes.php'] ) && ! empty( $submenu['themes.php'] ) ) {
 			foreach ( $submenu['themes.php'] as $key => $value ) {
@@ -283,11 +286,10 @@ class Avada_Admin {
 
 			// Reorder items in the array.
 			$submenu['themes.php'] = array_values( $submenu['themes.php'] ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride
+
+			// Remove TGMPA menu from Appearance.
+			remove_submenu_page( 'themes.php', 'install-required-plugins' );
 		}
-
-		// Remove TGMPA menu from Appearance.
-		remove_submenu_page( 'themes.php', 'install-required-plugins' );
-
 	}
 
 	/**
@@ -822,7 +824,7 @@ class Avada_Admin {
 	public static function get_social_media_links() {
 		$social_media_markup = '<div class="avada-db-footer-social-media">
 		<a href="https://www.facebook.com/ThemeFusion-101565403356430/" target="_blank" class="avada-db-social-icon dashicons dashicons-facebook-alt"></a>
-		<a href="https://twitter.com/theme_fusion" target="_blank" class="avada-db-social-icon dashicons dashicons-twitter"></a>
+		<a href="https://x.com/theme_fusion" target="_blank" class="avada-db-social-icon dashicons dashicons-twitter"></a>
 		<a href="https://www.instagram.com/themefusion/" target="_blank" class="avada-db-social-icon dashicons dashicons-instagram"></a>
 		<a href="https://www.youtube.com/channel/UC_C7uAOAH9RMzZs-CKCZ62w" target="_blank" class="avada-db-social-icon fusiona-youtube"></a>
 		</div>';
@@ -1634,12 +1636,11 @@ class Avada_Admin {
 	 * @return string Returns a URL.
 	 */
 	public static function get_dashboard_screen_video_url() {
+		$video_url     = '';
+		$fresh_install = get_transient( 'awb_fresh_install' );
+		$data          = Avada::get_data();
 
-		// Fallback values.
-		$video_url = 'https://www.youtube.com/watch?v=Y5k5UMgOpXs?rel=0';
-		$data      = Avada::get_data();
-
-		if ( isset( $data['video_url'] ) ) {
+		if ( isset( $data['video_url'] ) && ( 'fresh' === $fresh_install || 'https://www.youtube.com/watch?v=b_HWpHZJDU8' !== $data['video_url'] ) ) {
 			$video_url = $data['video_url'];
 		}
 
@@ -1762,5 +1763,125 @@ class Avada_Admin {
 	public function get_hubspot_affiliate_code() {
 		return $this->hubspot_code;
 	}
+
+	/**
+	 * Adds the menu order options as colum,n to the post tables.
+	 *
+	 * @access public
+	 * @since 7.11.10
+	 * @return void
+	 */ 
+	public function add_columns_to_post_tables() {
+		add_action( 'manage_avada_portfolio_posts_columns', [ $this, 'add_portfolio_columns' ] );
+		add_action( 'manage_avada_faq_posts_columns', [ $this, 'add_faq_columns' ] );
+
+		$post_types = [
+			'avada_faq',
+			'avada_portfolio',
+			'page',
+		];
+		
+		foreach ( $post_types as $post_type ) {
+			add_action( 'manage_' . $post_type . '_posts_columns', [ $this, 'add_order_column' ] );
+			add_action( 'manage_' . $post_type . '_posts_custom_column', [ $this, 'show_order_column_values' ] );
+			add_filter( 'manage_edit-' . $post_type . '_sortable_columns', [ $this, 'order_column_register_sortable' ] );
+		}
+	}
+
+	/**
+	 * Add categories, skills and tags columns to the Portfolio wp list table.
+	 *
+	 * @access public
+	 * @since 7.11.10
+	 * @return void
+	 */ 
+	public function add_portfolio_columns( $columns ) {
+		$columns['portfolio_category'] = esc_html__( 'Categories', 'Avada' );
+		$columns['portfolio_skills']   = esc_html__( 'Skills', 'Avada' );
+		$columns['portfolio_tags']     = esc_html__( 'Tags', 'Avada' );
+	
+		return $columns;
+	}
+
+	/**
+	 * Add categories colum to the FAQs wp list table.
+	 *
+	 * @access public
+	 * @since 7.11.10
+	 * @return void
+	 */ 
+	public function add_faq_columns( $columns ) {
+		$columns['faq_category'] = esc_html__( 'Categories', 'Avada' );
+	
+		return $columns;
+	}       
+		
+	/**
+	 * Add order column to wp list tables.
+	 *
+	 * @access public
+	 * @since 7.11.10
+	 * @return void
+	 */ 
+	public function add_order_column( $columns ) {
+		$columns['menu_order'] = esc_html__( 'Order', 'Avada' );
+	
+		return $columns;
+	}
+	
+	/**
+	 * Show order column values in wp list tables.
+	 *
+	 * @access public
+	 * @since 7.11.10
+	 * @return void
+	 */ 
+	public function show_order_column_values( $name ) {
+		global $post;
+	
+		switch ( $name ) {
+			case 'portfolio_category':
+			case 'portfolio_skills':
+			case 'portfolio_tags':
+			case 'faq_category':
+				$terms      = get_the_terms( $post->ID, $name );
+				$terms_html = '';
+				if ( $terms ) {
+					foreach ( $terms as $term ) {
+						$args        = [
+							$name       => $term->slug,
+							'post_type' => $post->post_type,
+						];
+						$terms_html .= sprintf(
+							'<a href="%1$s">%2$s</a>',
+							esc_url( add_query_arg( $args, 'edit.php' ) ),
+							esc_html( $term->name )
+						) . wp_get_list_item_separator();
+					}
+				}
+
+				echo trim( $terms_html, wp_get_list_item_separator() );
+				break;
+			case 'menu_order':
+				$order = $post->menu_order;
+				echo $order;
+				break;
+			default:
+				break;
+		}
+	}
+	
+	/**
+	 * Make order column sortable in wp list tables.
+	 *
+	 * @access public
+	 * @since 7.11.10
+	 * @return void
+	 */ 
+	public function order_column_register_sortable( $columns ) {
+		$columns['menu_order'] = 'menu_order';
+	
+		return $columns;
+	}   
 }
 /* Omit closing PHP tag to avoid "Headers already sent" issues. */

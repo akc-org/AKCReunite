@@ -452,7 +452,9 @@ class Fusion_Settings {
 			if ( false !== strpos( $setting, '_typography' ) && function_exists( 'AWB_Global_Typography' ) ) {
 				$global_typography_class = AWB_Global_Typography();
 				$setting_value           = $global_typography_class->get_real_value( $setting_value );
-			} elseif ( function_exists( 'AWB_Global_Colors' ) ) {
+			}
+
+			if ( function_exists( 'AWB_Global_Colors' ) ) {
 
 				// If we have a color global variable.
 				$global_color_class = AWB_Global_Colors();
@@ -612,10 +614,13 @@ class Fusion_Settings {
 				$setting_description = sprintf( esc_html__( '  Default currently set to %s.', 'Avada' ), $setting_link );
 				break;
 
+			case 'no_desc':
+				$setting_description = $setting_link;
+				break;
 			default:
 				if ( '' !== $setting_value ) {
 					/* translators: The default value. */
-					$setting_description = sprintf( esc_html__( '  Leave empty for default value of %s.', 'Avada' ), $setting_link );
+					$setting_description = sprintf( esc_html__( ' Leave empty for default value of %s.', 'Avada' ), $setting_link );
 				} else {
 					/* translators: %1$s is the link. %2$s is the link text. */
 					$setting_description = sprintf( __( '  Currently no default selected. Can be set globally from the <a %1$s>%2$s</a>.', 'Avada' ), 'href="' . $this->get_setting_link( $setting, $subset ) . '" target="_blank" rel="noopener noreferrer"', apply_filters( 'fusion_options_label', esc_html__( 'Element Options', 'Avada' ) ) );

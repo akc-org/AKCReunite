@@ -210,20 +210,20 @@ class PyreThemeFrameworkMetaboxes {
 	 */
 	public static function get_pagetype_tab( $posttype = false ) {
 		$pagetype_data = [
-			'page'              => [ 'page', 'header', 'sliders', 'pagetitlebar', 'content', 'sidebars', 'footer', 'seo' ],
-			'post'              => [ 'post', 'page', 'header', 'sliders', 'pagetitlebar', 'content', 'sidebars', 'footer', 'seo' ],
+			'page'              => [ 'page', 'header', 'sliders', 'pagetitlebar', 'content', 'sidebars', 'footer', 'seo', 'code_fields' ],
+			'post'              => [ 'post', 'page', 'header', 'sliders', 'pagetitlebar', 'content', 'sidebars', 'footer', 'seo', 'code_fields' ],
 			'avada_faq'         => [ 'post', 'page', 'header', 'sliders', 'pagetitlebar', 'content', 'sidebars', 'footer' ],
-			'avada_portfolio'   => [ 'portfolio_post', 'page', 'header', 'sliders', 'pagetitlebar', 'content', 'sidebars', 'footer', 'seo' ],
-			'product'           => [ 'page', 'header', 'sliders', 'pagetitlebar', 'content', 'sidebars', 'footer', 'seo' ],
-			'tribe_events'      => [ 'page', 'header', 'sliders', 'pagetitlebar', 'content', 'sidebars', 'footer', 'seo' ],
+			'avada_portfolio'   => [ 'portfolio_post', 'page', 'header', 'sliders', 'pagetitlebar', 'content', 'sidebars', 'footer', 'seo', 'code_fields' ],
+			'product'           => [ 'page', 'header', 'sliders', 'pagetitlebar', 'content', 'sidebars', 'footer', 'seo', 'code_fields' ],
+			'tribe_events'      => [ 'page', 'header', 'sliders', 'pagetitlebar', 'content', 'sidebars', 'footer', 'seo', 'code_fields' ],
 			'fusion_tb_section' => [ 'template', 'content', 'sidebars' ],
 			'fusion_form'       => [ 'form_general', 'form_appearance', 'form_submission', 'form_notifications', 'form_confirmation', 'form_steps', 'form_privacy' ],
-			'awb_off_canvas'    => [ 'template', 'off_canvas_general', 'off_canvas_design', 'off_canvas_overlay', 'off_canvas_close', 'off_canvas_animation', 'off_canvas_conditions', 'off_canvas_triggers', 'off_canvas_rules' ],
+			'awb_off_canvas'    => [ 'template', 'off_canvas_general', 'off_canvas_design', 'off_canvas_overlay', 'off_canvas_close', 'off_canvas_animation', 'off_canvas_conditions', 'off_canvas_triggers', 'off_canvas_rules', 'code_fields' ],
 			'fusion_element'    => [],
 			'fusion_template'   => [ 'content', 'page', 'fusion_template' ],
 			'post_card'         => [ 'template' ],
 			'mega_menu'         => [ 'template' ],
-			'default'           => [ 'post', 'page', 'header', 'sliders', 'pagetitlebar', 'content', 'sidebars', 'footer', 'seo' ],
+			'default'           => [ 'post', 'page', 'header', 'sliders', 'pagetitlebar', 'content', 'sidebars', 'footer', 'seo', 'code_fields' ],
 		];
 
 		if ( ! isset( $posttype ) || ! $posttype ) {
@@ -312,9 +312,9 @@ class PyreThemeFrameworkMetaboxes {
 		$this->add_meta_box( 'es_options', esc_html__( 'Elastic Slide Options', 'Avada' ), 'themefusion_elastic' );
 		$this->add_meta_box( 'woocommerce_options', esc_html__( 'Avada Page Options', 'Avada' ), 'product' );
 		$this->add_meta_box( 'slide_options', esc_html__( 'Slide Options', 'Avada' ), 'slide' );
-		$this->add_meta_box( 'events_calendar_options', esc_html__( 'Events Calendar Options', 'Avada' ), 'tribe_events' );
+		$this->add_meta_box( 'events_calendar_options', esc_html__( 'Events Calendar Event Options', 'Avada' ), 'tribe_events' );
 		$this->add_meta_box( 'fusion_tb_section', esc_html__( 'Layout Section Options', 'Avada' ), 'fusion_tb_section' );
-		$this->add_meta_box( 'fusion_form', esc_html__( 'Form Options', 'Avada' ), 'fusion_form' );
+		$this->add_meta_box( 'fusion_form', esc_html__( 'Avada Form Options', 'Avada' ), 'fusion_form' );
 		$this->add_meta_box( 'awb_off_canvas', esc_html__( 'Off Canvas Options', 'Avada' ), 'awb_off_canvas' );
 		$this->add_meta_box( 'fusion_element', esc_html__( 'Avada Page Options', 'Avada' ), 'fusion_element' );
 		$this->add_meta_box( 'fusion_template', esc_html__( 'Avada Page Options', 'Avada' ), 'fusion_template' );
@@ -582,6 +582,9 @@ class PyreThemeFrameworkMetaboxes {
 				case 'textarea':
 					$this->textarea( $field['id'], $field['label'], $field['description'], $field['default'], $field['dependency'], $field['responsive'], $field );
 					break;
+				case 'code':
+					$this->code( $field['id'], $field['label'], $field['description'], $field['default'], $field['dependency'], $field['responsive'], $field );
+					break;					
 				case 'custom':
 					$this->raw( $field['id'], $field['label'], $field['description'], $field['dependency'], $field['responsive'] );
 					break;
@@ -620,6 +623,11 @@ class PyreThemeFrameworkMetaboxes {
 				case 'iconpicker':
 					$this->iconpicker( $field['id'], $field['label'], $field['description'], $field['dependency'], $field['responsive'] );
 					break;
+				case 'date_time_picker':
+					$this->date_time_picker( $field['id'], $field['label'], $field['description'], $field['dependency'], $field['responsive'] );
+					break;
+
+					
 			}
 		}
 	}
@@ -668,6 +676,7 @@ class PyreThemeFrameworkMetaboxes {
 			'fusion_template'       => esc_html__( 'Template', 'Avada' ),
 			'form_steps'            => esc_html__( 'Step Progress', 'Avada' ),
 			'seo'                   => esc_html__( 'SEO', 'Avada' ),
+			'code_fields'           => esc_html__( 'Code Fields', 'Avada' ),
 		];
 
 		// Set tab name for mega menu.
@@ -1517,6 +1526,44 @@ class PyreThemeFrameworkMetaboxes {
 	}
 
 	/**
+	 * Code field.
+	 *
+	 * @param string $id         IDs of input fields.
+	 * @param string $label      Label of field.
+	 * @param string $desc       Description of field.
+	 * @param string $default    The default value.
+	 * @param array  $dependency The dependencies array.
+	 * @param mixed  $responsive The responsive param data.
+	 * @param array  $field      The full param field
+	 */
+	public function code( $id, $label, $desc = '', $default = '', $dependency = [], $responsive = false, $field = [] ) {
+		$settings = [];
+		$rows     = 10;
+		$mode     = isset( $field['choices']['languages'] ) ? $field['choices']['languages'] : 'html';
+		$value = $this->get_value( $id );
+		
+		if ( function_exists( 'wp_enqueue_code_editor' ) ) {
+			$settings = wp_enqueue_code_editor( [] );
+		}
+		?>
+		<div class="pyre_metabox_field<?php echo false !== $responsive ? ' has-responsive fusion-' . $responsive : ''; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>">
+			<?php // No need to sanitize this, we already know what's in here. ?>
+			<?php echo $this->dependency( $dependency ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+			<div class="pyre_desc">
+				<label for="pyre_<?php echo esc_attr( $id ); ?>"><?php echo $label; // phpcs:ignore WordPress.Security.EscapeOutput ?></label>
+				<?php if ( $desc ) : ?>
+					<p><?php echo $desc; // phpcs:ignore WordPress.Security.EscapeOutput ?></p>
+				<?php endif; ?>
+			</div>
+			<div class="pyre_field">
+				<textarea class="awb-code fusion-builder-code-block" cols="120" rows="<?php echo (int) $rows; ?>" id="pyre_<?php echo esc_attr( $id ); ?>" name="<?php echo esc_attr( $this->format_option_name( $id ) ); ?>" data-language="<?php echo esc_attr( $mode ); ?>" ><?php echo esc_html( $value ); ?></textarea>
+				<textarea style="display: none;" class="hidden <?php echo esc_attr( $this->format_option_name( $id ) ); ?>"><?php echo wp_json_encode( $settings ); ?></textarea>	
+			</div>
+		</div>
+		<?php
+	}
+
+	/**
 	 * Upload field.
 	 *
 	 * @param array  $id         IDs of input fields.
@@ -1876,6 +1923,41 @@ class PyreThemeFrameworkMetaboxes {
 						<div class="fusion-iconselect-wrapper">
 							<div class="icon_select_container"></div>
 						</div>
+				</div>
+			</div>
+			<?php
+	}
+
+	/**
+	 * Date time picker field.
+	 *
+	 * @access public
+	 * @since 7.11.12
+	 * @param string $id         ID of input field.
+	 * @param string $label      Label of field.
+	 * @param string $desc       Description of field.
+	 * @param array  $dependency The dependencies array.
+	 * @param mixed  $responsive The responsive param data.
+	 */
+	public function date_time_picker( $id, $label, $desc = '', $dependency = [], $responsive = false ) {
+		$value = $this->get_value( $id );
+		?>
+			<div class="pyre_metabox_field<?php echo false !== $responsive ? ' has-responsive fusion-' . $responsive : ''; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?> date_time_picker fusion-builder-option field-<?php echo esc_attr( $id ); ?>">
+			<?php // No need to sanitize this, we already know what's in here. ?>
+			<?php echo $this->dependency( $dependency ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+			<div class="pyre_desc">
+				<label for="pyre_<?php echo esc_attr( $id ); ?>"><?php echo esc_textarea( $label ); ?></label>
+				<?php if ( $desc ) : ?>
+						<p><?php echo $desc; // phpcs:ignore WordPress.Security.EscapeOutput ?></p>
+					<?php endif; ?>
+				</div>
+				<div class="pyre_field fusion-date-time-picker">
+					<div class="fusion-datetime full-picker">
+						<input type="text" id="pyre_<?php echo esc_attr( $id ); ?>" name="<?php echo esc_attr( $this->format_option_name( $id ) ); ?>" value="<?php echo esc_attr( $value ); ?>">
+						<div class="fusion-dt-picker-field add-on">
+							<i data-time-icon="fusiona-clock" data-date-icon="fusiona-calendar-plus-o" aria-hidden="true" class="fusiona-calendar-plus-o"></i>
+						</div>
+					</div>
 				</div>
 			</div>
 			<?php

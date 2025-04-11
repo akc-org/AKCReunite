@@ -80,11 +80,13 @@ class Avada_Upgrade_592 extends Avada_Upgrade_Abstract {
 
 		if ( is_array( $tokens ) ) {
 			foreach ( $tokens as $product => $token ) {
-				$registration_data[ $product ]             = [];
-				$registration_data[ $product ]['token']    = $token['token'];
-				$registration_data[ $product ]['is_valid'] = array_key_exists( $product, $registered ) ? $registered[ $product ] : false;
-				if ( array_key_exists( 'scopes', $registered ) && array_key_exists( $product, $registered['scopes'] ) ) {
-					$registration_data[ $product ]['scopes'] = $registered['scopes'][ $product ];
+				$registration_data[ $product ]          = [];
+				$registration_data[ $product ]['token'] = $token['token'];
+				if ( is_array( $registered ) ) {
+					$registration_data[ $product ]['is_valid'] = array_key_exists( $product, $registered ) ? $registered[ $product ] : false;
+					if ( array_key_exists( 'scopes', $registered ) && array_key_exists( $product, $registered['scopes'] ) ) {
+						$registration_data[ $product ]['scopes'] = $registered['scopes'][ $product ];
+					}
 				}
 			}
 		}

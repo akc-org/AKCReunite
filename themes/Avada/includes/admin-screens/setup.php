@@ -502,9 +502,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 			</div>
 		</div>
 		<?php
-			$studio_url         = class_exists( 'AWB_Studio_Import' ) ? AWB_Studio_Import()->studio_url : 'https://avada.studio/';
-			$default_header_url = $studio_url . 'fusion_tb_section/new-starter-header/?template-only=1';
-			$default_footer_url = $studio_url . 'fusion_tb_section/starter-footer/?template-only=1';
+			$studio_url         = class_exists( 'AWB_Studio_Import' ) ? AWB_Studio_Import()->studio_url : 'https://avada.studio';
+			$default_header_url = $studio_url . '/fusion_tb_section/new-starter-header/?template-only=1';
+			$default_footer_url = $studio_url . '/fusion_tb_section/starter-footer/?template-only=1';
 		?>
 		<div class="awb-setup-wizard-content">
 			<div class="awb-wizard-option-group" data-layout="header">

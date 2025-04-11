@@ -260,7 +260,7 @@ function avada_options_section_portfolio( $sections ) {
 					],
 					'portfolio_archive_excerpt_length'     => [
 						'label'           => esc_html__( 'Portfolio Archive Excerpt Length', 'Avada' ),
-						'description'     => esc_html__( 'Controls the number of words in the excerpts for portfolio archive pages.', 'Avada' ),
+						'description'     => sprintf( __( 'Controls the number of %s in the excerpts on portfolio archive pages.', 'Avada' ), Fusion_Settings::get_instance()->get_default_description( 'excerpt_base', false, 'no_desc' ) ),
 						'id'              => 'portfolio_archive_excerpt_length',
 						'default'         => '10',
 						'type'            => 'slider',
@@ -481,6 +481,13 @@ function avada_options_section_portfolio( $sections ) {
 						'default'     => 'portfolio-items',
 						'type'        => 'text',
 					],
+					'portfolio_with_front'                 => [
+						'label'           => esc_html__( 'Portfolio Include Permalink Front Base', 'Avada' ),
+						'description'     => esc_html__( 'Turn on to include the front base defined by the permalink structure set in Settings > Permalinks. Make sure to regenerate permalinks.', 'Avada' ),
+						'id'              => 'portfolio_with_front',
+						'default'         => '1',
+						'type'            => 'switch',
+					],					
 					'portfolio_meta_font_size'             => [
 						'label'       => esc_html__( 'Meta Data Font Size', 'Avada' ),
 						'description' => esc_html__( 'Controls the font size for meta data text.', 'Avada' ),

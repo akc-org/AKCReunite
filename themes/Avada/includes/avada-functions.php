@@ -477,17 +477,18 @@ if ( ! function_exists( 'avada_add_login_box_to_nav' ) ) {
 							if ( isset( $_GET['login'] ) && 'failed' === $_GET['login'] ) { // phpcs:ignore WordPress.Security.NonceVerification
 								$items .= '<p class="fusion-menu-login-box-error">' . esc_html__( 'Login failed, please try again.', 'Avada' ) . '</p>';
 							}
-							$items .= '<form action="' . esc_attr( site_url( 'wp-login.php', 'login_post' ) ) . '" name="loginform" method="post">';
-							$items .= '<p><input type="text" class="input-text" name="log" id="username-' . esc_attr( $menu_id ) . '" value="" placeholder="' . esc_html__( 'Username', 'Avada' ) . '" /></p>';
-							$items .= '<p><input type="password" class="input-text" name="pwd" id="password-' . esc_attr( $menu_id ) . '" value="" placeholder="' . esc_html__( 'Password', 'Avada' ) . '" /></p>';
+
+							$items .= '<form action="' . esc_url( apply_filters( 'login_url', site_url( 'wp-login.php', 'login_post' ), '', false ) ) . '" name="loginform" method="post">';
+							$items .= '<p><input type="text" class="input-text" name="log" id="username-' . esc_attr( $menu_id ) . '" value="" placeholder="' . esc_attr( 'Username', 'Avada' ) . '" /></p>';
+							$items .= '<p><input type="password" class="input-text" name="pwd" id="password-' . esc_attr( $menu_id ) . '" value="" placeholder="' . esc_attr( 'Password', 'Avada' ) . '" /></p>';
 							$items .= '<p class="fusion-remember-checkbox"><label for="fusion-menu-login-box-rememberme-' . esc_attr( $menu_id ) . '"><input name="rememberme" type="checkbox" id="fusion-menu-login-box-rememberme" value="forever"> ' . esc_html__( 'Remember Me', 'Avada' ) . '</label></p>';
 							$items .= '<input type="hidden" name="fusion_woo_login_box" value="true" />';
 							$items .= '<p class="fusion-login-box-submit">';
-							$items .= '<input type="submit" name="wp-submit" id="wp-submit-' . esc_attr( $menu_id ) . '" class="button button-small default comment-submit" value="' . esc_html__( 'Log In', 'Avada' ) . '">';
+							$items .= '<input type="submit" name="wp-submit" id="wp-submit-' . esc_attr( $menu_id ) . '" class="button button-small default comment-submit" value="' . esc_attr__( 'Log In', 'Avada' ) . '">';
 							$items .= '<input type="hidden" name="redirect" value="' . esc_url( $referer ) . '">';
 							$items .= '</p>';
 							$items .= '</form>';
-							$items .= '<a class="fusion-menu-login-box-register" href="' . get_permalink( get_option( 'woocommerce_myaccount_page_id' ) ) . '" title="' . esc_attr__( 'Register', 'Avada' ) . '">' . esc_attr__( 'Register', 'Avada' ) . '</a>';
+							$items .= '<a class="fusion-menu-login-box-register" href="' . get_permalink( get_option( 'woocommerce_myaccount_page_id' ) ) . '" title="' . esc_attr__( 'Register', 'Avada' ) . '">' . esc_html__( 'Register', 'Avada' ) . '</a>';
 							$items .= '</div>';
 						} else {
 							$account_endpoints = wc_get_account_menu_items();

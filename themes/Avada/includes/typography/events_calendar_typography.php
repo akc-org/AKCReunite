@@ -135,7 +135,7 @@ function avada_events_post_title_typography_elements( $typography_elements ) {
 	if ( class_exists( 'Tribe__Events__Main' ) ) {
 		$typography_elements['size'][] = '#wrapper .fusion-events-shortcode .fusion-events-meta h2';
 		$typography_elements['size'][] = '#wrapper .fusion-events-shortcode .fusion-events-meta h1';
-		$typography_elements['size'][] = '.fusion-body .fusion-wrapper #main .tribe-events.tribe-events-view article header h3';
+		$typography_elements['size'][] = '.fusion-body .fusion-wrapper #main .tribe-events.tribe-events-view article header h3:not(.tribe-events-pro-summary__event-title)';
 		$typography_elements['size'][] = '.fusion-body .fusion-wrapper #main .tribe-events .tribe-events-pro-photo__event-title';
 		$typography_elements['size'][] = '.fusion-body .fusion-wrapper #main .tribe-events .tribe-events-pro-map__event-title';
 		$typography_elements['size'][] = '.fusion-body .fusion-wrapper #main .tribe-events-calendar-month-mobile-events__mobile-event-title';

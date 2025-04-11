@@ -19,9 +19,18 @@ var FusionPageBuilder = FusionPageBuilder || {};
 			if ( '0' != FusionApp.settings.sharing_twitter ) {
 				socialMedia.push( 'twitter' );
 			}
+			if ( '0' != FusionApp.settings.sharing_bluesky ) {
+				socialMedia.push( 'bluesky' );
+			}
+			if ( '0' != FusionApp.settings.sharing_linkedin ) {
+				socialMedia.push( 'github' );
+			}					
 			if ( '0' != FusionApp.settings.sharing_linkedin ) {
 				socialMedia.push( 'linkedin' );
 			}
+			if ( '0' != FusionApp.settings.sharing_linkedin ) {
+				socialMedia.push( 'mastodon' );
+			}			
 			if ( '0' != FusionApp.settings.sharing_reddit ) {
 				socialMedia.push( 'reddit' );
 			}
@@ -31,6 +40,9 @@ var FusionPageBuilder = FusionPageBuilder || {};
 			if ( '0' != FusionApp.settings.sharing_telegram ) {
 				socialMedia.push( 'telegram' );
 			}
+			if ( '0' != FusionApp.settings.sharing_linkedin ) {
+				socialMedia.push( 'threads' );
+			}			
 			if ( '0' != FusionApp.settings.sharing_tumblr ) {
 				socialMedia.push( 'tumblr' );
 			}

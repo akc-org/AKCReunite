@@ -7,12 +7,276 @@ This is why we highly recommend to stay up to date with each new theme version a
 
 
 -----------------------------------------------------------------------------------------
+Version 7.11.15 - March 18th, 2025
+-----------------------------------------------------------------------------------------
+
+
+- SECURITY: Fixed Contributor+ level XSS issue, allowing authenticated users to use "javascript:" in element link fields
+- FIXED: Privacy embed notices not correctly showing on some installs
+
+
+-----------------------------------------------------------------------------------------
+Version 7.11.14 - January 28th, 2025
+-----------------------------------------------------------------------------------------
+
+
+- NEW: Added custom code fields to single posts and pages
+- NEW: Added code field to Off Canvas
+- NEW: Added custom CSS field to Mega Menu library elements
+- NEW: Added Threads, Bluesky, Mastodon, and Github to Social Links, Person, and Sharing Box elements
+- NEW: Added an option to set a custom lightbox ID in the Gallery element, for easy connecting an Image element to it
+- NEW: Added option to include WooCommere SKUs in the global search and also the Search element
+- NEW: Added options to Search element to include or exclude specific terms to/from search results
+- NEW: Added Post Views to the order by query parameters in Post Cards element
+- NEW: Added short slide animation to element animation options
+- NEW: Added options for Portfolio and FAQ post types to include or exclude the front base defined in permalink settings
+- NEW: Added option to Sharing Box element to disable tooltips
+- SECURITY: Fixed arbitrary shortcodes being able to be executed when using render_content REST API endpoint or reCAPTCHA on comments form
+- PERFORMANCE: Added preview image lazy loading to Video facade images in YouTube and Vimeo elements
+- IMPROVEMENT: Updated some of the keyboard shortcuts for the Live Editor
+- IMPROVEMENT: Added icon set navigation to icons picker in backend builder
+- IMPROVEMENT: Made sure that Post Card Archives auto sets the term order to menu order to reflect backend table ordering
+- IMPROVEMENT: Added a fallback for old dynamic data logo images to prevent missing logos on front-end
+- IMPROVEMENT: Changed bottom shadow in Tagline Box element to SVG for better displayability
+- IMPROVEMENT: Made The Events Calendar event status dynamic data translateable
+- COMPATIBILITY: Added support WooCommerce Zip Payment payment option to the Woo Cart element
+- COMPATIBILITY: Added support for WooCommerce Germanized legal info to the Woo Price element
+- COMPATIBILITY: Added support for more the_content filter scenarios in the Memberpress plugin to avoid issues with the Layout builder
+- COMPATIBILITY: Made sure that Avada's featured image takes precedence of the WooCommerce category thumbnail in dynamic data
+- COMPATIBILITY: Made sure that third-party plugins do not change how the builder controls are rendered in the back-end builder
+- FIXED: PHP notice for loading text domain too early (WP native issue)
+- FIXED: Woo variation image not being updated correctly in the product gallery when using Avada lazy loading and variation is set on load
+- FIXED: Gallery column spacing not working when using ACF repeaters
+- FIXED: Hidden conditional forms being treated as required within multi-step forms
+- FIXED: Responsive typography not working in Title element when using the div tag
+- FIXED: Incorrect text color in lightbox when using the mac skin
+- FIXED: Global option border-radius setting for Gallery element not being applied, if nothing is set in the Gallery element itself
+- FIXED: Audio element not being correctly initialized when AJAX loading more posts in Post Cards element
+- FIXED: Chrome console error, when using scroll progress on the to top button
+- FIXED: PHP notice in legacy menu options, when Off Canvas post type is disabled
+- FIXED: Data type check in the emoji script disabling function
+- FIXED: User text selection option in Text Block element missing the default value indicator
+- FIXED Button color option being incorrectly rendered in some cases in the Tagline Box element
+- FIXED: Special characters in translation files not working in option headings in Live Editor
+
+
+-----------------------------------------------------------------------------------------
+Version 7.11.13 - December 18th, 2024
+-----------------------------------------------------------------------------------------
+
+
+- IMPROVEMENT: Limited scroll to notice to WooCommerce single product pages on add to cart Ajax complete 
+- UPDATED: Compatibility with WooCommerce 9.5.1
+- FIXED: Data attributes not always being set in Counter element, Gallery element, and Lightboxes leading to display issues due to JS error
+- FIXED: Menu elements being misplaced when used together with collapsed mobile menus in some setups
+- FIXED: Border radius not working in Chrome for the to-top button when using scroll progress indicator
+- FIXED: WooCommerce product category featured image not always being displayed correctly
+- FIXED: Person element bottom shadow not displayed correctly in Live Editor
+
+
+-----------------------------------------------------------------------------------------
+Version 7.11.12 - December 16th, 2024
+-----------------------------------------------------------------------------------------
+
+
+- NEW: Added publishing status and date scheduling options to Off-Canvas
+- NEW: Added playback rate options to the Audio element
+- NEW: Added WooCommerce product's last purchase date and total purchase count to the dynamic data engine
+- NEW: Added WooCommerce product purchased / not purchased checks to the rendering logic engine
+- NEW: Added feature to dynamic data engine to pull images directly from a FileBird folder in the media library
+- NEW: Added an option to Lightbox settings to allow Lightbox images to loop
+- NEW: Added an option to display a page scroll indicator to floated to-top buttons
+- NEW: Added possibility to cancel the to-top scroll, when interfering with a click or mouse wheel move while scrolling is in progress
+- NEW: Added page post type to the available post types in Post Cards element query
+- NEW: Added post status to the query options filters in Post Cards element
+- NEW: Added ignore sticky posts to the query options filters in Post Cards element
+- NEW: Added support for ACF repeaters from option pages in Post Cards element
+- NEW: Added support for ACF icon pickers to dynamic data repeater options
+- NEW: Added a maintenance / coming soon mode indicator to the WP admin bar
+- NEW: WooCommerce quick view now supports AJAX add-to-cart
+- NEW: Added field value option to Textarea element in Avada Forms
+- NEW: Avada Forms submission expiration functionality will now be useable independent from the privacy settings
+- NEW: Added option to Avada Forms to remove/add the required field symbol decoration
+- NEW: YouTube shorts are now working in the Avada lightbox
+- NEW: Added option to System Status to copy the main site Global Options across all sites on a multisite install
+- NEW: Added the possibility to use clamp()-based font-sizes in Avada Slider
+- NEW: Added Woo logo badge to WooCommerce elements in the builder element selection
+- SECURITY: Contributor+ level users being able to clone arbitrary posts and thus being able to view contents of drafted or pending posts
+- SECURITY: Contributor+ level users being able to add JS code to a few elements for execution on page preview of an admin user
+- PERFORMANCE: Vastly improved the image ID lookup for images retrieved through the dynamic data engine
+- PERFORMANCE: Vastly improved speed of the attachment data lookup function when the attachment ID is not available
+- IMPROVEMENT: Added the possibility to paste content that was copied through the editor context menu directly to tinyMCE options
+- IMPROVEMENT: Changed initialization of the WooCommerce Image Gallery element to improve compatibility with certain hosts
+- IMPROVEMENT: Added the AvadaCustom Branding plugin to the Avada Patcher system
+- IMPROVEMENT: Made sure that the Avada favicon settings take precedence over the default WP Site Logo
+- IMPROVEMENT: Excluded post queries that use random post order from the Avada query cache to avoid result duplication
+- IMPROVEMENT: Removed the deprecated Google Maps pan control option when using the JS API
+- IMPROVEMENT: Scroll-to-step navigation in multi-step Avada Forms is now limited to forms with the navigation on top
+- IMPROVEMENT: Added maximum file size to the Avada Forms Upload field description
+- IMPROVEMENT: Made sure that all relevant FAQ items are shown in FAQ element, even if used on archives or on an FAQ itself
+- IMPROVEMENT: Dynamic data will now display category names of The Evnts Calendar plugin on archive pages instead of just "Events"
+- IMPROVEMENT: Added the set Favivon to Live Editor screens
+- IMPROVEMENT: Excerpt basis value is now linked to the excerpt length options for easier overview
+- IMPROVEMENT: Updated several option descriptions, dependencies, and dialogs for better usability and internationalization
+- COMPATIBILITY: Replaced outdated wp_smush_should_skip_parse for compatibility with the latest version of WP Smushit plugin
+- COMPATIBILITY: Fixed GravityView plugin icons not correctly working in Avada Builder
+- COMPATIBILITY: Fixed single post content compatibility issue with the latest versions of the Sermon Manager plugin
+- COMPATIBILITY: Fixed 520 loading error when using the WooCommerce My Account login on sites hosted by WPEngine
+- COMPATIBILITY: Fixed BuddyPress email templates URL replacements being filtered out creating link issues
+- COMPATIBILITY: Fixed media library scrolling issue when Instant Images plugin is used
+- UPDATED: Compatibility with WordPress 6.7.1
+- UPDATED: Compatibility with WooCommerce 9.4.3
+- UPDATED: Compatibility with The Events Calendar 6.8.3
+- UPDATED: Instagram element to comply with latest requirements from Meta
+- ACCESSIBILITY: Added alt and aria-label attributes to empty Column background images
+- ACCESSIBILITY: Fixed itemprop attribute in Vimeo and YouTube elements
+- ACCESSIBILITY: Fixed aria-expanded attribute being added to desktop menus that have a mobile mode
+- ACCESSIBILITY: Fixed aria-expanded attribute not correctly working in the Menu element when toggling different sub-menus
+- ACCESSIBILITY: Fixed WooCommerce My Account menu login labels using incorrect for attribute
+- ACCESSIBILITY: Fixed two misspelled aria-label attributes
+- FIXED: ACF repeater data not being retrievable on archive pages when using parent/child element setups
+- FIXED: Required fields in Avada Forms getting hidden/shown through conditional logic no longer being required then
+- FIXED: Error styling not being applied to required select fields in Avada Forms
+- FIXED: Default sender email being incorrect in Avada Forms in secondary languages when using WPML with sub-folder setup
+- FIXED: Elements with dynamic content not rendering correctly when added to multi-step forms in Avada Forms
+- FIXED: Form submission not working for second form when adding the same Avada Form twice to one page and using reCAPTCHA v3
+- FIXED: Links to post not added when using the single post share box and sharing on X
+- FIXED: Variation images not correctly displayed in lightbox when the WooCommerce product gallery does not have thumbs (i.e. only one featured image is used)
+- FIXED: Before & After elements not correctly initialized when being part of Post Cards that get loaded through load more feature
+- FIXED: Full-screen slider option not working correctly for Avada Slider when using slide animation
+- FIXED: Read more symbol not respecting the Global Option setting when using dynamic data excerpts option and WP auto excerpts
+- FIXED: Breadcrumbs element being hidden on mobile in custom Page Title Bar (PTB) layout, if the legacy PTB breadcrumbs are disabled in Global Options on mobile
+- FIXED: URL for layout imports in the Setup Wizard
+- FIXED: Post Card Image link being incorrect for WoCoomerce product variation after choosing a variation on the Post Card
+- FIXED: Apply/remove coupon notices not always being correctly displayed in the Woo Notices element
+- FIXED: Border radius option in Search element not correctly inheriting from the global form options
+- FIXED: Background image fase option not respecting the background-repeat option in Container element
+- FIXED: Woo Rating element not using full product link when being used as part of a Post Card
+- FIXED: Percentage-based discount badge being wrong in Woo Price element when product price is below 1
+- FIXED: Button element gradient angle option having incorrect default value
+- FIXED: Top and bottom padding options not working in Checklist element when using the divider line option
+- FIXED: Display issue in Post Cards element when a CPT with the name "product" is used that is not related to WooCommerce
+- FIXED: Caption color being incorrect in Image element when using the Schantel caption effect
+- FIXED: Spacing issue on the Events Calendar main archive pages
+- FIXED: Styling issue of options in the WordPress Customizer
+- FIXED: JS error happening when using the HubSpot oAuth API
+- FIXED: PHP notice for load text domain too early
+- FIXED: PHP notice in the Social Links widget regarding the Snapchat link
+- FIXED: PHP notice in class-fusion-images.php
+- FIXED: PHP notice appearing for subscriber role users in the WP Dashboard
+- FIXED: PP notice in Menu element on some expand directions when using active border sizes 
+- FIXED: History no always correctly working in Backend Editor  when using undo and redo
+- FIXED: Critical error happening due to wp_check_post_lock() function in Live Editor when user gets logged out automatically
+- FIXED: Absolutely positioned Comtainers not always having the correct width in Live Editor, depending on responsive settings and hover state
+- FIXED: Next/prev icons not being displayed correctly in Woo Product Images element in Live Editor
+- FIXED: Nested columns as children of a global Column being duplicated when added twice to a page in Live Editor and content getting edited
+- FIXED: Transform origin option not working correctly in Live Editor
+- FIXED: First placeholder image not being properly loaded in the Image Carousel element in Live Editor
+- FIXED: TinyMCE editor options in Live Editor leading to unwanted page scroll in WP 6.7
+- FIXED: Color option descriptions in Live Editor displaying global color variable instead of color name
+
+
+-----------------------------------------------------------------------------------------
+Version 7.11.11 - October 23rd, 2024
+-----------------------------------------------------------------------------------------
+
+
+- SECURITY: Avada's WooCommerce quick view setup is vulnerable to Broken Access Control (BAC). Worst case: drafted or private products could be obtained through quick view.
+- SECURITY: Deprecated custom colors are vulnerable to Cross Site Request Forgery (CSRF). Worst case: An admin user could be tricked into creating a new color.
+- IMPROVEMENT: Removed a few unnecessary cache clearing hooks
+- UPDATED: Option description for OSM element Map Style to include link to the Wiki
+- FIXED: Compatibility issue between Layout Builder and plugins using object type filters
+- FIXED: URI Exception happening when using unaccepted characters in Code Block element
+- FIXED: Possible PHP notice in dynamic data when looping through ACF options page options
+
+
+-----------------------------------------------------------------------------------------
+Version 7.11.10 - September 02nd, 2024
+-----------------------------------------------------------------------------------------
+
+
+- SECURITY: Additional security hardening for Button element attributes (This is only relevant when saving through a different page builder)
+- NEW: Added 29 different dynamic data endpoints for The Events Calendar, making it easy to create custom single event layouts using the Layout Builder
+- NEW: Added possibility to assign a layout to single Events Calendar events
+- NEW: Added Event Venue Name, Event Organizer Name, Event Address and Event Cost to Post Meta element
+- NEW: Added post type as option to the Post Meta element
+- NEW: Sortable option types like "Meta Elements" in Post Meta element can be adjusted through a double click on individual items now
+- NEW: Added the possibility to cross-site copy and paste Avada Builder content
+- NEW: Added right-click copy feature to icon pickers, to copy the icon name CSS easily
+- NEW: Added support for ACF icon pickers in dynamic data
+- NEW: Added support for ACF Option Pages in dynamic data
+- NEW: Added do_action() to dynamic data options
+- NEW: Added dynamic data to the Pinterest image option in the Sharing Box element
+- NEW: WooCommerce out-of-stock badge is now also shown when choosing the clean product design
+- NEW: Added loop and player control options to YouTube element
+- NEW: Added the interior content width option to Container elements in Off Canvas
+- NEW: Added animation timing function option to Off Canvas animations
+- NEW: Added option to allow Select elements in Avada Forms to be multi-select
+- NEW: Added posts offset option to the Post Card Archives element
+- NEW: Added functionality to have several Post Card Archives element on the same archive layout, for "featured post" like setups
+- NEW: Added option to control what is displayed in Post Card element when no posts have been found
+- NEW: Added LIKE operator to custom field comparison option in Post Card element
+- NEW: Added "Post In" setting to the order by option in Post Card element
+- NEW: Added session value as selection to the Rendering Logic engine
+- NEW: Added Portfolio categories, skills, and tag and FAQ categories to the admin tables for easier management
+- NEW: Added menu order option to the admin post tables for Pages, Portfolio, and FAQ post types, for easier sorting
+- NEW: Added an option to Button element to add the ARIA role button
+- IMPROVEMENT: Added support for the woocommerce_add_to_cart_redirect filter when using single product ajax add to cart feature
+- IMPROVEMENT: Element names in the Live Editor Navigator are no longer escaping special chars for better readability
+- IMPROVEMENT: Dynamic data global option logos will now always display correctly (not just a placeholder) when used on Image element
+- IMPROVEMENT: Changed Instagram social link icon color to one of the Instagram gradient main colors
+- IMPROVEMENT: Changed tagline color option in the Sharing Box element to the normal/hover states setup
+- IMPROVEMENT: Implicit consent text color is now tied to the form label color in Avada Forms
+- IMPROVEMENT: Soft linebreaks are now working in the Tex element when used inside of Avada Forms
+- IMPROVEMENT: Updated several option descriptions, dependencies, and dialogs for better usability
+- UPDATED: Off Canvas post option icon picker to make it work with latest versions of Google Chrome
+- UPDATED: Changed priority of the menu inline scripts enqueueing for better performance for other plugins enqueueing to footer 
+- UPDATED: Removed the placeholder JS script for better compatibility and performance
+- UPDATED: Compatibility with WooCommerce 9.2.3
+- UPDATED: Compatibility with The Events Calendar 6.6.2
+- ACCESSIBILITY: Added product name to the "Remove Item" button of the Cart Table element
+- ACCESSIBILITY: Fixed menu trigger button not changing aria-expanded attribute to true on menu open in Menu element
+- COMPATIBILITY: WooCommerce menu login box to use the wp_login_url() function for better compatibility with third parties.
+- COMPATIBILITY: Fixed compatibility issue with the Dynamic Menu Product Categories plugin
+- COMPATIBILITY: Fixed more content issues with the MemberDash plugin when using the Layout Builder
+- FIXED: Image element magnify and scroll features not working for AJAX loaded postcards when using load more option in Post Card element
+- FIXED: Custom capability CPTs not always being correctly matched in role manager for accessing the builders
+- FIXED: ACF relationship post source setting not working in Post Card element when being used on Archive pages 
+- FIXED: WooCommerce order attribution not being added when using Woo Checkout Billing element (necessary for latest versions of WooCommerce)
+- FIXED: Responsive columns not always working correctly in Gallery element
+- FIXED: Maintenance / coming soon mode not being able to exclude the site homepage alone
+- FIXED: Maintenance / coming soon mode default template displaying incorrectly on mobile
+- FIXED: Caption text not using correct font style in Image element
+- FIXED: The Events Calendar main loop being incorrect when using a Post Card element before the main content (e.g. in mega menus)
+- FIXED: Bottom shadow width not always being correct in Image element
+- FIXED: Instagram element not being able to load the feed correctly, if the site is not using pretty permalinks
+- FIXED: show_product_loop_outofstock_flash() function using incorrect class for action hook in WooProduct Grid element
+- FIXED: YouTube element autoplay not working when using Avada lazyloading and content being below the fold
+- FIXED: Missing px unit in inline CSS of the width setting for LayerSlider
+- FIXED: JS error happening when using the URL regex pattern Avada Forms
+- FIXED: JS error preventing WooCommerce quick view from working, when no product title is set on the product
+- FIXED: JS error happening in some cases in Post Card element when post slider is not initialized
+- FIXED: PHP notice in add-to-cart.php template when using WooCommerce 9.0+
+- FIXED: PHP notice when using Snapchat social link in combination with brand colors
+- FIXED: PHP notice when using an SVG as image that has no vieBox param set
+- FIXED: Potential fatal error if Avada And WooCommerce are active, but Avada Builder is not
+- FIXED: Image element focal point position difference between Live Editor and backend editor
+- FIXED: Slider Revolution element not rendering properly in the Live Editor
+- FIXED: SEO title and meta description options not triggering content changed action to make post saveable in Live Editor
+- FIXED: Several options of Media Slider element not live updating in Live Editor
+- FIXED: Post Card element preview being empty in Live Editor when a Blog or Portfolio element is rendering before it with full content
+- FIXED: Subgroup option types being incorrectly displayed in medium and small editor mode in the backend builder
+- FIXED: Wave weight and size options not saving correctly in Separator element in backend editor
+
+
+-----------------------------------------------------------------------------------------
 Version 7.11.9 - June 05th, 2024
 -----------------------------------------------------------------------------------------
 
 
 - SECURITY: Fixed Contributor+-level-only XSS vulnerability, allowing site Contributors to add event attributes to link attributes options
 - FIXED: Conditional rendering logic not working correctly in Containers on some specific setups
+- FIXED: Generated dimensions of some registered image sizes being incorrect
 - FIXED: Some Global Options and Page Options not correctly triggering page changed actions in Live Editor
 - FIXED: Bulk removal of Avada Form enrties not working
 

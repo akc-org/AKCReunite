@@ -1595,7 +1595,11 @@ class Avada_Scripts {
 			// Strip out any URLs referencing the WordPress.org emoji location.
 			$emoji_svg_url_bit = 'https://s.w.org/images/core/emoji/';
 			foreach ( $urls as $key => $url ) {
-				if ( false !== strpos( $url, $emoji_svg_url_bit ) ) {
+				if ( is_array( $url ) && isset( $url['href'] ) ) {
+					if ( false !== strpos( $url['href'], $emoji_svg_url_bit ) ) {
+						unset( $urls[ $key ] );
+					}
+				} elseif ( false !== strpos( $url, $emoji_svg_url_bit ) ) {
 					unset( $urls[ $key ] );
 				}
 			}

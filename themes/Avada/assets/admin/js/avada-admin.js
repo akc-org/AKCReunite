@@ -769,6 +769,10 @@ jQuery( document ).ready( function() {
 	jQuery( '.avada-db-welcome-video' ).on( 'click', function( e ) {
 		var $container = jQuery( '.avada-db-welcome-media-container' );
 
+		if ( '#' !== jQuery( this ).attr( 'href' ) ) {
+			return;
+		}
+
 		e.preventDefault();
 
 		$container.toggleClass( 'avada-db-active' );
@@ -886,22 +890,46 @@ jQuery( document ).ready( function() {
 		var $this = jQuery( this ),
 			statusCell = $this.closest( 'tr' ).find( 'td:nth-child(3)' ),
 			data = {
-			action: 'fusion_create_forms_tables',
-			nonce: jQuery( '#fusion-system-status-nonce' ).val()
-		};
+				action: 'fusion_create_forms_tables',
+				nonce: jQuery( '#fusion-system-status-nonce' ).val()
+			};
 
 		event.preventDefault();
 
-		statusCell.html( '' );
-		$this.closest( 'tr' ).find( '.fusion-system-status-spinner' ).css( 'display', 'inline-block' );
+		statusCell.find( '.avada-db-status-version-control-desc, a ' ).hide();
+		statusCell.find( '.fusion-system-status-spinner' ).css( 'display', 'inline-block' );
 
 		jQuery.get( ajaxurl, data, function( response ) {
-
-			$this.closest( 'tr' ).find( '.fusion-system-status-spinner' ).css( 'display', 'none' );
+			statusCell.find( '.fusion-system-status-spinner' ).hide();
 			statusCell.html( response.message );
 		}, 'json' );
 
 	} );
+
+	// Copy multisite global options.
+	jQuery( '.awb-copy-multisite-global-options' ).on( 'click', function( event ) {
+		var $this = jQuery( this ),
+			statusCell = $this.closest( 'tr' ).find( 'td:nth-child(3)' ),
+			data = {
+				action: 'awb_copy_multisite_global_options',
+				nonce: jQuery( '#fusion-system-status-nonce' ).val()
+			};
+
+		event.preventDefault();
+
+		if ( false === confirm( jQuery( this ).data( 'confirm-text' ) ) ) {
+			return;
+		}
+
+		statusCell.find( '.avada-db-status-version-control-desc, a ' ).hide();
+		statusCell.find( '.fusion-system-status-spinner' ).css( 'display', 'inline-block' );
+
+		jQuery.get( ajaxurl, data, function( response ) {
+			statusCell.find( '.fusion-system-status-spinner' ).hide();
+			statusCell.html( response.message );
+		}, 'json' );
+
+	} );	
 
 	// Registration scroll to.
 	function scrollToRegistration() {

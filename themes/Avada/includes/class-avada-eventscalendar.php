@@ -37,6 +37,8 @@ class Avada_EventsCalendar {
 	 * @access public
 	 */
 	public function __construct() {
+		add_action( 'avada_before_main_container', [ $this, 'correct_main_query' ], 10 );
+
 		add_action( 'tribe_events_before_the_title', [ $this, 'before_the_title' ] );
 		add_action( 'tribe_events_after_the_title', [ $this, 'after_the_title' ] );
 
@@ -80,10 +82,29 @@ class Avada_EventsCalendar {
 
 		add_filter( 'tribe_events_views_v2_use_wp_template_hierarchy', [ $this, 'use_wp_template_hierarchy' ], 10, 4 );
 
+		add_action( 'awb_tec_single_events_meta', [ $this, 'add_single_events_meta_sidebar' ] );
+
 		// When widgets are disabled, make sure the single event sidebar still shows.
-		$global_options = get_option( 'fusion_options' );
-		if ( isset( $global_options['status_widget_areas'] ) && '0' === $global_options['status_widget_areas'] && isset( $global_options['ec_meta_layout'] ) && 'sidebar' === $global_options['ec_meta_layout'] ) {
-			add_action( 'wp', [ $this, 'add_single_event_sidebar' ], 20 );
+		add_action( 'wp', [ $this, 'add_single_event_sidebar' ], 20 );
+	}
+	
+	/**
+	 * If a Post Card (or similar) gets rendered before the main content, the hijacking of the TEC query and template fail.
+	 * This function reinits both for the main events page and also the single events.
+	 *
+	 * @access public
+	 * @since 7.11.10
+	 * @return void
+	 */ 
+	public function correct_main_query() {
+		if ( tribe_is_events_home() || tribe_is_event( get_queried_object_id() ) ) {
+			$page_template = tribe( Tribe\Events\Views\V2\Template\Page::class );
+
+			if ( $page_template->has_hijacked_posts() ) {
+				$page_template->restore_main_query();
+
+				add_action( 'loop_start', [ $page_template, 'hijack_on_loop_start' ], 1000 );
+			}
 		}
 	}
 
@@ -497,6 +518,36 @@ class Avada_EventsCalendar {
 	}
 
 	/**
+	 * Checks if the legacy meta sidebar should be displayed.
+	 *
+	 * @static
+	 * @access public
+	 * @since 7.11.10
+	 * @return bool 
+	 */
+	public static function has_legacy_meta_sidebar() {
+		if ( is_singular( 'tribe_events' ) && 'sidebar' === fusion_library()->get_option( 'ec_meta_layout' ) && ! ( function_exists( 'Fusion_Template_Builder' ) && Fusion_Template_Builder()->get_override( 'content' ) ) ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Add the single events meta sidebar.
+	 *
+	 * @access public
+	 * @since 7.11.10
+	 * @return void
+	 */
+	public function add_single_events_meta_sidebar() {
+		if ( $this->has_legacy_meta_sidebar() ) {
+			do_action( 'tribe_events_single_event_before_the_meta' );
+			tribe_get_template_part( 'modules/meta' );
+		}
+	}
+
+	/**
 	 * Add the single events sidebar when widgets are disabled.
 	 *
 	 * @access public
@@ -504,8 +555,7 @@ class Avada_EventsCalendar {
 	 * @return void
 	 */
 	public function add_single_event_sidebar() {
-
-		if ( is_singular( 'tribe_events' ) ) {
+		if ( '0' === fusion_library()->get_option( 'status_widget_areas' ) && $this->has_legacy_meta_sidebar() ) {
 			add_action( 'avada_after_content', [ $this, 'append_single_event_sidebar' ] );
 
 			add_filter( 'awb_content_tag_style', [ $this, 'set_single_event_content_styles' ] );

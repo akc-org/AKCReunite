@@ -497,7 +497,7 @@ body {
 .fusion-body:not(.avada-has-page-title-mobile-height-auto) .fusion-page-title-captions {
   width: 100%;
 }
-.avada-has-breadcrumb-mobile-hidden.fusion-body .fusion-page-title-bar .fusion-breadcrumbs {
+.avada-has-breadcrumb-mobile-hidden.fusion-body .avada-page-titlebar-wrapper .fusion-breadcrumbs {
   display: none;
 }
 .avada-has-slider-fallback-image #sliders-container {

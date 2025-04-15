@@ -99,6 +99,20 @@ function avada_options_section_search( $sections ) {
 							],
 						],
 					],
+					'search_add_woo_product_skus'        => [
+						'label'           => esc_html__( 'Search for WooCommerce Product SKUs', 'Avada' ),
+						'description'     => esc_html__( 'Turn on to also search for WooCommerce product SKUs. This will only work, if products have been added to the search results content.', 'Avada' ),
+						'id'              => 'search_add_woo_product_skus',
+						'default'         => '0',
+						'type'            => 'switch',
+						'update_callback' => [
+							[
+								'condition' => 'is_search',
+								'operator'  => '===',
+								'value'     => true,
+							],
+						],
+					],					
 					'search_form_design'                 => [
 						'label'       => esc_html__( 'Search Form Design', 'Avada' ),
 						'description' => esc_html__( 'Controls the design of the search forms.', 'Avada' ),
@@ -471,7 +485,7 @@ function avada_options_section_search( $sections ) {
 			],
 			'search_excerpt_length'                        => [
 				'label'           => esc_html__( 'Search Excerpt Length', 'Avada' ),
-				'description'     => esc_html__( 'Controls the number of words (or characters) in the search results excerpts.', 'Avada' ),
+				'description'     => sprintf( __( 'Controls the number of %s in the excerpts on search results.', 'Avada' ), Fusion_Settings::get_instance()->get_default_description( 'excerpt_base', false, 'no_desc' ) ),
 				'id'              => 'search_excerpt_length',
 				'default'         => '10',
 				'type'            => 'slider',

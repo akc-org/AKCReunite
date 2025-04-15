@@ -237,8 +237,8 @@ $avada_avadaredux_args = [
 	'textdomain'           => 'Avada',
 	'disable_dependencies' => (bool) ( '0' === Avada()->settings->get( 'dependencies_status' ) ),
 	'display_name'         => 'Avada',
-	'menu_title'           => __( 'Global Options', 'Avada' ),
-	'page_title'           => __( 'Global Options', 'Avada' ),
+	'menu_title'           => 'Global Options',
+	'page_title'           => 'Global Options',
 	'global_variable'      => 'fusion_fusionredux_options',
 	'page_parent'          => 'themes.php',
 	'page_slug'            => 'avada_options',
@@ -324,7 +324,7 @@ if ( is_admin() ) {
 /**
  * Instantiate Avada_System_Status helper class.
  */
-if ( is_admin() && ( isset( $_GET['page'] ) && 'avada-status' === sanitize_text_field( wp_unslash( $_GET['page'] ) ) ) || ( fusion_doing_ajax() && isset( $_GET['action'] ) && ( 'fusion_check_api_status' === $_GET['action'] || 'fusion_create_forms_tables' === $_GET['action'] ) ) ) { // phpcs:ignore WordPress.Security.NonceVerification
+if ( is_admin() && ( isset( $_GET['page'] ) && 'avada-status' === sanitize_text_field( wp_unslash( $_GET['page'] ) ) ) || ( fusion_doing_ajax() && isset( $_GET['action'] ) && ( 'fusion_check_api_status' === $_GET['action'] || 'fusion_create_forms_tables' === $_GET['action'] || 'awb_copy_multisite_global_options' === $_GET['action'] ) ) ) { // phpcs:ignore WordPress.Security.NonceVerification
 	new Avada_System_Status();
 }
 
@@ -377,6 +377,10 @@ if ( class_exists( 'WooCommerce' ) ) {
 	require_once Avada::$template_dir_path . '/includes/class-avada-woocommerce-variations.php';
 	global $avada_woocommerce;
 	$avada_woocommerce = new Avada_Woocommerce();
+}
+
+if ( class_exists( 'ACF' ) ) {
+	new AWB_ACF();
 }
 
 /**
@@ -585,74 +589,80 @@ function avada_layerslider_ready() {
 add_action( 'layerslider_ready', 'avada_layerslider_ready' );
 
 
-// Init patcher only in Dashboard.
-if ( is_admin() || ( defined( 'WP_CLI' ) && WP_CLI ) ) {
+function awb_init_patcher() {
+	// Init patcher only in Dashboard.
+	if ( is_admin() || ( defined( 'WP_CLI' ) && WP_CLI ) ) {
+		/**
+		 * Istantiate the auto-patcher tool.
+		 */
+		global $avada_patcher;
+		$avada_patcher_args = [
+			'context'     => 'avada',
+			'version'     => AVADA_VERSION,
+			'name'        => 'Avada',
+			'parent_slug' => 'avada',
+			'page_title'  => esc_attr__( 'Avada Patcher', 'Avada' ),
+			'menu_title'  => esc_attr__( 'Patcher', 'Avada' ),
+			'classname'   => 'Avada',
+			'bundled'     => [],
+		];
+
+		$avada_plugins = [
+			'fusion-builder'              => 'fusion-builder/fusion-builder.php',
+			'fusion-core'                 => 'fusion-core/fusion-core.php',
+			'fusion-white-label-branding' => 'fusion-white-label-branding/fusion-white-label-branding.php',
+		];
+
+		if ( ! function_exists( 'is_plugin_active' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		}
+
+		foreach ( $avada_plugins as $plugin_context => $plugin_path ) {
+			if ( is_plugin_active( $plugin_path ) ) {
+				$avada_patcher_args['bundled'][] = $plugin_context;
+			}
+		}
+
+		$avada_patcher = new Fusion_Patcher( $avada_patcher_args );
+	}
+}
+add_action( 'after_setup_theme', 'awb_init_patcher' );
+
+function awb_init_maintenance() {
 	/**
-	 * Istantiate the auto-patcher tool.
+	 * During updates sometimes there are changes that will break a site.
+	 * We're adding a maintenance page to make sure users don't see a broken site.
+	 * As soon as the update is complete the site automatically returns to normal mode.
 	 */
-	global $avada_patcher;
-	$avada_patcher_args = [
-		'context'     => 'avada',
-		'version'     => AVADA_VERSION,
-		'name'        => 'Avada',
-		'parent_slug' => 'avada',
-		'page_title'  => esc_attr__( 'Avada Patcher', 'Avada' ),
-		'menu_title'  => esc_attr__( 'Patcher', 'Avada' ),
-		'classname'   => 'Avada',
-		'bundled'     => [],
-	];
-
-	$avada_plugins = [
-		'fusion-builder'              => 'fusion-builder/fusion-builder.php',
-		'fusion-core'                 => 'fusion-core/fusion-core.php',
-		'fusion-white-label-branding' => 'fusion-white-label-branding/fusion-white-label-branding.php',
-	];
-
-	if ( ! function_exists( 'is_plugin_active' ) ) {
-		require_once ABSPATH . 'wp-admin/includes/plugin.php';
+	$maintenance   = false;
+	$users_message = esc_html__( 'Our site is currently undergoing scheduled maintenance. Please try again in a moment.', 'Avada' );
+	// Check if we're currently update Avada.
+	if ( Avada::$is_updating ) {
+		$maintenance   = true;
+		$admin_message = esc_html__( 'Currently updating the Avada Theme. Your site will be accessible once the update finishes', 'Avada' );
 	}
 
-	foreach ( $avada_plugins as $plugin_context => $plugin_path ) {
-		if ( is_plugin_active( $plugin_path ) ) {
-			$avada_patcher_args['bundled'][] = $plugin_context;
+	/**
+	 * Make sure that if the fusion-core plugin is activated,
+	 * it's at least version 2.0.
+	 */
+	if ( class_exists( 'FusionCore_Plugin' ) ) {
+		$fc_version = FUSION_CORE_VERSION;
+		if ( version_compare( $fc_version, '2.0', '<' ) ) {
+			$maintenance = true;
+			/* translators: The "follow this link" link. */
+			$admin_message = sprintf( esc_attr__( 'The Avada-Core plugin needs to be updated before your site can exit maintenance mode. Please %s to update the plugin.', 'Avada' ), '<a href="' . admin_url( 'themes.php?page=install-required-plugins' ) . '" style="color:#0088cc;font-weight:bold;">' . esc_attr__( 'follow this link', 'Avada' ) . '</a>' );
 		}
 	}
 
-	$avada_patcher = new Fusion_Patcher( $avada_patcher_args );
-}
-
-/**
- * During updates sometimes there are changes that will break a site.
- * We're adding a maintenance page to make sure users don't see a broken site.
- * As soon as the update is complete the site automatically returns to normal mode.
- */
-$maintenance   = false;
-$users_message = esc_html__( 'Our site is currently undergoing scheduled maintenance. Please try again in a moment.', 'Avada' );
-// Check if we're currently update Avada.
-if ( Avada::$is_updating ) {
-	$maintenance   = true;
-	$admin_message = esc_html__( 'Currently updating the Avada Theme. Your site will be accessible once the update finishes', 'Avada' );
-}
-
-/**
- * Make sure that if the fusion-core plugin is activated,
- * it's at least version 2.0.
- */
-if ( class_exists( 'FusionCore_Plugin' ) ) {
-	$fc_version = FUSION_CORE_VERSION;
-	if ( version_compare( $fc_version, '2.0', '<' ) ) {
-		$maintenance = true;
-		/* translators: The "follow this link" link. */
-		$admin_message = sprintf( esc_attr__( 'The Avada-Core plugin needs to be updated before your site can exit maintenance mode. Please %s to update the plugin.', 'Avada' ), '<a href="' . admin_url( 'themes.php?page=install-required-plugins' ) . '" style="color:#0088cc;font-weight:bold;">' . esc_attr__( 'follow this link', 'Avada' ) . '</a>' );
+	/**
+	 * If we're on maintenance mode, show the screen.
+	 */
+	if ( $maintenance ) {
+		new Avada_Maintenance( true, $users_message, $admin_message );
 	}
 }
-
-/**
- * If we're on maintenance mode, show the screen.
- */
-if ( $maintenance ) {
-	new Avada_Maintenance( true, $users_message, $admin_message );
-}
+add_action( 'after_setup_theme', 'awb_init_maintenance' );
 
 /**
  * Class for adding Avada specific data to builder.

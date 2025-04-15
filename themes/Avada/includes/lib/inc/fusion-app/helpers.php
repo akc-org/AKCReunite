@@ -201,6 +201,8 @@ function fusion_app_textdomain_strings() {
 	$text_strings = [
 
 		'custom_css'                                  => esc_html__( 'Custom CSS', 'fusion-builder' ),
+		'code_fields'                                 => esc_html__( 'Code Fields', 'fusion-builder' ),
+		'custom_code'                                 => esc_html__( 'Custom Code', 'fusion-builder' ),
 		'builder'                                     => esc_html__( 'Builder', 'fusion-builder' ),
 		'library'                                     => esc_html__( 'Library', 'fusion-builder' ),
 		'add_css_code_here'                           => esc_html__( 'Add your CSS code here...', 'fusion-builder' ),
@@ -255,7 +257,7 @@ function fusion_app_textdomain_strings() {
 		'layout_section_elements'                     => esc_html__( 'Layout Elements', 'fusion-builder' ),
 		'form_elements'                               => esc_html__( 'Form Elements', 'fusion-builder' ),
 		'library_elements'                            => esc_html__( 'Library Elements', 'fusion-builder' ),
-		'generator_elements_tooltip'                  => esc_html__( 'Inline element for usage in the Avada Builder Generator.', 'fusion-builder' ),
+		'generator_elements_tooltip'                  => esc_html__( 'Inline element for usage inside of other elements.', 'fusion-builder' ),
 		'template_max_use_limit'                      => esc_html__( 'This element can be added only', 'fusion-builder' ),
 		'time'                                        => esc_html__( 'time.', 'fusion-builder' ),
 		'times'                                       => esc_html__( 'times.', 'fusion-builder' ),

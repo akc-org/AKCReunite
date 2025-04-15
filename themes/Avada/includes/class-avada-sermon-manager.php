@@ -31,20 +31,11 @@ class Avada_Sermon_Manager {
 	public function get_sermon_content( $archive = false ) {
 		global $post;
 
-		$sermon_content          = '';
-		$sermon_manager_template = '';
-
-		if ( class_exists( 'Sermon_Manager_Template_Tags' ) ) {
-			$sermon_manager_template = new Sermon_Manager_Template_Tags();
-		}
+		$sermon_content = '';
 
 		// Get the date.
 		ob_start();
-		if ( is_object( $sermon_manager_template ) ) {
-			$sermon_manager_template->wpfc_sermon_date( get_option( 'date_format' ), '<span class="sermon_date">', '</span> ' );
-		} else {
-			wpfc_sermon_date( get_option( 'date_format' ), '<span class="sermon_date">', '</span> ' );
-		}
+		wpfc_sermon_date( get_option( 'date_format' ), '<span class="sermon_date">', '</span> ' );
 		$date = ob_get_clean();
 
 		// Print the date.
@@ -58,11 +49,8 @@ class Avada_Sermon_Manager {
 
 		<?php ob_start(); ?>
 		<p>
-			<?php if ( is_object( $sermon_manager_template ) ) : ?>
-				<?php $sermon_manager_template->wpfc_sermon_meta( 'bible_passage', '<span class="bible_passage">' . esc_attr__( 'Bible Text: ', 'Avada' ), '</span> | ' ); ?>
-			<?php else : ?>
-				<?php wpfc_sermon_meta( 'bible_passage', '<span class="bible_passage">' . esc_attr__( 'Bible Text: ', 'Avada' ), '</span> | ' ); ?>
-			<?php endif; ?>
+
+			<?php wpfc_sermon_meta( 'bible_passage', '<span class="bible_passage">' . esc_attr__( 'Bible Text: ', 'Avada' ), '</span> | ' ); ?>
 			<?php echo the_terms( $post->ID, 'wpfc_preacher', '<span class="preacher_name">', ', ', '</span>' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			<?php echo the_terms( $post->ID, 'wpfc_sermon_series', '<p><span class="sermon_series">' . esc_attr__( 'Series: ', 'Avada' ), ' ', '</span></p>' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 		</p>
@@ -71,28 +59,16 @@ class Avada_Sermon_Manager {
 			<?php $sermonoptions = get_option( 'wpfc_options' ); ?>
 			<?php if ( isset( $sermonoptions['archive_player'] ) ) : ?>
 				<div class="wpfc_sermon cf">
-					<?php
-					if ( is_object( $sermon_manager_template ) ) {
-						echo $sermon_manager_template->wpfc_sermon_media(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-					} else {
-						wpfc_sermon_files();
-					}
-					?>
+					<?php wpfc_sermon_files(); ?>
 				</div>
 			<?php endif; ?>
 		<?php endif; ?>
 
 		<?php if ( ! $archive ) : ?>
 			<?php
-			if ( is_object( $sermon_manager_template ) ) {
-				echo $sermon_manager_template->wpfc_sermon_media(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-				$sermon_manager_template->wpfc_sermon_description();
-				echo $sermon_manager_template->wpfc_sermon_attachments(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-			} else {
 				echo wpfc_sermon_media(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-				wpfc_sermon_description();
+				the_content();
 				echo wpfc_sermon_attachments(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-			}
 			?>
 			<?php echo the_terms( $post->ID, 'wpfc_sermon_topics', '<p class="sermon_topics">' . esc_attr__( 'Topics: ', 'sermon-manager' ), ',', '', '</p>' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 		<?php endif; ?>
@@ -101,11 +77,7 @@ class Avada_Sermon_Manager {
 
 		<?php if ( $archive ) : ?>
 			<?php ob_start(); ?>
-			<?php if ( is_object( $sermon_manager_template ) ) : ?>
-				<?php $sermon_manager_template->wpfc_sermon_description(); ?>
-			<?php else : ?>
-				<?php wpfc_sermon_description(); ?>
-			<?php endif; ?>
+			<?php the_content(); ?>
 			<?php $description = ob_get_clean(); ?>
 			<?php $excerpt_length = fusion_library()->get_option( 'excerpt_length_blog' ); ?>
 
@@ -123,12 +95,7 @@ class Avada_Sermon_Manager {
 	 * @since 5.1.0
 	 */
 	public function render_wpfc_sorting() {
-		if ( class_exists( 'Sermon_Manager_Template_Tags' ) ) {
-			$sermon_manager_template = new Sermon_Manager_Template_Tags();
-			echo $sermon_manager_template->render_wpfc_sorting(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		} else {
-			render_wpfc_sorting();
-		}
+		render_wpfc_sorting();
 	}
 }
 

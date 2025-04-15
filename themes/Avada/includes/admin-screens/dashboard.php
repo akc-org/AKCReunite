@@ -57,25 +57,29 @@ if ( ! defined( 'ABSPATH' ) ) {
 						<?php endif; ?>
 					</div>
 
-			<?php // Filter for the dashboard welcome content. ?>
-			<?php ob_start(); ?>
-			<?php if ( '' !== $setup_completed ) : ?>
-					<a class="avada-db-welcome-video" href="#">
-						<span class="avada-db-welcome-video-icon">
-							<span class="avada-db-triangle"></span>
-						</span>
-						<?php /* translators: %s: version number. */ ?>
-						<span class="avada-db-welcome-video-text"><?php echo esc_html( sprintf( __( 'What’s New In Avada %s', 'Avada' ), AVADA_VERSION ) ); ?></span>
-					</a>
-				<?php else : ?>
-					<a class="avada-db-get-started-button" href="<?php echo esc_url( admin_url( 'admin.php?page=avada-setup' ) ); ?>"><?php esc_html_e( 'Get Started', 'Avada' ); ?></a>
-				<?php endif; ?>
+					<?php // Filter for the dashboard welcome content. ?>
+					<?php ob_start(); ?>
+					<?php if ( '' !== $setup_completed ) : ?>
+						<?php $welcome_video = self::get_dashboard_screen_video_url(); ?>
+						<?php $href       = '' !== $welcome_video ? '#' : 'https://avada.com/whats-new/'; ?>
+						<?php $icon_class = '' !== $welcome_video ? 'avada-db-triangle' : 'fusiona-star-empty'; ?>
+						<a class="avada-db-welcome-video" href="<?php echo esc_attr( $href ); ?>" target="_blank">
+							<span class="avada-db-welcome-video-icon">
+								<span class="<?php echo esc_attr( $icon_class ); ?>"></span>
+							</span>
+							<?php /* translators: %s: version number. */ ?>
+							<span class="avada-db-welcome-video-text"><?php echo esc_html( sprintf( __( 'What’s New In Avada %s', 'Avada' ), AVADA_VERSION ) ); ?></span>
+						</a>
+					<?php else : ?>
+						<a class="avada-db-get-started-button" href="<?php echo esc_url( admin_url( 'admin.php?page=avada-setup' ) ); ?>"><?php esc_html_e( 'Get Started', 'Avada' ); ?></a>
+					<?php endif; ?>
 				</div>
 				<div class="avada-db-welcome-media-container">
 					<?php if ( '' !== $setup_completed ) : ?>
-						<?php $welcome_video = self::get_dashboard_screen_video_url(); ?>
 						<img class="avada-db-welcome-image" src="<?php echo esc_url( get_template_directory_uri() . '/assets/admin/images/welcome-completed.png' ); ?>" alt="<?php esc_html_e( 'Avada Welcome Image', 'Avada' ); ?>" width="646" height="400">
-						<iframe class="avada-db-welcome-video-iframe" data-src="<?php echo esc_url( $welcome_video ); ?>" width="100%" height="100%" frameborder="0"></iframe>
+						<?php if ( '' !== $welcome_video ) : ?>
+							<iframe class="avada-db-welcome-video-iframe" data-src="<?php echo esc_url( $welcome_video ); ?>" width="100%" height="100%" frameborder="0"></iframe>
+						<?php endif; ?>
 					<?php else : ?>
 						<img src="<?php echo esc_url( get_template_directory_uri() . '/assets/admin/images/welcome.png' ); ?>" alt="<?php esc_html_e( 'Avada Welcome Image', 'Avada' ); ?>" width="646" height="400">
 					<?php endif; ?>

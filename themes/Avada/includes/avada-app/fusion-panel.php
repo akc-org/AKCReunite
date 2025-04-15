@@ -240,7 +240,6 @@ function fusion_customizer_front_options_loop( $params ) {
 						'iconpicker',
 						'multiple_select',
 						'multiple_upload',
-						'checkbox_button_set',
 						'link_selector',
 						'date_time_picker',
 						'upload_images',

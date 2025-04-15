@@ -595,7 +595,7 @@ function avada_options_section_blog( $sections ) {
 			],
 			'excerpt_length_blog'                          => [
 				'label'           => esc_html__( 'Excerpt Length', 'Avada' ),
-				'description'     => esc_html__( 'Controls post excerts length for the assigned blog page in "Settings > Reading" or blog archive pages. Limit is applied to number of letter or words depending on Basis for Excerpt Length option.', 'Avada' ),
+				'description'     => sprintf( __( 'Controls the number of %s in the excerpts on the assigned blog page in "Settings > Reading" or on blog archive pages.', 'Avada' ), Fusion_Settings::get_instance()->get_default_description( 'excerpt_base', false, 'no_desc' ) ),
 				'id'              => 'excerpt_length_blog',
 				'default'         => '10',
 				'type'            => 'slider',

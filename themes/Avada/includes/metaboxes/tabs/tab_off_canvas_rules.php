@@ -31,7 +31,22 @@ function avada_page_options_tab_off_canvas_rules( $sections ) {
 		'alt_icon' => 'fusiona-rules',
 		'id'       => 'off_canvas_rules',
 		'fields'   => [
-
+			'publish_date_after'   => [
+				'type'        => 'date_time_picker',
+				'label'       => esc_html__( 'Published After', 'Avada' ),
+				'description' => esc_html__( 'Controls when the Off-Canvas should be published. Use SQL time format: YYYY-MM-DD HH:MM:SS. E.g: 2016-05-10 12:30:00. Timezone of site is used. Leave empty for no restriction.', 'Avada' ),
+				'id'          => 'publish_date_after',
+				'transport'   => 'postMessage',
+				'value'       => '',
+			],
+			'publish_date_until'   => [
+				'type'        => 'date_time_picker',
+				'label'       => esc_html__( 'Published Until', 'Avada' ),
+				'description' => esc_html__( 'Controls date and time the Off-Canvas should be published until. Use SQL time format: YYYY-MM-DD HH:MM:SS. E.g: 2016-05-10 12:30:00. Timezone of site is used. Leave empty for no restriction.', 'Avada' ),
+				'id'          => 'publish_date_until',
+				'transport'   => 'postMessage',
+				'value'       => '',
+			],
 			// Frequency.
 			'frequency'            => [
 				'type'        => 'select',

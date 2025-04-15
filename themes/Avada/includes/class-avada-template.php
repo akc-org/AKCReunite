@@ -248,7 +248,7 @@ class Avada_Template {
 		$classes[] = 'avada-blog-archive-layout-' . Avada()->settings->get( 'blog_archive_layout' );
 
 		if ( class_exists( 'Tribe__Events__Main' ) ) {
-			if ( '100-width.php' !== tribe_get_option( 'tribeEventsTemplate', 'default' ) && ( ! is_singular( 'tribe_events' ) || ( is_singular( 'tribe_events' ) && 'sidebar' === Avada()->settings->get( 'ec_meta_layout' ) ) ) ) {
+			if ( '100-width.php' !== tribe_get_option( 'tribeEventsTemplate', 'default' ) && ( ! is_singular( 'tribe_events' ) || Avada_EventsCalendar::has_legacy_meta_sidebar() ) ) {
 				$classes[] = 'avada-ec-not-100-width';
 			}
 			$classes[] = 'avada-ec-meta-layout-' . Avada()->settings->get( 'ec_meta_layout' );

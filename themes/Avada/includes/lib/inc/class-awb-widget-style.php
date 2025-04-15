@@ -61,7 +61,7 @@ class AWB_Widget_Style {
 	 */
 	public function __construct() {
 
-		$this->init_options();
+		add_action( 'after_setup_theme', [ $this, 'init_options' ] );
 
 		// Add styles and scripts.
 		add_action( 'admin_enqueue_scripts', [ $this, 'add_scripts_styles' ] );
@@ -155,20 +155,20 @@ class AWB_Widget_Style {
 	 * Init all options that we're going to add.
 	 *
 	 * @since 5.3.0
-	 * @access private
+	 * @access public
 	 * @return void
 	 */
-	private function init_options() {
+	public function init_options() {
 
 		$this->widget_options = [
 			'fusion_display_title'  => [
 				'key'         => 'fusion_display_title',
-				'title'       => esc_html__( 'Display Widget Title', 'fusion-builder' ),
-				'description' => esc_html__( 'Choose to enable or disable the widget title. Specifically useful for WP\'s default widget titles.', 'fusion-builder' ),
+				'title'       => esc_html__( 'Display Widget Title', 'Avada' ),
+				'description' => esc_html__( 'Choose to enable or disable the widget title. Specifically useful for WP\'s default widget titles.', 'Avada' ),
 				'default'     => 'yes',
 				'choices'     => [
-					'yes' => esc_html__( 'Yes', 'fusion-builder' ),
-					'no'  => esc_html__( 'No', 'fusion-builder' ),
+					'yes' => esc_html__( 'Yes', 'Avada' ),
+					'no'  => esc_html__( 'No', 'Avada' ),
 				],
 				'type'        => 'radio_button_set',
 			],

@@ -18,9 +18,13 @@ get_header();
 ?>
 <section id="content" style="<?php esc_attr_e( apply_filters( 'awb_content_tag_style', '' ) ); ?>">
 	<div id="tribe-events-pg-template">
-		<?php tribe_events_before_html(); ?>
-		<?php tribe_get_view( 'single-event' ); ?>
-		<?php tribe_events_after_html(); ?>
+		<?php if ( ( function_exists( 'Fusion_Template_Builder' ) && Fusion_Template_Builder()->get_override( 'content' ) ) ) : ?>
+			<?php tribe_get_view( 'single-event' ); ?>
+		<?php else: ?>
+			<?php tribe_events_before_html(); ?>
+			<?php tribe_get_view( 'single-event' ); ?>
+			<?php tribe_events_after_html(); ?>
+		<?php endif; ?>	
 	</div> <!-- #tribe-events-pg-template -->
 </section>
 <?php do_action( 'avada_after_content' ); ?>

@@ -57,13 +57,15 @@ class Avada_Block_Editor {
 
 		} else { // Front-end only.
 
-			add_filter( 'fusion_dynamic_css_final', [ $this, 'add_css_vars_to_css' ], PHP_INT_MAX );
-
 			// Use fusion_library()->get_option() instead of Avada()->settings->get() or fusion_get_option()
 			// to avoid an infinite loop 'caused by the Avada constructor calling this object again.
 			$load_block_styles = fusion_library()->get_option( 'load_block_styles' );
 
-			// Remove block styles if not expricitly set to ON.
+			if ( 'off' !== $load_block_styles ) {
+				add_filter( 'fusion_dynamic_css_final', [ $this, 'add_css_vars_to_css' ], PHP_INT_MAX );
+			}
+
+			// Remove block styles if not explicitly set to ON.
 			// If AUTO we'll be adding them conditionally.
 			if ( 'on' !== $load_block_styles ) {
 				add_action( 'wp_enqueue_scripts', [ $this, 'dequeue_block_styles' ], 999 );

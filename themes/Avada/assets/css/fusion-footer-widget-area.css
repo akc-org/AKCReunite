@@ -187,7 +187,7 @@
   color: var(--footer_link_color);
 }
 .fusion-footer-widget-area .fusion-vertical-menu-widget ul.menu li a:hover {
-  color: var(--link_hover_color);
+  color: var(--footer_link_color_hover);
 }
 .fusion-footer-widget-area .fusion-tabs-clean .fusion-tabs-nav ul {
   border: 1px solid var(--footer_divider_color);

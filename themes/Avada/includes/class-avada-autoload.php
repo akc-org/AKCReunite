@@ -150,6 +150,7 @@ class Avada_Autoload {
 			'Avada_Portfolio'                 => $template_dir_path . '/includes/class-avada-portfolio.php',
 			'Avada_Scripts'                   => $template_dir_path . '/includes/class-avada-scripts.php',
 			'Avada_EventsCalendar'            => $template_dir_path . '/includes/class-avada-eventscalendar.php',
+			'AWB_ACF'                         => $template_dir_path . '/includes/class-awb-acf.php',
 			'Avada_Google_Fonts'              => $template_dir_path . '/includes/class-avada-google-fonts.php',
 			'AWB_Google_Recaptcha'            => $template_dir_path . '/includes/class-awb-google-recaptcha.php',
 			'Fusion_Dynamic_CSS_From_Options' => $template_dir_path . '/includes/class-fusion-dynamic-css-from-options.php',

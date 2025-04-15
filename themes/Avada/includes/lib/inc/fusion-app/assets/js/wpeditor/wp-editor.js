@@ -29,7 +29,7 @@
 		var configVar = 'undefined' === typeof fusionAppConfig ? fusionBuilderConfig : fusionAppConfig,
 			default_options = {
 			'mode': 'html',
-			'mceInit' : {
+			'mceInit': {
 				"theme": "modern",
 				"skin": "lightgray",
 				"language": "en",
@@ -145,6 +145,7 @@
 					editor_tabs = $('<div class="wp-editor-tabs" />'),
 					switch_editor_html = $('<a id="' + current_id + '-html" class="wp-switch-editor switch-html" data-wp-editor-id="' + current_id + '">Text</a>'),
 					switch_editor_tmce = $('<a id="' + current_id + '-tmce" class="wp-switch-editor switch-tmce" data-wp-editor-id="' + current_id + '">Visual</a>'),
+					switch_editor_input = $( '<input type="text" id="awb-switch-editor-focus" style="pointer-events: none; position: absolute; height: 0px; width: 0px; padding: 0px !important; margin: 0px; border: none;"/>' ),
 					media_buttons = $('<div id="wp-' + current_id + '-media-buttons" class="wp-media-buttons" />'),
 					insert_media_button = $('<a href="#" id="insert-media-button" class="button insert-media add_media" data-editor="' + current_id + '" title="Add Media"><span class="wp-media-buttons-icon"></span> Add Media</a>'),
 					insert_gravity_button = $('<a href="#" id="add_gform" class="button gform_media_link" data-editor="' + current_id + '" title="Add Gravity Form">Add Gravity Form</a>'),
@@ -164,7 +165,8 @@
 				editor_tools.appendTo(wrap);
 				editor_container.appendTo(wrap);
 
-				editor_container.append($(self).clone().addClass('wp-editor-area'));
+				const newTextarea = $(self).clone().addClass('wp-editor-area');
+				editor_container.append( newTextarea );
 
 				if( content_css != false )
 					$.each( content_css, function() {
@@ -175,6 +177,7 @@
 				$(self).before('<link rel="stylesheet" id="editor-buttons-css" href="' + configVar.includes_url + 'css/editor.css" type="text/css" media="all">');
 
 				$(self).before(wrap);
+				wrap.before( switch_editor_input );
 				$(self).remove();
 
 				jQuery( document ).trigger( 'fusionButtons', [ current_id ] );
@@ -190,10 +193,61 @@
 
 				switchEditors.go(current_id, options.mode);
 
-				if( content && options.mode == 'tmce' ) {
-					setTimeout( function() {
-					}, 1000 );
+				// Content paste to editor text mode.
+				wrap.find( '#' + current_id ).on( 'paste', function( event ) {
+					const cursorPos = jQuery( event.currentTarget ).prop( 'selectionStart' ),
+						content = jQuery( event.currentTarget ).val();
+						plainPasteContent = getPlainContent( event.originalEvent.clipboardData.getData( 'text' ) );
+
+					if ( plainPasteContent ) {
+						jQuery( event.currentTarget ).val( content.slice( 0, cursorPos ) + plainPasteContent + content.slice( cursorPos ) );
+
+						return false;
+					}
+				} );
+
+				// Content paste to editor mce mode.
+				window.tinyMCE.get( current_id ).on( 'PastePreProcess', function( data ) {
+					const plainContent = getPlainContent( data.content );
+
+					data.content = plainContent ? plainContent : data.content;
+				} )	;
+
+				// Handles the content to be pasted.
+				function getPlainContent( content ) {
+					console.log( content, _.unescape( content ) );
+					try {
+						const pasteContent = JSON.parse( _.unescape( content ) );
+
+						if ( 'object' === typeof pasteContent && 'undefined' !== typeof pasteContent.type && 'fusion_builder_container' !== typeof pasteContent.type && 'fusion_builder_column' !== typeof pasteContent.type && 'undefined' !== typeof pasteContent.content ) {
+							return pasteContent.content;
+						}
+					} catch ( objError ) {
+						return '';
+					}			
 				}
+
+				// Remove the mce_SELRES_start class from the contents, otherwise WP will always scroll to the editor.
+				window.tinyMCE.get( current_id ).on( 'init', function( e ) {
+					e.target.targetElm.value = e.target.targetElm.value.replace( 'mce_SELRES_start', '' );
+					e.target.$( '.mce_SELRES_start' ).removeClass( 'mce_SELRES_start' );
+				} );
+
+				// On click on the mode buttons, make sure no scroll happens and that the placeholder content isn't wiped out.
+				$(wrap).on( 'click', '.wp-editor-tabs a', function( event ) {
+					const anchor = $( event.currentTarget ),
+						focusInput = anchor.closest( '.wp-editor-wrap' ).prev();
+
+					focusInput.addClass( 'awb-had-focus' ).focus();
+
+					focusInput.on( 'blur', function() {
+						setTimeout( function() {
+							focusInput.focus();
+							focusInput.unbind( 'blur' );
+							
+						}, 0 );
+					} );
+				} );
 
 				$(wrap).on( 'click', '.insert-media', function( event ) {
 					var elem = $( event.currentTarget ),

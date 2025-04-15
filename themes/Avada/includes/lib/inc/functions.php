@@ -595,6 +595,39 @@ if ( ! function_exists( 'avada_render_rollover' ) ) {
 
 add_action( 'avada_rollover', 'avada_render_rollover', 10, 8 );
 
+if ( ! function_exists( 'awb_adjust_excerpt_more_symbol' ) ) {
+	/**
+	 * Adds the correct excerpt symbol, incl. link if needed.
+	 *
+	 * @since 5.5.0
+	 * @param string $excerpt_more Excerpt more symbol with whitespace.
+	 * @return string
+	 */
+	function awb_adjust_excerpt_more_symbol( $excerpt_more ) {
+		// If read more for excerpts is not disabled.
+		if ( fusion_library()->get_option( 'disable_excerpts' ) ) {
+
+			$read_more_text = fusion_library()->get_option( 'excerpt_read_more_symbol' );
+			$read_more_text = $read_more_text ? $read_more_text : $excerpt_more;
+
+			// Filter to set the default [...] read more to something arbritary.
+			$read_more_text = apply_filters( 'fusion_blog_read_more_excerpt', $read_more_text );
+
+			// Check if the read more [...] should link to single post.
+			if ( fusion_library()->get_option( 'link_read_more' ) ) {
+				$read_more = ' <a href="' . get_permalink( get_the_ID() ) . '">' . $read_more_text . '</a>';
+			} else {
+				$read_more = ' ' . $read_more_text;
+			}
+
+			return $read_more;
+		} else {
+			return '';
+		}
+	}
+}
+add_filter( 'excerpt_more', 'awb_adjust_excerpt_more_symbol', 20 );
+
 if ( ! function_exists( 'fusion_get_post_content' ) ) {
 	/**
 	 * Return the post content, either excerpted or in full length.
@@ -704,24 +737,7 @@ if ( ! function_exists( 'fusion_get_post_content_excerpt' ) ) {
 
 		$post = get_post( $page_id );
 
-		// If read more for excerpts is not disabled.
-		if ( fusion_library()->get_option( 'disable_excerpts' ) ) {
-
-			$read_more_text = fusion_library()->get_option( 'excerpt_read_more_symbol' );
-			if ( '' === $read_more_text ) {
-				$read_more_text = '&#91;...&#93;';
-			}
-
-			// Filter to set the default [...] read more to something arbritary.
-			$read_more_text = apply_filters( 'fusion_blog_read_more_excerpt', $read_more_text );
-
-			// Check if the read more [...] should link to single post.
-			if ( fusion_library()->get_option( 'link_read_more' ) ) {
-				$read_more = ' <a href="' . get_permalink( get_the_ID() ) . '">' . $read_more_text . '</a>';
-			} else {
-				$read_more = ' ' . $read_more_text;
-			}
-		}
+		$read_more = apply_filters( 'excerpt_more', ' &#91;...&#93;' );
 
 		// Construct the content.
 		// Posts having a custom excerpt.
@@ -946,8 +962,16 @@ if ( ! function_exists( 'fusion_cached_query' ) ) {
 		// Make sure cached queries are not language agnostic.
 		if ( is_array( $args ) ) {
 			$args['fusion_lang'] = Fusion_Multilingual::get_active_language();
+
+			if ( isset( $args['order_by'] ) && 'random' === $args['order_by'] ) {
+				$args['randomize'] = rand( 0, 1000 );
+			}
 		} else {
 			$args .= '&fusion_lang=' . Fusion_Multilingual::get_active_language();
+
+			if ( false !== strpos( $args, 'order_by=random' ) ) {
+				$args .= '&randomize=' . rand( 0, 1000 );
+			}
 		}
 
 		$query_id = md5( maybe_serialize( $args ) );
@@ -1577,69 +1601,6 @@ if ( ! function_exists( 'fusion_menu_element_add_woo_cart_to_widget_html' ) ) {
 	}
 }
 
-if ( ! function_exists( 'avada_menu_element_add_login_box_to_nav' ) ) {
-	/**
-	 * Add woocommerce cart to main navigation or top navigation.
-	 *
-	 * @param  array $args  Arguments for the WP menu.
-	 * @return string
-	 */
-	function avada_menu_element_add_login_box_to_nav( $args ) {
-
-		$output = '';
-
-		if ( class_exists( 'WooCommerce' ) ) {
-			$woo_account_page_link = wc_get_page_permalink( 'myaccount' );
-
-			if ( $woo_account_page_link ) {
-
-				$output .= '<a href="' . $woo_account_page_link . '" aria-haspopup="true" class="' . esc_attr( $args['link_classes'] ) . '">' . $args['menu_item_content'];
-
-				$output .= $args['after_content_inside'] . '</a>' . $args['after_content'];
-
-				if ( ! is_user_logged_in() ) {
-					$referer = fusion_get_referer();
-					$referer = ( $referer ) ? $referer : '';
-
-					$output .= '<ul class="sub-menu avada-custom-menu-item-contents"><li class="menu-item">';
-
-					if ( isset( $_GET['login'] ) && 'failed' === $_GET['login'] ) { // phpcs:ignore WordPress.Security.NonceVerification
-						$output .= '<p class="fusion-menu-login-box-error">' . esc_html__( 'Login failed, please try again.', 'Avada' ) . '</p>';
-					}
-					$output .= '<form action="' . esc_attr( site_url( 'wp-login.php', 'login_post' ) ) . '" name="loginform" method="post">';
-					$output .= '<p><label class="screen-reader-text hidden" for="username">' . esc_html__( 'Username:', 'Avada' ) . '</label><input type="text" class="input-text" name="log" id="username-' . esc_attr( $args['menu_id'] ) . '" value="" placeholder="' . esc_html__( 'Username', 'Avada' ) . '" /></p>';
-					$output .= '<p><label class="screen-reader-text hidden" for="password">' . esc_html__( 'Password:', 'Avada' ) . '</label><input type="password" class="input-text" name="pwd" id="password-' . esc_attr( $args['menu_id'] ) . '" value="" placeholder="' . esc_html__( 'Password', 'Avada' ) . '" /></p>';
-					$output .= '<p class="fusion-remember-checkbox"><label for="fusion-menu-login-box-rememberme"><input name="rememberme" type="checkbox" id="fusion-menu-login-box-rememberme-' . esc_attr( $args['menu_id'] ) . '" value="forever"> ' . esc_html__( 'Remember Me', 'Avada' ) . '</label></p>';
-					$output .= '<input type="hidden" name="fusion_woo_login_box" value="true" />';
-					$output .= '<p class="fusion-login-box-submit">';
-					$output .= '<input type="submit" name="wp-submit" id="wp-submit-' . esc_attr( $args['menu_id'] ) . '" class="button button-small default comment-submit" value="' . esc_html__( 'Log In', 'Avada' ) . '">';
-					$output .= '<input type="hidden" name="redirect" value="' . esc_url( $referer ) . '">';
-					$output .= '</p>';
-					$output .= '</form>';
-					$output .= '<div><a class="fusion-menu-login-box-register" href="' . get_permalink( get_option( 'woocommerce_myaccount_page_id' ) ) . '" title="' . esc_attr__( 'Register', 'Avada' ) . '">' . esc_attr__( 'Register', 'Avada' ) . '</a></div>';
-
-					$output .= '</li></ul>';
-				} else {
-					$account_endpoints = wc_get_account_menu_items();
-					unset( $account_endpoints['dashboard'] );
-
-					$output .= '<ul class="sub-menu">';
-					foreach ( $account_endpoints as $endpoint => $label ) {
-						$active_classes = ( is_wc_endpoint_url( $endpoint ) ) ? ' current-menu-item current_page_item' : '';
-
-						$output .= '<li class="menu-item fusion-dropdown-submenu' . $active_classes . '">';
-						$output .= '<a href="' . esc_url( wc_get_account_endpoint_url( $endpoint ) ) . '">' . esc_html( $label ) . '</a>';
-						$output .= '</li>';
-					}
-					$output .= '</ul>';
-				}
-			}
-		}
-
-		return $output;
-	}
-}
-
 if ( ! function_exists( 'fusion_get_term_image' ) ) {
 	/**
 	 * Return the featured image for a term.
@@ -1649,8 +1610,17 @@ if ( ! function_exists( 'fusion_get_term_image' ) ) {
 	 * @param string $type Type of data to return.
 	 * @return mixed
 	 */
-	function fusion_get_term_image( $type = 'url' ) {
+	function fusion_get_term_image( $type = 'url', $get_product_cat_thumb = false ) {
 		if ( is_tax() || is_category() || is_tag() ) {
+
+			if ( is_tax( 'product_cat' ) && $get_product_cat_thumb ) {
+				$featured_image_id = get_term_meta( get_queried_object()->term_id, 'thumbnail_id', true );
+
+				if ( $featured_image_id ) {
+					return 'url' === $type ? wp_get_attachment_url( $featured_image_id ) : $featured_image_id;
+				}
+			}
+
 			$featured_image = fusion_data()->term_meta( get_queried_object()->term_id )->get( 'featured_image' );
 			if ( ! empty( $featured_image ) ) {
 				if ( 'url' === $type && isset( $featured_image['url'] ) ) {

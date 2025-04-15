@@ -255,3 +255,12 @@
 .ginput_shipping_price {
   color: var(--primary_color);
 }
+.gv-approval-toggle {
+  display: inline;
+  position: static;
+  border: none;
+}
+.gv-approval-toggle:before {
+  color: inherit;
+  transition: none;
+}

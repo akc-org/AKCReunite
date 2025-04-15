@@ -61,6 +61,7 @@ var FusionPageBuilder = FusionPageBuilder || {};
 			this.$previewPanel = this.$body.find( '#customize-preview' );
 
 			// Add listeners.
+			this.listenTo( FusionEvents, 'fusion-to-fav_icon-changed', this.changeFavicon );
 			this.listenTo( FusionEvents, 'fusion-to-posts_slideshow_number-changed', this.recreatePoTab );
 			this.listenTo( FusionEvents, 'fusion-postMessage-custom_fonts', this.updateCustomFonts );
 			this.listenTo( FusionEvents, 'fusion-to-portfolio_equal_heights-changed', this.togglePortfolioEqualHeights );
@@ -1299,6 +1300,22 @@ var FusionPageBuilder = FusionPageBuilder || {};
 
 			return this;
 		},
+
+		/**
+		 * Change the Favicon.
+		 *
+		 * @since 3.11.11
+		 * @return void
+		 */		
+		changeFavicon: function() {
+			let favIcon = fusionSanitize.getOption( 'fav_icon', '', 'url' );
+
+			if ( ! favIcon ) {
+				favIcon = '/favicon.ico';
+			}
+
+			jQuery( 'link[type="image/x-icon"]' ).attr( 'href', favIcon );
+		},		
 
 		/**
 		 * Toggles equal heights on portfolio archive pages.

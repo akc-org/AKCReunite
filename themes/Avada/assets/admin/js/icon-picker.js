@@ -156,10 +156,8 @@
         }
     }
 
-// watch fusion-icons-rendered instead of using on load.
- jQuery( document ).on( 'DOMNodeInserted', function( e ) {
-    if ( jQuery( e.target ).hasClass( 'fusion-icons-rendered' ) ) {
+    jQuery( 'body' ).on( 'awb-icon-picker-init', function() {
         optionIconpicker();
-    }
-} );
+    } );
+
 }( jQuery ) );

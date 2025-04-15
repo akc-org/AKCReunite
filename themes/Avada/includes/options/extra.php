@@ -264,6 +264,13 @@ function avada_options_section_extra( $sections ) {
 						'default'     => 'faq-items',
 						'type'        => 'text',
 					],
+					'faq_with_front'                 => [
+						'label'           => esc_html__( 'FAQ Include Permalink Front Base', 'Avada' ),
+						'description'     => esc_html__( 'Turn on to include the front base defined by the permalink structure set in Settings > Permalinks. Make sure to regenerate permalinks.', 'Avada' ),
+						'id'              => 'faq_with_front',
+						'default'         => '1',
+						'type'            => 'switch',
+					],						
 					'cloning_posts'              => [
 						'label'       => esc_html__( 'Enable Cloning Pages/Posts', 'Avada' ),
 						'description' => esc_html__( 'Adds a button in posts/pages view under each item to allow an easy and fast way to clone the item. The button is also added to avada custom post types.', 'Avada' ),
@@ -1269,6 +1276,46 @@ function avada_options_section_extra( $sections ) {
 								'setting'  => 'status_totop',
 								'operator' => '!=',
 								'value'    => 'off',
+							],
+						],
+					],
+					'totop_scroll_progress'  => [
+						'label'       => esc_html__( 'ToTop Show Scroll Progress', 'Avada' ),
+						'description' => esc_html__( 'Turn on to show the page scroll progress within the ToTop Button.', 'Avada' ),
+						'id'          => 'totop_scroll_progress',
+						'default'     => '0',
+						'type'        => 'switch',
+						'output'      => [
+							[
+								'element'           => 'helperElement',
+								'property'          => 'dummy',
+								'callback'          => [
+									'toggle_class',
+									[
+										'condition' => [ '', 'true' ],
+										'element'   => '.to-top-container',
+										'className' => 'awb-to-top-scroll-progress',
+									],
+
+								],
+								'sanitize_callback' => '__return_empty_string',
+							],
+						],
+						'required'    => [
+							[
+								'setting'  => 'status_totop',
+								'operator' => '!=',
+								'value'    => 'off',
+							],
+							[
+								'setting'  => 'totop_position',
+								'operator' => '!=',
+								'value'    => 'left',
+							],
+							[
+								'setting'  => 'totop_position',
+								'operator' => '!=',
+								'value'    => 'right',
 							],
 						],
 					],

@@ -211,6 +211,7 @@ var FusionPageBuilder = FusionPageBuilder || {};
 		initOptions: function( $element ) {
 			var $thisEl = 'undefined' !== typeof $element && $element.length ? $element : this.$el;
 
+			this.optionDateTimePicker( $thisEl );
 			this.optionColorpicker( $thisEl );
 			this.optionRadioButtonSet( $thisEl );
 			this.optionCheckboxButtonSet( $thisEl );
@@ -404,7 +405,7 @@ var FusionPageBuilder = FusionPageBuilder || {};
 			}
 
 			// If its a file upload for import.
-			if ( $target.hasClass( 'fusion-dont-update' ) || $target.hasClass( 'fusion-import-file-input' ) || 'demo_import' === id || 'seo_title' === id || 'meta_description' === id  ) {
+			if ( $target.hasClass( 'fusion-dont-update' ) || $target.hasClass( 'fusion-import-file-input' ) || 'demo_import' === id ) {
 				return false;
 			}
 
@@ -687,6 +688,11 @@ var FusionPageBuilder = FusionPageBuilder || {};
 				return;
 			}
 
+			// PO code fields.
+			if ( fields[ id ].id && ( 'tracking_code' === fields[ id ].id || 'space_head_close' === fields[ id ].id || 'space_body_open' === fields[ id ].id || 'space_body_close' === fields[ id ].id ) ) {
+				return;
+			}
+
 			// Check how to update preview. partial_refresh, output;
 			if ( fields[ id ].id && 'custom_css' === fields[ id ].id ) {
 				avadaPanelIFrame.liveUpdateCustomCSS( value );
@@ -695,6 +701,11 @@ var FusionPageBuilder = FusionPageBuilder || {};
 
 			if ( fields[ id ].id && '_fusion_builder_custom_css' === fields[ id ].id ) {
 				avadaPanelIFrame.liveUpdatePageCustomCSS( value );
+				return;
+			}
+
+			if ( fields[ id ].id && ( 'seo_title' === fields[ id ].id || 'meta_description' === fields[ id ].id ) ) {
+				this.updateSEOMeta( fields[ id ].id, value );
 				return;
 			}
 
@@ -778,6 +789,27 @@ var FusionPageBuilder = FusionPageBuilder || {};
 						$option.removeClass( 'full-refresh-active' );
 					} );
 				}
+			}
+		},
+
+		updateSEOMeta: function( id, value ) {
+			if ( 'seo_title' === id ) {
+				jQuery( '#fb-preview' ).contents().find( 'title' ).html( value );
+
+				if ( jQuery( '#fb-preview' ).contents().find( 'meta[property="og:title"]' ).length ) {
+					jQuery( '#fb-preview' ).contents().find( 'meta[property="og:title"]' ).attr( 'content', value );
+				}
+			}
+
+			if ( 'meta_description' === id ) {
+				if ( jQuery( '#fb-preview' ).contents().find( 'meta[name="description"]' ).length ) {
+					jQuery( '#fb-preview' ).contents().find( 'meta[name="description"]' ).attr( 'content', value );
+				}
+
+				if ( jQuery( '#fb-preview' ).contents().find( 'meta[property="og:description"]' ).length ) {
+					jQuery( '#fb-preview' ).contents().find( 'meta[property="og:description"]' ).attr( 'content', value );
+				}
+				
 			}
 		},
 
@@ -1217,6 +1249,7 @@ var FusionPageBuilder = FusionPageBuilder || {};
 	_.extend( FusionPageBuilder.TabView.prototype, FusionPageBuilder.options.fusionTypographyField );
 	_.extend( FusionPageBuilder.TabView.prototype, FusionPageBuilder.options.fusionTypographySetsField );
 	_.extend( FusionPageBuilder.TabView.prototype, FusionPageBuilder.options.fusionCodeBlock );
+	_.extend( FusionPageBuilder.TabView.prototype, FusionPageBuilder.options.fusionDateTimePicker );
 	_.extend( FusionPageBuilder.TabView.prototype, FusionPageBuilder.options.fusionColorPicker );
 	_.extend( FusionPageBuilder.TabView.prototype, FusionPageBuilder.options.fusionDimensionField );
 	_.extend( FusionPageBuilder.TabView.prototype, FusionPageBuilder.options.fusionOptionUpload );

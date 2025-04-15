@@ -400,7 +400,6 @@ jQuery( document ).ready( function() {
 
 			$i++;
 		} );
-
 	}
 
 	function colorChange( input, defaultReset ) {
@@ -448,6 +447,7 @@ jQuery( document ).ready( function() {
 			this.initRepeaters();
 			this.initToggles();
 			this.initCounterTextareas();
+			this.initDateTimePickers();
 
 		},
 
@@ -473,6 +473,14 @@ jQuery( document ).ready( function() {
 
 				jQuery( this ).keyup( function() {
 					self.setCounter( jQuery( this ) );
+				} );
+			} );
+		},
+		
+		initDateTimePickers: function() {
+			jQuery( '.pyre_field .fusion-datetime.full-picker' ).each( function() {
+				jQuery( this ).fusiondatetimepicker( {
+					format: 'yyyy-MM-dd hh:mm:ss'
 				} );
 			} );
 		},

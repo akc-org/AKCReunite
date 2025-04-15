@@ -446,8 +446,8 @@ function avada_options_section_contact( $sections ) {
 						'update_callback' => $contact_page_callback,
 					],
 					'map_zoomcontrol'                => [
-						'label'           => esc_html__( 'Map Zoom & Pan Control Icons', 'Avada' ),
-						'description'     => esc_html__( 'Turn on to display the google map zoom control and pan control icons.', 'Avada' ),
+						'label'           => esc_html__( 'Map Zoom Control Icons', 'Avada' ),
+						'description'     => esc_html__( 'Turn on to display the google map zoom control icons.', 'Avada' ),
 						'id'              => 'map_zoomcontrol',
 						'default'         => '1',
 						'type'            => 'switch',

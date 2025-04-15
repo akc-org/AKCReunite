@@ -220,7 +220,7 @@ class AWB_Global_Colors {
 	 */
 	public function print_inline_global_colors_declaration_in_backend() {
 		$is_builder = ( function_exists( 'fusion_is_preview_frame' ) && fusion_is_preview_frame() ) || ( function_exists( 'fusion_is_builder_frame' ) && fusion_is_builder_frame() );
-		if ( ! is_admin() && ! $is_builder ) {
+		if ( is_customize_preview() || ( ! is_admin() && ! $is_builder ) ) {
 			return;
 		}
 

@@ -195,9 +195,36 @@ if ( ! defined( 'ABSPATH' ) ) {
 			</table>
 		<?php endif; ?>
 
+		<?php if ( is_multisite() ) : ?>
+			<table class="widefat avada-status-no-export" cellspacing="0">
+				<tbody>
+					<tr>
+						<td>
+						<strong><?php esc_html_e( 'Copy Multisite Global Options ', 'Avada' ); ?></strong>
+
+						</td>
+						<td class="help">&nbsp;</td>
+						<td>
+							<div class="avada-db-status-version-control">
+								<span class="avada-db-status-version-control-desc">
+									<?php esc_html_e( 'Copy the main site global options to all sites across this multisite.', 'Avada' ); ?>
+									<br />
+									<?php esc_html_e( 'WARNING: This can\'t be reversed.', 'Avada' ); ?>
+								</span>
+								<a href="#" class="button button-primary awb-copy-multisite-global-options" data-confirm-text="<?php esc_html_e( 'Are you sure you want to copy Avada Global Options across the multisite?', 'Avada' ); ?>"><?php esc_html_e( 'Copy Global Options', 'Avada' ); ?></a>
+								<span class="fusion-system-status-spinner" style="display: none;">
+									<img src="<?php echo esc_url( admin_url( 'images/spinner.gif' ) ); ?>" />
+								</span>
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		<?php endif; ?>		
+
 		<?php // Display Avada 4.0 and/or 5.0 conversions if available. ?>
 		<?php if ( ( $show_400_migration && false === $force_hide_400_migration ) || $show_500_migration ) : ?>
-			<h3 class="avada-status-no-export awb-status-legacy-conversion"><?php esc_html_e( 'Legacy Conversion Tools', 'Avada' ); ?></h2>
+			<h3 class="avada-status-no-export awb-status-legacy-conversion"><?php esc_html_e( 'Legacy Conversion Tools', 'Avada' ); ?></h3>
 
 			<p class="avada-db-status-version-control-notice">
 				<?php /* translators: URL. */ ?>

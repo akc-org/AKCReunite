@@ -514,7 +514,7 @@ class Fusion_Images {
 			if ( false !== strpos( $fusion_col_type['type'], '.' ) ) {
 
 				// Custom % value.
-				$width = absint( $width * $fusion_col_type['type'] / 100 );
+				$width = absint( $width * (float) $fusion_col_type['type'] / 100 );
 			} elseif ( false !== strpos( $fusion_col_type['type'], '_' ) ) {
 
 				// Standard columns.
@@ -698,15 +698,6 @@ class Fusion_Images {
 
 		if ( ! $attachment_id ) {
 			$attachment_id = self::get_attachment_id_from_url( $attachment_url );
-		} else {
-			$attachment_id = self::get_translated_attachment_id( $attachment_id );
-
-			$test_size      = ( 'none' === $size ) ? 'full' : $size;
-			$attachment_src = wp_get_attachment_image_src( $attachment_id, $size );
-
-			if ( ! $attachment_src ) {
-				$attachment_id = self::get_attachment_id_from_url( $attachment_url );
-			}
 		}
 
 		if ( ! $attachment_id ) {
@@ -715,10 +706,16 @@ class Fusion_Images {
 			return $attachment_data;
 		}
 
+		$attachment_id         = self::get_translated_attachment_id( $attachment_id );
 		$attachment_data['id'] = $attachment_id;
 
 		if ( 'none' !== $size ) {
-			$attachment_src = ( $attachment_src ) ? $attachment_src : wp_get_attachment_image_src( $attachment_id, $size );
+			$attachment_src = wp_get_attachment_image_src( $attachment_id, $size );
+			
+			if ( ! $attachment_src ) {
+				$attachment_src = wp_get_attachment_image_src( $attachment_id, 'full' );
+			}
+
 			if ( $attachment_src ) {
 				$attachment_data['url'] = esc_url( $attachment_src[0] );
 
@@ -1662,7 +1659,7 @@ class Fusion_Images {
 
 				if ( ! is_bool( $xml ) ) {
 					$attr    = $xml->attributes();
-					$viewbox = explode( ' ', $attr->viewBox ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+					$viewbox = isset( $attr->viewBox ) ? explode( ' ', $attr->viewBox ) : []; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 
 					if ( isset( $attr->width ) && preg_match( '/\d+/', $attr->width, $value ) ) {
 						$image[1] = (int) $value[0];

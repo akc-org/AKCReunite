@@ -78,7 +78,7 @@ class Avada_Head {
 		 * a user would have to gain access to the database
 		 * in which case this is the least of your worries.
 		 */
-		echo Avada()->settings->get( 'space_body_open' ); // phpcs:ignore WordPress.Security.EscapeOutput
+		echo apply_filters( 'awb_space_body_open', Avada()->settings->get( 'space_body_open' ) ); // phpcs:ignore WordPress.Security.EscapeOutput
 	}
 
 	/**
@@ -476,6 +476,12 @@ class Avada_Head {
 	 * @return  void
 	 */
 	public function insert_favicons() {
+		if ( '' !== Avada()->settings->get( 'fav_icon', 'url' ) || '' !== Avada()->settings->get( 'fav_icon_apple_touch', 'url' ) || '' !== Avada()->settings->get( 'fav_icon_android', 'url' ) || '' !== Avada()->settings->get( 'fav_icon_edge', 'url' ) ) {
+			remove_action( 'admin_head', 'wp_site_icon' );
+			remove_action( 'wp_head', 'wp_site_icon', 99 );
+			remove_action( 'login_head', 'wp_site_icon', 99 );
+		}
+
 		?>
 		<?php if ( '' !== Avada()->settings->get( 'fav_icon', 'url' ) ) : ?>
 			<link rel="shortcut icon" href="<?php echo esc_url( Avada()->settings->get( 'fav_icon', 'url' ) ); ?>" type="image/x-icon" />

@@ -34,6 +34,9 @@ class Avada_System_Status {
 
 		// Re-create Avada Forms DB tables.
 		add_action( 'wp_ajax_fusion_create_forms_tables', [ $this, 'create_forms_tables' ] );
+
+		// Copy multisite global options.
+		add_action( 'wp_ajax_awb_copy_multisite_global_options', [ $this, 'copy_multisite_global_options' ] );      
 	}
 
 	/**
@@ -153,6 +156,40 @@ class Avada_System_Status {
 
 		echo wp_json_encode( $response );
 		die();
+	}
+
+
+	/**
+	 * Copy Avada Global Options from main site to all sites across the multisite install.
+	 *
+	 * @since 7.11.12
+	 * @access public
+	 * @return void
+	 */
+	public function copy_multisite_global_options() {
+		$response = [ 'message' => __( 'This is not a multisite.' ) ];
+
+		if ( ! current_user_can( 'manage_options' ) || ! check_ajax_referer( 'fusion_system_status_nonce', 'nonce', false ) ) {
+			$response = [ 'message' => __( 'Security check failed.' ) ];
+		}       
+
+		if ( is_multisite() ) {
+			$main_site_id      = get_main_site_id();
+			$main_site_options = get_blog_option( $main_site_id, 'fusion_options', [] );
+			$sites             = get_sites();
+
+			foreach ( $sites as $site ) {
+				$site_id = $site->blog_id;
+				if ( $site_id !== $main_site_id ) {
+					update_blog_option( $site->blog_id, 'fusion_options', $main_site_options );
+				}
+			}
+			
+			$response = [ 'message' => __( 'Global options were successfully copied across the network.' ) ];
+		}
+
+		echo wp_json_encode( $response );
+		die();      
 	}
 }
 

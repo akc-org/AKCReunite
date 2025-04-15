@@ -259,7 +259,7 @@ class Fusion_Breadcrumbs {
 		$class = function_exists( 'yoast_breadcrumb' ) ? $class . ' awb-yoast-breadcrumbs' : $class;
 		$class = ( 'fusion-breadcrumbs' !== $class && function_exists( 'rank_math_get_breadcrumbs' ) ) ? $class . ' awb-rankmath-breadcrumbs' : $class;
 
-		$this->html_markup = '<nav class="' . $class . '" ara-label="' . esc_attr__( 'Breadcrumb', 'Avada' ) . '">' . $this->html_markup . '</nav>';
+		$this->html_markup = '<nav class="' . $class . '" aria-label="' . esc_attr__( 'Breadcrumb', 'Avada' ) . '">' . $this->html_markup . '</nav>';
 	}
 
 	/**

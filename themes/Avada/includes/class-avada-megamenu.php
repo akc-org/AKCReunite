@@ -142,6 +142,10 @@ if ( ! class_exists( 'Avada_Megamenu' ) ) {
 		 */
 		public function add_menu_style_data_to_menu( $menu_item ) {
 
+			if ( ! is_object( $menu_item ) || ! isset( $menu_item->ID ) ) {
+				return $menu_item;
+			}
+
 			$meta_data  = get_post_meta( $menu_item->ID );
 			$avada_meta = ! empty( $meta_data['_menu_item_fusion_megamenu'][0] ) ? maybe_unserialize( $meta_data['_menu_item_fusion_megamenu'][0] ) : [];
 			$avada_meta = apply_filters( 'avada_menu_meta', $avada_meta, $menu_item->ID );

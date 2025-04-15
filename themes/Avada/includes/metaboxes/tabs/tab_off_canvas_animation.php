@@ -24,6 +24,7 @@ function avada_page_options_tab_off_canvas_animation( $sections ) {
 		'rubberBand'   => esc_attr__( 'Rubberband', 'fusion-builder' ),
 		'shake'        => esc_attr__( 'Shake', 'fusion-builder' ),
 		'slide'        => esc_attr__( 'Slide', 'fusion-builder' ),
+		'slideShort'   => esc_attr__( 'Slide Short', 'fusion-builder' ),
 		'zoom'         => esc_attr__( 'Zoom', 'fusion-builder' ),
 		'flipinx'      => esc_attr__( 'Flip Vertically', 'fusion-builder' ),
 		'flipiny'      => esc_attr__( 'Flip Horizontally', 'fusion-builder' ),
@@ -35,6 +36,7 @@ function avada_page_options_tab_off_canvas_animation( $sections ) {
 		'bounce'        => esc_attr__( 'Bounce', 'fusion-builder' ),
 		'fade'          => esc_attr__( 'Fade', 'fusion-builder' ),
 		'slide'         => esc_attr__( 'Slide', 'fusion-builder' ),
+		'slideShort'    => esc_attr__( 'Slide Short', 'fusion-builder' ),
 		'zoom'          => esc_attr__( 'Zoom', 'fusion-builder' ),
 		'flipOutX'      => esc_attr__( 'Flip Vertically', 'fusion-builder' ),
 		'flipOutY'      => esc_attr__( 'Flip Horizontally', 'fusion-builder' ),
@@ -153,6 +155,36 @@ function avada_page_options_tab_off_canvas_animation( $sections ) {
 					],
 				],
 			],
+			'enter_animation_timing'    => [
+				'type'        => 'select',
+				'label'       => esc_attr__( 'Timing Of Entrance Animation', 'Avada' ),
+				'description' => esc_attr__( 'Select the timing function of the entrance animation.', 'Avada' ),
+				'id'          => 'enter_animation_timing',
+				'default'     => 'ease',
+				'choices'     => [
+					'ease'        => esc_attr__( 'Ease', 'fusion-builder' ),
+					'linear'      => esc_attr__( 'Linear', 'fusion-builder' ),
+					'ease-in'     => esc_attr__( 'Ease-in', 'fusion-builder' ),
+					'ease-out'    => esc_attr__( 'Ease-out', 'fusion-builder' ),
+					'ease-in-out' => esc_attr__( 'Ease-in-out', 'fusion-builder' ),
+				],
+				'transport'   => 'postMessage',
+				'events'      => [
+					'awb-off-canvas-enter-animation',
+				],
+				'dependency'  => [
+					[
+						'field'      => 'enter_animation',
+						'value'      => '',
+						'comparison' => '!=',
+					],
+					[
+						'field'      => 'type',
+						'value'      => 'sliding-bar',
+						'comparison' => '!=',
+					],
+				],
+			],
 			'exit_animation'            => [
 				'type'        => 'select',
 				'label'       => esc_html__( 'Exit Animation', 'Avada' ),
@@ -250,7 +282,36 @@ function avada_page_options_tab_off_canvas_animation( $sections ) {
 					],
 				],
 			],
-			// sliding bar animations.
+			'exit_animation_timing'     => [
+				'type'        => 'select',
+				'label'       => esc_attr__( 'Timing Of Exit Animation', 'Avada' ),
+				'description' => esc_attr__( 'Select the timing function of the exit animation.', 'Avada' ),
+				'id'          => 'exit_animation_timing',
+				'default'     => 'ease',
+				'choices'     => [
+					'ease'        => esc_attr__( 'Ease', 'fusion-builder' ),
+					'linear'      => esc_attr__( 'Linear', 'fusion-builder' ),
+					'ease-in'     => esc_attr__( 'Ease-in', 'fusion-builder' ),
+					'ease-out'    => esc_attr__( 'Ease-out', 'fusion-builder' ),
+					'ease-in-out' => esc_attr__( 'Ease-in-out', 'fusion-builder' ),
+				],
+				'transport'   => 'postMessage',
+				'events'      => [
+					'awb-off-canvas-exit-animation',
+				],
+				'dependency'  => [
+					[
+						'field'      => 'exit_animation',
+						'value'      => '',
+						'comparison' => '!=',
+					],
+					[
+						'field'      => 'type',
+						'value'      => 'sliding-bar',
+						'comparison' => '!=',
+					],
+				],
+			],          // sliding bar animations.
 			'sb_enter_animation'        => [
 				'type'        => 'select',
 				'label'       => esc_html__( 'Entrance Animation', 'Avada' ),
@@ -284,6 +345,36 @@ function avada_page_options_tab_off_canvas_animation( $sections ) {
 					'step' => 0.1,
 					'min'  => 0.1,
 					'max'  => 5,
+				],
+				'transport'   => 'postMessage',
+				'events'      => [
+					'awb-off-canvas-enter-animation',
+				],
+				'dependency'  => [
+					[
+						'field'      => 'sb_enter_animation',
+						'value'      => '',
+						'comparison' => '!=',
+					],
+					[
+						'field'      => 'type',
+						'value'      => 'sliding-bar',
+						'comparison' => '==',
+					],
+				],
+			],
+			'sb_enter_animation_timing' => [
+				'type'        => 'select',
+				'label'       => esc_attr__( 'Timing Of Entrance Animation', 'Avada' ),
+				'description' => esc_attr__( 'Select the timing function of the entrance animation.', 'Avada' ),
+				'id'          => 'sb_enter_animation_timing',
+				'default'     => 'ease',
+				'choices'     => [
+					'ease'        => esc_attr__( 'Ease', 'fusion-builder' ),
+					'linear'      => esc_attr__( 'Linear', 'fusion-builder' ),
+					'ease-in'     => esc_attr__( 'Ease-in', 'fusion-builder' ),
+					'ease-out'    => esc_attr__( 'Ease-out', 'fusion-builder' ),
+					'ease-in-out' => esc_attr__( 'Ease-in-out', 'fusion-builder' ),
 				],
 				'transport'   => 'postMessage',
 				'events'      => [
@@ -353,6 +444,36 @@ function avada_page_options_tab_off_canvas_animation( $sections ) {
 					],
 				],
 			],
+			'sb_exit_animation_timing'  => [
+				'type'        => 'select',
+				'label'       => esc_attr__( 'Timing Of Exit Animation', 'Avada' ),
+				'description' => esc_attr__( 'Select the timing function of the exit animation.', 'Avada' ),
+				'id'          => 'sb_exit_animation_timing',
+				'default'     => 'ease',
+				'choices'     => [
+					'ease'        => esc_attr__( 'Ease', 'fusion-builder' ),
+					'linear'      => esc_attr__( 'Linear', 'fusion-builder' ),
+					'ease-in'     => esc_attr__( 'Ease-in', 'fusion-builder' ),
+					'ease-out'    => esc_attr__( 'Ease-out', 'fusion-builder' ),
+					'ease-in-out' => esc_attr__( 'Ease-in-out', 'fusion-builder' ),
+				],
+				'transport'   => 'postMessage',
+				'events'      => [
+					'awb-off-canvas-exit-animation',
+				],
+				'dependency'  => [
+					[
+						'field'      => 'sb_exit_animation',
+						'value'      => '',
+						'comparison' => '!=',
+					],
+					[
+						'field'      => 'type',
+						'value'      => 'sliding-bar',
+						'comparison' => '==',
+					],
+				],
+			],          
 		],
 	];
 

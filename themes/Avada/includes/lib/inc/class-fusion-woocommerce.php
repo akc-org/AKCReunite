@@ -168,7 +168,7 @@ class Fusion_WooCommerce {
 				|| $this->is_shop_layout && is_shop()
 				|| $this->is_cart_layout && is_cart()
 				|| $this->is_checkout_layout && is_checkout()
-				|| FusionBuilder()->post_card_data['is_rendering']
+				|| ( function_exists( 'FusionBuilder' ) && FusionBuilder()->post_card_data['is_rendering'] )
 			) {
 				$new_template = str_replace( $avada_path, $woo_path, $template );
 			} else {
@@ -314,6 +314,8 @@ class Fusion_WooCommerce {
 		global $post;
 
 		$flexslider_options['directionNav'] = true;
+		$flexslider_options['prevText']     = '<i class="awb-icon-angle-left"></i>';
+		$flexslider_options['nextText']     = '<i class="awb-icon-angle-right"></i>';
 
 		$product = wc_get_product( $post );
 
@@ -365,7 +367,7 @@ class Fusion_WooCommerce {
 			$sale_price    = (float) $product->get_sale_price();
 
 			if ( 'percent' === $discount_type ) {
-				$discount = 0 !== (int) $regular_price ? round( 100 - ( $sale_price / $regular_price * 100 ) ) : 0;
+				$discount = 0.0 !== $regular_price ? round( ( 1 - $sale_price / $regular_price ) * 100 ) : 0;
 			} else {
 				$discount = $regular_price - $sale_price;
 			}

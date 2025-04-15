@@ -262,14 +262,21 @@ function avada_options_section_events_calendar( $sections ) {
 				'id'     => 'ec_single_event_detail_section_heading',
 				'type'   => 'sub-section',
 				'fields' => [
-					'ec_all_events_link'              => [
+					'ec_all_events_link'               => [
 						'label'       => esc_html__( 'Display All Events Link', 'Avada' ),
 						'description' => esc_html__( 'Turn on to display the link back to the main event page.', 'Avada' ),
 						'id'          => 'ec_all_events_link',
 						'default'     => 0,
 						'type'        => 'switch',
 					],
-					'events_social_sharing_box'       => [
+					'tec_display_featured_image_title' => [
+						'label'       => __( 'Display Featured Image & Title', 'Avada' ),
+						'description' => esc_html__( 'Turn on to display the featured image and title on single event posts.', 'Avada' ),
+						'id'          => 'tec_display_featured_image_title',
+						'default'     => 1,
+						'type'        => 'switch',
+					],
+					'events_social_sharing_box'        => [
 						'label'           => esc_html__( 'Events Social Sharing Box', 'Avada' ),
 						'description'     => esc_html__( 'Turn on to display the social sharing box on single event posts.', 'Avada' ),
 						'id'              => 'events_social_sharing_box',
@@ -283,7 +290,7 @@ function avada_options_section_events_calendar( $sections ) {
 							],
 						],
 					],
-					'ec_meta_layout'                  => [
+					'ec_meta_layout'                   => [
 						'type'        => 'radio-buttonset',
 						'label'       => esc_html__( 'Events Single Post Meta Layout', 'Avada' ),
 						'description' => esc_html__( 'Sets the layout of the single events meta data.', 'Avada' ),
@@ -295,13 +302,13 @@ function avada_options_section_events_calendar( $sections ) {
 							'disabled'      => esc_html__( 'Disabled', 'Avada' ),
 						],
 					],
-					'ec_sidebar_layouts_info'         => [
+					'ec_sidebar_layouts_info'          => [
 						'label'       => esc_html__( 'Events Single Sidebar Layout', 'Avada' ),
 						'description' => '',
 						'id'          => 'ec_sidebar_layouts_info',
 						'type'        => 'info',
 					],
-					'ec_sidebar_width'                => [
+					'ec_sidebar_width'                 => [
 						'label'       => esc_html__( 'Events Single Sidebar Width', 'Avada' ),
 						'description' => esc_html__( 'Controls the width of the sidebar when only one sidebar is present.', 'Avada' ),
 						'id'          => 'ec_sidebar_width',
@@ -314,13 +321,13 @@ function avada_options_section_events_calendar( $sections ) {
 							],
 						],
 					],
-					'ec_dual_sidebar_layouts_info'    => [
+					'ec_dual_sidebar_layouts_info'     => [
 						'label'       => esc_html__( 'Events Dual Sidebar Layout', 'Avada' ),
 						'description' => '',
 						'id'          => 'ec_dual_sidebar_layouts_info',
 						'type'        => 'info',
 					],
-					'ec_sidebar_2_1_width'            => [
+					'ec_sidebar_2_1_width'             => [
 						'label'       => esc_html__( 'Events Dual Sidebar Width 1', 'Avada' ),
 						'description' => esc_html__( 'Controls the width of sidebar 1 when dual sidebars are present.', 'Avada' ),
 						'id'          => 'ec_sidebar_2_1_width',
@@ -333,7 +340,7 @@ function avada_options_section_events_calendar( $sections ) {
 							],
 						],
 					],
-					'ec_sidebar_2_2_width'            => [
+					'ec_sidebar_2_2_width'             => [
 						'label'       => esc_html__( 'Events Dual Sidebar Width 2', 'Avada' ),
 						'description' => esc_html__( 'Controls the width of sidebar 2 when dual sidebars are present.', 'Avada' ),
 						'id'          => 'ec_sidebar_2_2_width',
@@ -346,13 +353,13 @@ function avada_options_section_events_calendar( $sections ) {
 							],
 						],
 					],
-					'ec_sidebar_sidebar_styling_info' => [
+					'ec_sidebar_sidebar_styling_info'  => [
 						'label'       => esc_html__( 'Events Single Post Sidebar / Meta Content Styling', 'Avada' ),
 						'description' => '',
 						'id'          => 'ec_sidebar_sidebar_styling_info',
 						'type'        => 'info',
 					],
-					'ec_sidebar_bg_color'             => [
+					'ec_sidebar_bg_color'              => [
 						'label'       => esc_html__( 'Events Sidebar / Meta Content Background Color', 'Avada' ),
 						'description' => esc_html__( 'Controls the background color of the single event post sidebar(s) / meta content.', 'Avada' ),
 						'id'          => 'ec_sidebar_bg_color',
@@ -365,7 +372,7 @@ function avada_options_section_events_calendar( $sections ) {
 							],
 						],
 					],
-					'ec_sidebar_padding'              => [
+					'ec_sidebar_padding'               => [
 						'label'       => esc_html__( 'Events Sidebar / Meta Content Padding', 'Avada' ),
 						'description' => esc_html__( 'Controls the padding for the single event post sidebar(s) / meta content.', 'Avada' ),
 						'id'          => 'ec_sidebar_padding',
@@ -382,7 +389,7 @@ function avada_options_section_events_calendar( $sections ) {
 							],
 						],
 					],
-					'ec_sidew_font_size'              => [
+					'ec_sidew_font_size'               => [
 						'label'       => esc_html__( 'Events Sidebar Widget / Meta Content Heading Font Size', 'Avada' ),
 						'description' => esc_html__( 'Controls the size of the sidebar widget / meta content heading for single event posts.', 'Avada' ),
 						'id'          => 'ec_sidew_font_size',
@@ -394,7 +401,7 @@ function avada_options_section_events_calendar( $sections ) {
 							],
 						],
 					],
-					'ec_sidebar_widget_bg_color'      => [
+					'ec_sidebar_widget_bg_color'       => [
 						'label'       => esc_html__( 'Events Sidebar Widget / Meta Content Title Background Color', 'Avada' ),
 						'description' => esc_html__( 'Controls the background color of the sidebar widget / meta content title for single event posts.', 'Avada' ),
 						'id'          => 'ec_sidebar_widget_bg_color',
@@ -417,7 +424,7 @@ function avada_options_section_events_calendar( $sections ) {
 							],
 						],
 					],
-					'ec_sidebar_heading_color'        => [
+					'ec_sidebar_heading_color'         => [
 						'label'       => esc_html__( 'Events Sidebar Widget / Meta Content Headings Color', 'Avada' ),
 						'description' => esc_html__( 'Controls the color of the sidebar widget / meta content heading for single event posts.', 'Avada' ),
 						'id'          => 'ec_sidebar_heading_color',
@@ -430,7 +437,7 @@ function avada_options_section_events_calendar( $sections ) {
 							],
 						],
 					],
-					'ec_text_font_size'               => [
+					'ec_text_font_size'                => [
 						'label'       => esc_html__( 'Events Sidebar / Meta Content Text Font Size', 'Avada' ),
 						'description' => esc_html__( 'Controls the size of the text in the single event post sidebar / meta content.', 'Avada' ),
 						'id'          => 'ec_text_font_size',
@@ -448,7 +455,7 @@ function avada_options_section_events_calendar( $sections ) {
 							],
 						],
 					],
-					'ec_sidebar_text_color'           => [
+					'ec_sidebar_text_color'            => [
 						'label'       => esc_html__( 'Events Sidebar / Meta Content Text Color', 'Avada' ),
 						'description' => esc_html__( 'Controls the color of the text in the single event post sidebar / meta content.', 'Avada' ),
 						'id'          => 'ec_sidebar_text_color',
@@ -461,7 +468,7 @@ function avada_options_section_events_calendar( $sections ) {
 							],
 						],
 					],
-					'ec_sidebar_link_color'           => [
+					'ec_sidebar_link_color'            => [
 						'label'       => esc_html__( 'Events Sidebar / Meta Content Link Color', 'Avada' ),
 						'description' => esc_html__( 'Controls the color of the link text in the single event post sidebar / meta content.', 'Avada' ),
 						'id'          => 'ec_sidebar_link_color',
@@ -474,7 +481,7 @@ function avada_options_section_events_calendar( $sections ) {
 							],
 						],
 					],
-					'ec_sidebar_divider_color'        => [
+					'ec_sidebar_divider_color'         => [
 						'label'       => esc_html__( 'Events Sidebar / Meta Content Divider Color', 'Avada' ),
 						'description' => esc_html__( 'Controls the color of the dividers in the single event post sidebar / meta content.', 'Avada' ),
 						'id'          => 'ec_sidebar_divider_color',

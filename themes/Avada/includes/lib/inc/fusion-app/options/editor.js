@@ -59,12 +59,21 @@ FusionPageBuilder.options.fusionEditor = {
 
 						// If it is a placeholder, add an on focus listener.
 						if ( jQuery( '#' + textareaID ).data( 'placeholder' ) ) {
-							window.tinyMCE.get( textareaID ).on( 'focus', function() {
+							window.tinyMCE.get( textareaID ).on( 'focus', function( event ) {
+								const textareaHadFocus = jQuery( event.target.targetElm ).hasClass( 'awb-had-focus' ),
+									switchButtonInputHadFocus = jQuery( event.target.targetElm ).closest( '#wp-' + textareaID + '-wrap' ).prev().hasClass( 'awb-had-focus' );
+								
 								$theContent = window.tinyMCE.get( textareaID ).getContent();
 								$theContent = jQuery( '<div/>' ).html( $theContent ).text();
-								if ( $theContent === jQuery( '#' + textareaID ).data( 'placeholder' ) ) {
+
+								// The flags make sure that laceholder content isn't wiped out through WP's efault behaviour.
+								if ( $theContent === jQuery( event.target.targetElm ).data( 'placeholder' ) && ( ( ! textareaHadFocus && ! switchButtonInputHadFocus ) || ( textareaHadFocus && switchButtonInputHadFocus ) ) ) {
 									window.tinyMCE.get( textareaID ).setContent( '' );
 								}
+
+								if ( ! jQuery( event.target.targetElm ).hasClass( 'awb-had-focus' ) ) {
+									jQuery( event.target.targetElm ).addClass( 'awb-had-focus' );
+								}								
 							} );
 						}
 						window.tinyMCE.get( textareaID ).on( 'keyup change', function() {
@@ -78,16 +87,24 @@ FusionPageBuilder.options.fusionEditor = {
 					textareaID = $contentTextarea.attr( 'id' );
 
 					setTimeout( function() {
-
 						$contentTextarea.wp_editor( content, textareaID, allowGenerator );
 
 						// If it is a placeholder, add an on focus listener.
 						if ( jQuery( '#' + textareaID ).data( 'placeholder' ) ) {
-							window.tinyMCE.get( textareaID ).on( 'focus', function() {
+							window.tinyMCE.get( textareaID ).on( 'focus', function( event ) {
+								const textareaHadFocus = jQuery( event.target.targetElm ).hasClass( 'awb-had-focus' ),
+									switchButtonInputHadFocus = jQuery( event.target.targetElm ).closest( '#wp-' + textareaID + '-wrap' ).prev().hasClass( 'awb-had-focus' );
+
 								$theContent = window.tinyMCE.get( textareaID ).getContent();
 								$theContent = jQuery( '<div/>' ).html( $theContent ).text();
-								if ( $theContent === jQuery( '#' + textareaID ).data( 'placeholder' ) ) {
+
+								// The flags make sure that laceholder content isn't wiped out through WP's efault behaviour.
+								if ( $theContent === jQuery( event.target.targetElm ).data( 'placeholder' ) && ( ( ! textareaHadFocus && ! switchButtonInputHadFocus ) || ( textareaHadFocus && switchButtonInputHadFocus ) ) ) {
 									window.tinyMCE.get( textareaID ).setContent( '' );
+								}
+
+								if ( ! jQuery( event.target.targetElm ).hasClass( 'awb-had-focus' ) ) {
+									jQuery( event.target.targetElm ).addClass( 'awb-had-focus' );
 								}
 							} );
 						}

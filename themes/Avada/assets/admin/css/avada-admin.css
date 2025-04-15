@@ -378,6 +378,9 @@
   border-left: 0.6em solid #fff;
   border-bottom: 0.4em solid transparent;
 }
+.avada-dashboard .avada-db-welcome-setup .avada-db-welcome-video .avada-db-welcome-video-icon .fusiona-star-empty {
+  color: #ffffff;
+}
 .avada-dashboard .avada-db-welcome-setup .avada-db-welcome-video:hover .avada-db-welcome-video-icon {
   background-color: #0e7abd;
 }

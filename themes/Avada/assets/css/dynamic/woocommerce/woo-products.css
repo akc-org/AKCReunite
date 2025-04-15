@@ -673,13 +673,16 @@ li.outofstock .onsale {
 .fusion-woo-badges-wrapper .fusion-out-of-stock {
   font-size: var(--fusion-woo-outofstock-badge-text-size, "13px");
 }
-.fusion-woo-product-design-clean .product.sale .fusion-image-wrapper {
+.fusion-woo-product-design-clean .product.sale .fusion-image-wrapper,
+.fusion-woo-product-design-clean .outofstock .fusion-image-wrapper {
   z-index: auto;
 }
-.fusion-woo-product-design-clean .product.sale .fusion-image-wrapper .fusion-rollover {
+.fusion-woo-product-design-clean .product.sale .fusion-image-wrapper .fusion-rollover,
+.fusion-woo-product-design-clean .outofstock .fusion-image-wrapper .fusion-rollover {
   z-index: 4;
 }
-.fusion-woo-product-design-clean .product.sale .onsale {
+.fusion-woo-product-design-clean .product.sale .fusion-woo-badges-wrapper,
+.fusion-woo-product-design-clean .outofstock .fusion-woo-badges-wrapper {
   z-index: 3;
 }
 .ywgc-message textarea {

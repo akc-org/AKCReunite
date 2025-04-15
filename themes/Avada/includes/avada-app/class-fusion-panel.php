@@ -1112,6 +1112,14 @@ class Fusion_Panel {
 		global $post;
 		$sections  = [];
 		$post_type = get_post_type( fusion_library()->get_page_id() );
+		$type      = '';
+
+		if ( 'fusion_element' === $post_type ) {
+			$terms = get_the_terms( fusion_library()->get_page_id(), 'element_category' );
+			if ( $terms ) {
+				$type = $terms[0]->name;
+			}
+		}	
 
 		if ( ! is_singular() && get_option( 'page_for_posts' ) !== fusion_library()->get_page_id() && ! ( class_exists( 'WooCommerce' ) && is_shop() ) ) {
 			$this->get_archive_options();
@@ -1136,7 +1144,7 @@ class Fusion_Panel {
 		$sections = $page_options->get_options();
 
 		// Library elements have no POs.
-		if ( 'fusion_element' !== $post_type ) {
+		if ( 'fusion_element' !== $post_type || 'mega_menus' === $type ) {
 			$sections['custom_css'] = [
 				'label'  => esc_html__( 'Custom CSS', 'Avada' ),
 				'id'     => 'custom_css',
@@ -1343,7 +1351,7 @@ class Fusion_Panel {
 		 * Use caches if available.
 		 * If WP_DEBUG is on, don't cache.
 		 */
-		if ( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG ) {
+		if ( ! defined( 'AVADA_DEV_MODE' ) || ! AVADA_DEV_MODE ) {
 			$this->options                = get_transient( 'fusion_tos' );
 			$this->fusion_builder_options = get_transient( 'fusion_fb_tos' );
 		}

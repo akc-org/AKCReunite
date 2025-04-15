@@ -79,6 +79,9 @@ class Fusion_Patcher_Client {
 		if ( defined( 'FUSION_BUILDER_VERSION' ) ) {
 			$args['fusion_builder_version'] = FUSION_BUILDER_VERSION;
 		}
+		if ( defined( 'FUSION_WHITE_LABEL_BRANDING_VERSION' ) ) {
+			$args['fusion_white_label_branding_version'] = FUSION_WHITE_LABEL_BRANDING_VERSION;
+		}
 
 		// Pass on reg data just in case.
 		if ( class_exists( 'Avada' ) ) {

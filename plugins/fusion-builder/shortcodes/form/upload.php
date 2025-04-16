@@ -124,6 +124,10 @@ if ( fusion_is_element_enabled( 'fusion_form_upload' ) ) {
  * @since 3.1
  */
 function fusion_form_upload() {
+	$max_upload_size = size_format( wp_max_upload_size() );
+	if ( ! $max_upload_size ) {
+		$max_upload_size = 0;
+	}
 
 	fusion_builder_map(
 		fusion_builder_frontend_data(
@@ -194,7 +198,8 @@ function fusion_form_upload() {
 					[
 						'type'        => 'range',
 						'heading'     => esc_html__( 'Max File Upload Size', 'fusion-builder' ),
-						'description' => esc_html__( 'Maximum size limit for file upload. The default is 2 MB.', 'fusion-builder' ),
+						/* translators: Maximum upload size. */
+						'description' => sprintf( __( 'Maximum size limit for file upload. The default is 2 MB. Maximum upload size on your site is currently set to %s.', 'fusion-builder' ), $max_upload_size ),
 						'param_name'  => 'upload_size',
 						'value'       => '2',
 						'min'         => '1',

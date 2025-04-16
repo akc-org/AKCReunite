@@ -1632,7 +1632,7 @@ class Fusion_Template_Builder extends AWB_Layout_Conditions {
 			}
 
 			// MemberPress plugin.
-			if ( defined( 'MEPR_PLUGIN_NAME' ) ) {
+			if ( 1 === $this->rendering_override_loop && defined( 'MEPR_PLUGIN_NAME' ) ) {
 				remove_filter( 'the_content', 'MeprAppCtrl::page_route', 100 );
 				remove_filter( 'the_content', 'MeprGroupsCtrl::render_pricing_boxes', 10 );
 				remove_filter( 'the_content', 'MeprProductsCtrl::display_registration_form', 10 );
@@ -1857,7 +1857,7 @@ class Fusion_Template_Builder extends AWB_Layout_Conditions {
 				add_filter( 'the_content', 'members_content_permissions_protect', 95 );
 			}
 
-			if ( defined( 'MEPR_PLUGIN_NAME' ) ) {
+			if ( 1 === $this->rendering_override_loop && defined( 'MEPR_PLUGIN_NAME' ) ) {
 				add_filter( 'the_content', 'MeprAppCtrl::page_route', 100 );
 				add_filter( 'the_content', 'MeprGroupsCtrl::render_pricing_boxes', 10 );
 				add_filter( 'the_content', 'MeprProductsCtrl::display_registration_form', 10 );
@@ -1912,8 +1912,26 @@ class Fusion_Template_Builder extends AWB_Layout_Conditions {
 					foreach ( $actions as $name => $action ) {
 
 						// Memberdash plugin.
-						if ( ( false !== strpos( $name, 'register_form' ) || false !== strpos( $name, 'verification_notification' ) ) && isset( $action['function'][0] ) && 'MS_Controller_Frontend' === get_class( $action['function'][0] ) ) {
-							$this->handle_content_filter( $action['function'], $index );
+						if ( is_array( $action['function'] ) && isset( $action['function'][0] ) && is_object( $action['function'][0] ) ) {
+							if ( 'MS_Controller_Frontend' === get_class( $action['function'][0] ) && ( false !== strpos( $name, 'register_form' ) || false !== strpos( $name, 'verification_notification' ) || false !== strpos( $name, 'payment_table' ) || false !== strpos( $name, 'gateway_form' ) ) ) {
+								$this->handle_content_filter( $action['function'], $index );
+							}
+
+							if ( 'SimpleWpMembership' === get_class( $action['function'][0] ) && false !== strpos( $name, 'filter_content' ) ) {
+								$this->handle_content_filter( $action['function'], $index );
+							}
+
+							if ( ( 'MS_View_Shortcode_Login' === get_class( $action['function'][0] ) || 'MS_View_Frontend_Activities' === get_class( $action['function'][0] ) || 'MS_View_Frontend_Invoices' === get_class( $action['function'][0] ) || 'MS_View_Frontend_Profile' === get_class( $action['function'][0] ) ) && false !== strpos( $name, 'to_html' ) ) {
+								$this->handle_content_filter( $action['function'], $index );
+							}
+
+							if ( 'MS_Rule_Content_Model' === get_class( $action['function'][0] ) && ( false !== strpos( $name, 'check_special_page' ) || false !== strpos( $name, 'replace_more_tag_content' ) ) ) {
+								$this->handle_content_filter( $action['function'], $index );
+							}
+
+							if ( 'MS_Controller_Gateway' === get_class( $action['function'][0] ) && ( false !== strpos( $name, 'gateway_form' ) || false !== strpos( $name, 'purchase_info_content' ) || false !== strpos( $name, 'purchase_error_content' ) ) ) {
+								$this->handle_content_filter( $action['function'], $index );
+							}
 						}
 					}
 				}

@@ -223,8 +223,6 @@ if ( fusion_is_element_enabled( 'fusion_tagline_box' ) ) {
 				// Single string for CSS.
 				$this->args['button_border_radius'] = fusion_library()->sanitize->get_value_with_unit( $this->args['button_border_radius_top_left'] ) . ' ' . fusion_library()->sanitize->get_value_with_unit( $this->args['button_border_radius_top_right'] ) . ' ' . fusion_library()->sanitize->get_value_with_unit( $this->args['button_border_radius_bottom_right'] ) . ' ' . fusion_library()->sanitize->get_value_with_unit( $this->args['button_border_radius_bottom_left'] );
 
-				$styles = apply_filters( 'fusion_builder_tagline_box_style', "<style type='text/css'>.reading-box-container-{$this->tagline_box_counter} .element-bottomshadow:before,.reading-box-container-{$this->tagline_box_counter} .element-bottomshadow:after{opacity:{$shadowopacity};}</style>", $defaults, $this->tagline_box_counter );
-
 				if ( isset( $title ) && $title ) {
 					$title_tag = '<h2>' . $title . '</h2>';
 				}
@@ -282,7 +280,16 @@ if ( fusion_is_element_enabled( 'fusion_tagline_box' ) ) {
 					$additional_content        .= '<a ' . FusionBuilder::attributes( 'tagline-shortcode-button' ) . '><span>' . $button . '</span></a>';
 				}
 
-				$html = $styles . '<div ' . FusionBuilder::attributes( 'tagline-shortcode' ) . '><div ' . FusionBuilder::attributes( 'tagline-shortcode-reading-box' ) . '>' . $additional_content . '</div></div>';
+				$styles = apply_filters( 'fusion_builder_tagline_box_style', '<style type="text/css"></style>', $defaults, $this->tagline_box_counter );
+				$styles = '<style type="text/css"></style>' === $styles ? '' : $styles;
+
+				$html = $styles . '<div ' . FusionBuilder::attributes( 'tagline-shortcode' ) . '><div ' . FusionBuilder::attributes( 'tagline-shortcode-reading-box' ) . '>' . $additional_content . '</div>';
+				
+				if ( 'yes' === $this->args['shadow'] ) {
+					$html .= '<svg style="opacity:' . $this->args['shadowopacity'] . ';" xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" viewBox="0 0 600 28" preserveAspectRatio="none"><g clip-path="url(#a)"><mask id="b" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="0" y="0" width="600" height="28"><path d="M0 0h600v28H0V0Z" fill="#fff"/></mask><g filter="url(#c)" mask="url(#b)"><path d="M16.439-18.667h567.123v30.8S438.961-8.4 300-8.4C161.04-8.4 16.438 12.133 16.438 12.133v-30.8Z" fill="#000"/></g></g><defs><clipPath id="a"><path fill="#fff" d="M0 0h600v28H0z"/></clipPath><filter id="c" x="5.438" y="-29.667" width="589.123" height="52.8" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur stdDeviation="5.5" result="effect1_foregroundBlur_3983_183"/></filter></defs></svg>';
+				}				
+				
+				$html .=  '</div>';
 
 				$this->tagline_box_counter++;
 
@@ -376,10 +383,6 @@ if ( fusion_is_element_enabled( 'fusion_tagline_box' ) ) {
 					$attr['class'] .= ' reading-box-right';
 				} elseif ( 'center' === $this->args['content_alignment'] ) {
 					$attr['class'] .= ' reading-box-center';
-				}
-
-				if ( 'yes' === $this->args['shadow'] ) {
-					$attr['class'] .= ' element-bottomshadow';
 				}
 
 				$attr['style']  = 'background-color:' . $this->args['backgroundcolor'] . ';';
@@ -587,6 +590,36 @@ if ( fusion_is_element_enabled( 'fusion_tagline_box' ) ) {
  */
 function fusion_element_tagline_box() {
 	$fusion_settings = awb_get_fusion_settings();
+
+	$button_color = [];
+	if ( apply_filters( 'awb_load_button_presets', '1' === $fusion_settings->get( 'button_presets' ) ) ) {
+		$button_color = [
+			'type'        => 'select',
+			'heading'     => esc_attr__( 'Button Color', 'fusion-builder' ),
+			'description' => esc_attr__( 'Choose the button color.', 'fusion-builder' ),
+			'group'       => esc_attr__( 'Design', 'fusion-builder' ),
+			'param_name'  => 'buttoncolor',
+			'value'       => [
+				'default'   => esc_attr__( 'Default', 'fusion-builder' ),
+				'green'     => esc_attr__( 'Green', 'fusion-builder' ),
+				'darkgreen' => esc_attr__( 'Dark Green', 'fusion-builder' ),
+				'orange'    => esc_attr__( 'Orange', 'fusion-builder' ),
+				'blue'      => esc_attr__( 'Blue', 'fusion-builder' ),
+				'red'       => esc_attr__( 'Red', 'fusion-builder' ),
+				'pink'      => esc_attr__( 'Pink', 'fusion-builder' ),
+				'darkgray'  => esc_attr__( 'Dark Gray', 'fusion-builder' ),
+				'lightgray' => esc_attr__( 'Light Gray', 'fusion-builder' ),
+			],
+			'default'     => 'default',
+			'dependency'  => [
+				[
+					'element'  => 'link',
+					'value'    => '',
+					'operator' => '!=',
+				],
+			],
+		];
+	}
 
 	fusion_builder_map(
 		fusion_builder_frontend_data(
@@ -802,6 +835,7 @@ function fusion_element_tagline_box() {
 						'type'        => 'radio_button_set',
 						'heading'     => esc_attr__( 'Button Size', 'fusion-builder' ),
 						'description' => esc_attr__( "Select the button's size. Choose default for Global Option selection.", 'fusion-builder' ),
+						'group'       => esc_attr__( 'Design', 'fusion-builder' ),
 						'param_name'  => 'button_size',
 						'value'       => [
 							''       => esc_attr__( 'Default', 'fusion-builder' ),
@@ -823,6 +857,7 @@ function fusion_element_tagline_box() {
 						'type'        => 'radio_button_set',
 						'heading'     => esc_attr__( 'Button Type', 'fusion-builder' ),
 						'description' => esc_attr__( "Select the button's type.", 'fusion-builder' ),
+						'group'       => esc_attr__( 'Design', 'fusion-builder' ),
 						'param_name'  => 'button_type',
 						'value'       => [
 							''     => esc_attr__( 'Default', 'fusion-builder' ),
@@ -859,31 +894,7 @@ function fusion_element_tagline_box() {
 							],
 						],
 					],
-					[
-						'type'        => ( apply_filters( 'awb_load_button_presets', ( '1' === $fusion_settings->get( 'button_presets' ) ) ) ? 'select' : 'hidden' ),
-						'heading'     => esc_attr__( 'Button Color', 'fusion-builder' ),
-						'description' => esc_attr__( 'Choose the button color.', 'fusion-builder' ),
-						'param_name'  => 'buttoncolor',
-						'value'       => [
-							'default'   => esc_attr__( 'Default', 'fusion-builder' ),
-							'green'     => esc_attr__( 'Green', 'fusion-builder' ),
-							'darkgreen' => esc_attr__( 'Dark Green', 'fusion-builder' ),
-							'orange'    => esc_attr__( 'Orange', 'fusion-builder' ),
-							'blue'      => esc_attr__( 'Blue', 'fusion-builder' ),
-							'red'       => esc_attr__( 'Red', 'fusion-builder' ),
-							'pink'      => esc_attr__( 'Pink', 'fusion-builder' ),
-							'darkgray'  => esc_attr__( 'Dark Gray', 'fusion-builder' ),
-							'lightgray' => esc_attr__( 'Light Gray', 'fusion-builder' ),
-						],
-						'default'     => 'default',
-						'dependency'  => [
-							[
-								'element'  => 'link',
-								'value'    => '',
-								'operator' => '!=',
-							],
-						],
-					],
+					$button_color,
 					[
 						'type'         => 'raw_textarea',
 						'heading'      => esc_attr__( 'Tagline Title', 'fusion-builder' ),

@@ -1161,9 +1161,10 @@ if ( ! class_exists( 'Fusion_Column_Element' ) ) {
 		public function empty_col_bg_img_attr() {
 
 			$attr = [
-				'class' => 'fusion-empty-dims-img-placeholder',
-				'alt'   => '',
-				'src'   => call_user_func_array( [ fusion_library()->images, 'get_lazy_placeholder' ], [ $this->args['background_data']['width'], $this->args['background_data']['height'] ] ),
+				'class'      => 'fusion-empty-dims-img-placeholder',
+				'alt'        => $this->args['background_data']['alt'],
+				'aria-label' => $this->args['background_data']['title_attribute'],
+				'src'        => call_user_func_array( [ fusion_library()->images, 'get_lazy_placeholder' ], [ $this->args['background_data']['width'], $this->args['background_data']['height'] ] ),
 			];
 
 			// Empty BG Image Dims.
@@ -1197,11 +1198,11 @@ if ( ! class_exists( 'Fusion_Column_Element' ) ) {
 		 * @return string
 		 */
 		public function generate_placeholder_img( $background_data, $classname ) {
-
 			$attr = [
-				'class' => 'fusion-empty-dims-img-placeholder' . $classname,
-				'alt'   => '',
-				'src'   => call_user_func_array( [ fusion_library()->images, 'get_lazy_placeholder' ], [ $background_data['width'], $background_data['height'] ] ),
+				'class'      => 'fusion-empty-dims-img-placeholder' . $classname,
+				'alt'        => $background_data['alt'],
+				'aria-label' => $background_data['title_attribute'],
+				'src'        => call_user_func_array( [ fusion_library()->images, 'get_lazy_placeholder' ], [ $background_data['width'], $background_data['height'] ] ),
 			];
 
 			// Empty BG Image Dims.
@@ -2602,6 +2603,7 @@ if ( ! class_exists( 'Fusion_Column_Element' ) ) {
 					'type'         => 'link_selector',
 					'heading'      => esc_attr__( 'Link URL', 'fusion-builder' ),
 					'description'  => __( 'Add the URL the column will link to, ex: http://example.com. <strong>IMPORTANT:</strong> This will disable links on elements inside the column.', 'fusion-builder' ),
+					'group'        => esc_attr__( 'General', 'fusion-builder' ),
 					'param_name'   => 'link',
 					'value'        => '',
 					'dynamic_data' => true,
@@ -2610,6 +2612,7 @@ if ( ! class_exists( 'Fusion_Column_Element' ) ) {
 					'type'        => 'radio_button_set',
 					'heading'     => esc_attr__( 'Link Target', 'fusion-builder' ),
 					'description' => esc_attr__( '_self = open in same browser tab, _blank = open in new browser tab.', 'fusion-builder' ),
+					'group'       => esc_attr__( 'General', 'fusion-builder' ),
 					'param_name'  => 'target',
 					'default'     => '_self',
 					'value'       => [
@@ -2629,6 +2632,7 @@ if ( ! class_exists( 'Fusion_Column_Element' ) ) {
 					'type'         => 'textfield',
 					'heading'      => esc_attr__( 'Link Description', 'fusion-builder' ),
 					'description'  => esc_attr__( 'Add descriptive text to the link to make it easier accessible.', 'fusion-builder' ),
+					'group'        => esc_attr__( 'General', 'fusion-builder' ),
 					'param_name'   => 'link_description',
 					'value'        => '',
 					'dynamic_data' => true,
@@ -2676,6 +2680,7 @@ if ( ! class_exists( 'Fusion_Column_Element' ) ) {
 					'value'       => fusion_builder_visibility_options( 'full' ),
 					'default'     => fusion_builder_default_visibility( 'array' ),
 					'description' => esc_attr__( 'Choose to show or hide the column on small, medium or large screens. You can choose more than one at a time.', 'fusion-builder' ),
+					'group'       => esc_attr__( 'General', 'fusion-builder' ),
 				],
 				'fusion_sticky_visibility_placeholder'  => [],
 				[

@@ -522,7 +522,9 @@ var FusionPageBuilder = FusionPageBuilder || {};
 			FusionPageBuilderApp.$el.find( '.fusion_builder_container' ).remove();
 
 			// Try to make the shortcode if the content does not contain them.
-			data = FusionPageBuilderApp.validateContent( data );
+			if ( ! FusionApp.data.is_fusion_element || 'mega_menus' === FusionApp.data.fusion_element_type ) {
+				data = FusionPageBuilderApp.validateContent( data );
+			}
 
 			// Reset models with new elements
 			FusionPageBuilderApp.createBuilderLayout( data );
@@ -1677,6 +1679,10 @@ var FusionPageBuilder = FusionPageBuilder || {};
 				jQuery( '#fb-preview' )[ 0 ].contentWindow.jQuery( 'body' ).find( '.fusion-form-form-wrapper' ).removeClass( 'has-icon-alignment' );
 			}
 
+			if ( 'undefined' !== typeof this.formData.required_field_symbol_decoration &&  'no' === this.formData.required_field_symbol_decoration ) {
+				customVars.required_field_symbol_deco = 'none';
+			}
+
 			cssVarsOptions.margin_top    = { 'callback': _.fusionGetValueWithUnit };
 			cssVarsOptions.margin_right  = { 'callback': _.fusionGetValueWithUnit };
 			cssVarsOptions.margin_bottom = { 'callback': _.fusionGetValueWithUnit };
@@ -1819,8 +1825,10 @@ var FusionPageBuilder = FusionPageBuilder || {};
 				filteredOptions.type = 'sliding-bar';
 				filteredOptions.enter_animation = filteredOptions.sb_enter_animation;
 				filteredOptions.enter_animation_speed = filteredOptions.sb_enter_animation_speed;
+				filteredOptions.enter_animation_timing = filteredOptions.sb_enter_animation_timing;
 				filteredOptions.exit_animation = filteredOptions.sb_exit_animation;
 				filteredOptions.exit_animation_speed = filteredOptions.sb_exit_animation_speed;
+				filteredOptions.exit_animation_timing = filteredOptions.sb_exit_animation_timing;
 
 				if ( 'left' === filteredOptions.position || !filteredOptions.position ) {
 					filteredOptions.height = 'full';
@@ -1906,9 +1914,11 @@ var FusionPageBuilder = FusionPageBuilder || {};
 				'enter_animation': '',
 				'enter_animation_direction': 'static',
 				'enter_animation_speed': 0.5,
+				'enter_animation_timing': 'ease',
 				'exit_animation': '',
 				'exit_animation_direction': 'static',
 				'exit_animation_speed': 0.5,
+				'exit_animation_timing': 'ease',
 
 				'off_canvas_state': 'closed',
 				'sb_height': '',
@@ -1917,8 +1927,10 @@ var FusionPageBuilder = FusionPageBuilder || {};
 
 				'sb_enter_animation': 'slideShort',
 				'sb_enter_animation_speed': 0.5,
+				'sb_enter_animation_timing': 'ease',
 				'sb_exit_animation': 'slideShort',
 				'sb_exit_animation_speed': 0.5,
+				'sb_exit_animation_timing': 'ease',
 
 				// Design.
 				'background_color': '#ffffff',
@@ -2545,7 +2557,8 @@ var FusionPageBuilder = FusionPageBuilder || {};
 
 			let     animation = options.enter_animation;
 			const   animationDirection = options.enter_animation_direction && 'static' !== options.enter_animation_direction ? this.capitalize( options.enter_animation_direction ) : '',
-			animationSpeed = options.enter_animation_speed || 1;
+			animationSpeed = options.enter_animation_speed || 1,
+			animationTiming = options.enter_animation_timing || 'ease';
 
 			if ( animation ) {
 				if ( ! this.animationsWithoutDirection.includes( animation ) ) {
@@ -2555,7 +2568,8 @@ var FusionPageBuilder = FusionPageBuilder || {};
 				offCanvas.attr( 'data-animation-type', animation );
 				offCanvas.css( {
 					'visibility': 'visible',
-					'animation-duration': animationSpeed + 's'
+					'animation-duration': animationSpeed + 's',
+					'animation-timing-function': animationTiming
 				} );
 			}
 			offCanvas.addClass( 'fusion-animated ' + animation );
@@ -2582,7 +2596,8 @@ var FusionPageBuilder = FusionPageBuilder || {};
 
 			let     animation = options.exit_animation;
 			const   animationDirection = options.exit_animation_direction && 'static' !== options.exit_animation_direction ? this.capitalize( options.exit_animation_direction ) : '',
-			animationSpeed = options.enter_animation_speed || 1;
+			animationSpeed = options.exit_animation_speed || 1,
+			animationTiming = options.exit_animation_timing || 'ease';
 
 			if ( animation ) {
 				if ( ! this.animationsWithoutDirection.includes( animation ) ) {
@@ -2592,7 +2607,8 @@ var FusionPageBuilder = FusionPageBuilder || {};
 				offCanvas.attr( 'data-animation-type', animation );
 				offCanvas.css( {
 					'visibility': 'visible',
-					'animation-duration': animationSpeed + 's'
+					'animation-duration': animationSpeed + 's',
+					'animation-timing-function': animationTiming
 				} );
 			}
 			offCanvas.addClass( 'fusion-animated ' + animation );
@@ -3328,8 +3344,7 @@ var FusionPageBuilder = FusionPageBuilder || {};
 					}
 
 					// Remove HTML tags but keep quotation marks etc.
-					dialogTitle = jQuery( '<div/>' ).html( dialogTitle ).text();
-					dialogTitle = jQuery( '<div/>' ).html( dialogTitle ).text();
+					dialogTitle = dialogTitle.replace( /(<([^>]+)>)/ig, '' );
 					dialogTitle = ( dialogTitle && 15 < dialogTitle.length ) ? dialogTitle.substring( 0, 15 ) + '...' : dialogTitle;
 
 					dialogTitle = _.fusionUcFirst( dialogTitle );
@@ -10480,6 +10495,18 @@ var FusionPageBuilder = FusionPageBuilder || {};
 ( function() {
 
 	jQuery( document ).ready( function() {
+		let isClipboardEnabled;
+		if ( 'clipboard' in navigator ) {
+			navigator.clipboard.readText().then( ( clipboardContent ) => {
+				isClipboardEnabled = true;
+
+			} ).catch( error => {
+				isClipboardEnabled = false;
+				console.log( error );
+			} )
+		} else {
+			isClipboardEnabled = false;
+		}
 
 		// Builder Container View
 		FusionPageBuilder.ContextMenuView = window.wp.Backbone.View.extend( {
@@ -10525,6 +10552,39 @@ var FusionPageBuilder = FusionPageBuilder || {};
 			 * @return {Object} this
 			 */
 			render: function() {
+
+				if ( isClipboardEnabled ) {
+					const self = this;
+
+					navigator.clipboard.readText().then( ( clipboardContent ) => {
+						if ( 'string' === typeof clipboardContent && '' !== clipboardContent ) {
+							const data = JSON.parse( clipboardContent )
+
+							if ( 'object' === typeof data && 'undefined' !== typeof data.type && 'undefined' !== typeof data.content ) {
+								self.copyData.data.type = data.type
+								self.copyData.data.content = data.content
+							}
+						}
+
+						self.doRender()
+					} ).catch( error => {
+						console.error( 'Error storing content from clipboard: ' + error )
+						self.doRender()
+					} )
+				} else {
+					this.doRender();
+				}
+
+				return this;
+			},
+
+			/**
+			 * Do the rendering of the view.
+			 *
+			 * @since 3.11.10
+			 * @return {void}
+			 */
+			doRender: function() {
 				var leftOffset = this.model.event.pageX,
 					topOffset = this.model.event.pageY;
 
@@ -10538,8 +10598,6 @@ var FusionPageBuilder = FusionPageBuilder || {};
 				}
 
 				this.$el.css( { top: ( topOffset ) + 'px', left: ( leftOffset ) + 'px' } );
-
-				return this;
 			},
 
 			/**
@@ -10627,16 +10685,20 @@ var FusionPageBuilder = FusionPageBuilder || {};
 					$temp   = jQuery( '<textarea>' ),
 					data;
 
-				// Copy to actual clipboard, handy for pasting.
-				jQuery( 'body' ).append( $temp );
-				$temp.val( content ).select();
-				document.execCommand( 'copy' );
-				$temp.remove();
-
 				data = {
 					type: type,
 					content: content
 				};
+
+				// Copy to actual clipboard.
+				if ( isClipboardEnabled ) {
+					navigator.clipboard.writeText( JSON.stringify( data ) );
+				} else {
+					jQuery( 'body' ).append( $temp );
+					$temp.val( content ).select();
+					document.execCommand( 'copy' );
+					$temp.remove();
+				}
 
 				this.storeCopy( data );
 			},
@@ -13885,6 +13947,10 @@ var FusionPageBuilder = FusionPageBuilder || {};
 
 				if ( dynamicData.parent_dynamic_content ) {
 					this.$el.find( '.fusion-child-sortables' ).addClass( 'has-dynamic-data' );
+
+					if ( 'filebird_folder_parent' === dynamicData.parent_dynamic_content.data ) {
+						this.$el.find( '.fusion-child-sortables' ).addClass( 'has-dynamic-data-no-children' );
+					}
 				}
 			}
 
@@ -14930,7 +14996,7 @@ var FusionPageBuilder = FusionPageBuilder || {};
 
 		checkPageTemplate: function() {
 			var option  = this.$el.find( 'li[data-option-id="hundred_percent"]' ),
-				postTypes = [ 'post', 'fusion_template', 'fusion_element' ];
+				postTypes = [ 'post', 'fusion_template', 'fusion_element', 'awb_off_canvas' ];
 
 			if ( 'fusion_builder_container' === this.model.get( 'element_type' ) ) {
 				option.show();
@@ -16214,9 +16280,14 @@ var FusionPageBuilder = FusionPageBuilder || {};
 					this.elementView.dynamicParams.removeParam( 'multiple_upload' );
 				}
 
-				const self = this;
+				const self = this,
+					sortableChildren = jQuery( `[data-option-id=${param}]` ).closest( '.fusion-tab-content' ).find( '.fusion-child-sortables' );
 				// Add dynamic class.
-				jQuery( `[data-option-id=${param}]` ).closest( '.fusion-tab-content' ).find( '.fusion-child-sortables' ).addClass( 'has-dynamic-data' );
+				sortableChildren.addClass( 'has-dynamic-data' );
+
+				if ( 'undefined' !== typeof this.elementView.dynamicParams.attributes.params.parent_dynamic_content.data && 'filebird_folder_parent' === this.elementView.dynamicParams.attributes.params.parent_dynamic_content.data ) {
+					sortableChildren.addClass( 'has-dynamic-data-no-children' );
+				}
 
 				// Remove children.
 				const children = FusionPageBuilderViewManager.getChildViews( this.model.get( 'cid' ) );
@@ -16243,7 +16314,7 @@ var FusionPageBuilder = FusionPageBuilder || {};
 
 				const self = this;
 				// Remove dynamic class.
-				jQuery( `[data-option-id=${param}]` ).closest( '.fusion-tab-content' ).find( '.fusion-child-sortables' ).removeClass( 'has-dynamic-data' );
+				jQuery( `[data-option-id=${param}]` ).closest( '.fusion-tab-content' ).find( '.fusion-child-sortables' ).removeClass( 'has-dynamic-data' ).removeClass( 'has-dynamic-data-no-children' );
 
 				// Remove children.
 				const children = FusionPageBuilderViewManager.getChildViews( this.model.get( 'cid' ) );
@@ -24014,6 +24085,10 @@ _.mixin( {
 				label: 'Blogger',
 				color: '#f57d00'
 			},
+			bluesky: {
+				label: 'Bluesky',
+				color: '#0085FF'
+			},
 			deviantart: {
 				label: 'Deviantart',
 				color: '#4dc47d'
@@ -24046,13 +24121,21 @@ _.mixin( {
 				label: 'Forrst',
 				color: '#5b9a68'
 			},
+			github: {
+				label: 'GitHub',
+				color: '#24292e'
+			},			
 			instagram: {
 				label: 'Instagram',
-				color: '#3f729b'
+				color: '#c13584'
 			},
 			linkedin: {
 				label: 'LinkedIn',
 				color: '#0077b5'
+			},
+			mastodon: {
+				label: 'Mastodon',
+				color: '#6364FF'
 			},
 			myspace: {
 				label: 'Myspace',
@@ -24078,6 +24161,10 @@ _.mixin( {
 				label: 'Skype',
 				color: '#00aff0'
 			},
+			snapchat: {
+				label: 'Snapchat',
+				color: '#F7F300',
+			},				
 			soundcloud: {
 				label: 'Soundcloud',
 				color: '#ff8800'
@@ -24094,6 +24181,10 @@ _.mixin( {
 				label: 'Telegram',
 				color: '#0088cc'
 			},
+			threads: {
+				label: 'Threads',
+				color: '#000000',
+			},					
 			tiktok: {
 				label: 'Tiktok',
 				color: '#010101'
@@ -24285,6 +24376,10 @@ _.mixin( {
 				xing: 'xing',
 				yelp: 'yelp',
 				spotify: 'spotify',
+				bluesky: 'bluesky',
+				github: 'github',
+				mastodon: 'mastodon',
+				threads: 'threads',
 				email: 'mail',
 				phone: 'phone'
 			};
@@ -25313,7 +25408,7 @@ _.mixin( {
 
 		const values = self.values;
 		// Early exit if no pattern selected.
-		if ( '' === values.background_slider_images ) {
+		if ( 'undefined' === typeof values.background_slider_images || '' === values.background_slider_images ) {
 			return;
 		}
 
@@ -25675,7 +25770,7 @@ _.mixin( {
 	 * @return {String}
 	 */
 	fusionGetStickyClass: function( value ) {
-		return '' !== value && ! value.includes( ',' ) ? ' fusion-display-' + value + '-only' : '';
+		return 'undefined' !== typeof valu && '' !== value && ! value.includes( ',' ) ? ' fusion-display-' + value + '-only' : '';
 	},
 
 	/**
@@ -27966,7 +28061,7 @@ var FusionPageBuilder = FusionPageBuilder || {};
 		 * @return {void}
 		 */
 		removeChildElements: function( mainContainer, currentCID, elementType  ) {
-			var findString = ( 'fusion_builder_container' === elementType ) ? '.fusion-builder-remove, .fusion-builder-column-remove' : '.fusion-builder-remove';
+			var findString = ( 'fusion_builder_container' === elementType ) ? '.fusion-builder-remove, .fusion-builder-column-remove' : '.fusion-builder-remove, .fusion-builder-row-remove';
 
 			// Remove child elements.
 			jQuery.each( mainContainer.jQuery( '[data-cid="' + currentCID + '"] .fusion-builder-module-controls' ), function() {
@@ -30405,6 +30500,9 @@ var FusionPageBuilder = FusionPageBuilder || {};
 			// Post Id
 			this.postID = false;
 
+			// Dummy text area to decode text encoded by the builder.
+			this.dummyTextArea = document.createElement( 'textarea' );
+			
 			// Listen for new elements
 			this.listenTo( this.collection, 'add', this.addBuilderElement );
 
@@ -32110,11 +32208,9 @@ var FusionPageBuilder = FusionPageBuilder || {};
 					}
 
 					if ( 'fusion_alert' === shortcodeName ) {
-						console.log( shortcodeAttributes.named.dismissable );
 						if ( 'undefined' !== typeof shortcodeAttributes.named.dismissable && 'yes' === shortcodeAttributes.named.dismissable ) {
 							prefixedAttributes.params.dismissable = 'boxed';
 						}
-						console.log( shortcodeAttributes.named.dismissable );
 					}
 
 					elementSettings = _.extend( elementSettings, prefixedAttributes );
@@ -33071,7 +33167,11 @@ var FusionPageBuilder = FusionPageBuilder || {};
 				return data;
 			}
 
-			data = unescape( encodeURIComponent( data ) );
+			try {
+				data = unescape( encodeURIComponent( data ) );
+			} catch ( e ) {
+				data = unescape( data );
+			}			
 
 			do {
 
@@ -33186,6 +33286,35 @@ var FusionPageBuilder = FusionPageBuilder || {};
 			return string;
 		},
 
+		/**
+		 * Decodes headings if encoded.
+		 *
+		 * @since 3.11.0
+		 * @param {string} html - The data to decode.
+		 * @return {string}
+		 */
+		maybeDecode: function( text ) {
+			if ( ! this.needsDecoding( text ) ) {
+				return text;
+			}
+			this.dummyTextArea.innerHTML = text;
+			if ( '' !== this.dummyTextArea.value ) {
+				return this.dummyTextArea.value;
+			}
+			return text;
+		},
+
+		/**
+		 * Checks if encoded.
+		 *
+		 * @since 3.11.0
+		 * @param {string} html - The data to decode.
+		 * @return {string}
+		 */
+		needsDecoding( text ) {
+			const entityPattern = /&[#A-Za-z0-9]+;/;
+			return entityPattern.test( text );
+		},
 		setContent: function( textareaID, content ) {
 			if ( 'undefined' !== typeof window.tinyMCE && window.tinyMCE.get( textareaID ) && ! window.tinyMCE.get( textareaID ).isHidden() ) {
 
@@ -33848,7 +33977,6 @@ var FusionPageBuilder = FusionPageBuilder || {};
 				};
 
 				counterCircleWrapperShortcode[ 'data-originalsize' ] = values.size.toString();
-				console.log( 'Rendered', counterCircleWrapperShortcode );
 				this.model.set( 'selectors', counterCircleWrapperShortcode );
 				this.model.set( 'childSelectors', counterCircleShortcode );
 			},
@@ -34540,7 +34668,13 @@ var FusionPageBuilder = FusionPageBuilder || {};
 			 */
 			onRender: function() {
 				var self = this,
-					parentView = FusionPageBuilderViewManager.getView( this.model.get( 'parent' ) );
+					parentCid   = this.model.get( 'parent' ),
+					parentView  = FusionPageBuilderViewManager.getView( parentCid );
+					parentModel = FusionPageBuilderElements.find( function( model ) {
+						return model.get( 'cid' ) == parentCid;
+					} ),
+					parentValues = jQuery.extend( true, {}, fusionAllElements.fusion_gallery.defaults, _.fusionCleanParameters( parentModel.get( 'params' ) ) ),
+					lightboxID          = '' !== parentValues.lightbox_id ? parentValues.lightbox_id : 'awb_gallery_' + parentCid;
 
 				if ( 'undefined' !== typeof this.model.attributes.selectors ) {
 					this.model.attributes.selectors[ 'class' ] += ' ' + this.className;
@@ -34562,6 +34696,10 @@ var FusionPageBuilder = FusionPageBuilder || {};
 					}
 				}, 50 );
 
+				if ( 'undefined' === typeof this.lightboxID ) {
+					this.lightboxID = 'iLightbox[' + lightboxID + ']';
+				}
+
 				this.initLightbox();
 			},
 
@@ -34582,13 +34720,35 @@ var FusionPageBuilder = FusionPageBuilder || {};
 			 */
 			initLightbox: function( remove ) {
 				var parentCid           = this.model.get( 'parent' ),
-					galleryLightboxName = 'iLightbox[awb_gallery_' + parentCid + ']',
+					parentModel = FusionPageBuilderElements.find( function( model ) {
+						return model.get( 'cid' ) == parentCid;
+					} ),
+					parentValues = jQuery.extend( true, {}, fusionAllElements.fusion_gallery.defaults, _.fusionCleanParameters( parentModel.get( 'params' ) ) ),
+					lightboxID          = '' !== parentValues.lightbox_id ? parentValues.lightbox_id : 'awb_gallery_' + parentCid,
+					galleryLightboxName = 'iLightbox[' + lightboxID + ']',
 					galleryLightbox,
 					elements,
 					link;
 
 				if ( 'object' !== typeof jQuery( '#fb-preview' )[ 0 ].contentWindow.$ilInstances ) {
 					return;
+				}
+
+				// Remove the last active lightbox. If it is one of a gallery, reinit the gallery, but without the image element.
+				if ( this.lightboxID && galleryLightboxName !== this.lightboxID && 'object' === typeof jQuery( '#fb-preview' )[ 0 ].contentWindow.avadaLightBox && this.lightboxID in jQuery( '#fb-preview' )[ 0 ].contentWindow.$ilInstances ) {
+					galleryLightbox   = jQuery( '#fb-preview' )[ 0 ].contentWindow.$ilInstances[ this.lightboxID ];
+					elements          = jQuery( '#fb-preview' )[ 0 ].contentWindow.jQuery( '.fusion-gallery' ).not( this.$el.closest( '.fusion-gallery' ) ).find( '[data-rel="' + this.lightboxID + '"]' );
+					elements          = elements.add(  jQuery( '#fb-preview' )[ 0 ].contentWindow.jQuery( '.fusion-imageframe' ).find( '[data-rel="' + this.lightboxID + '"]' ) );
+					link              = jQuery( '#fb-preview' )[ 0 ].contentWindow.jQuery( elements );
+
+					if ( 'undefined' !== typeof galleryLightbox ) {
+						galleryLightbox.destroy();
+						delete jQuery( '#fb-preview' )[ 0 ].contentWindow.$ilInstances[ this.lightboxID ];
+
+						if ( link.length ) {
+							jQuery( '#fb-preview' )[ 0 ].contentWindow.$ilInstances[ this.lightboxID ] = link.iLightBox( jQuery( '#fb-preview' )[ 0 ].contentWindow.avadaLightBox.prepare_options( this.lightboxID ) );
+						}
+					}
 				}
 
 				galleryLightbox = jQuery( '#fb-preview' )[ 0 ].contentWindow.$ilInstances[ galleryLightboxName ];
@@ -34598,16 +34758,20 @@ var FusionPageBuilder = FusionPageBuilder || {};
 				} else {
 					elements = this.$el.closest( '.fusion-gallery' ).find( '[data-rel="' + galleryLightboxName + '"]' );
 				}
-
 				link = jQuery( '#fb-preview' )[ 0 ].contentWindow.jQuery( elements );
 
 				if ( 'object' === typeof jQuery( '#fb-preview' )[ 0 ].contentWindow.avadaLightBox ) {
 					if ( 'undefined' !== typeof galleryLightbox ) {
 						galleryLightbox.destroy();
+						delete jQuery( '#fb-preview' )[ 0 ].contentWindow.$ilInstances[ galleryLightboxName ];
+					}
 
-						link.iLightBox( jQuery( '#fb-preview' )[ 0 ].contentWindow.avadaLightBox.prepare_options( galleryLightboxName ) );
+					if ( link.length ) {
+						jQuery( '#fb-preview' )[ 0 ].contentWindow.$ilInstances[ galleryLightboxName ] = link.iLightBox( jQuery( '#fb-preview' )[ 0 ].contentWindow.avadaLightBox.prepare_options( galleryLightboxName ) );
 					}
 				}
+
+				this.lightboxID = galleryLightboxName;
 			},
 
 			/**
@@ -34618,7 +34782,7 @@ var FusionPageBuilder = FusionPageBuilder || {};
 			 */
 			beforeRemove: function() {
 				var self = this,
-parentCid           = this.model.get( 'parent' ),
+					parentCid           = this.model.get( 'parent' ),
 					parentView          = FusionPageBuilderViewManager.getView( parentCid );
 
 				if ( 'undefined' !== typeof parentView.fusionIsotope ) {
@@ -34805,10 +34969,16 @@ parentCid           = this.model.get( 'parent' ),
 			 * @return {Object} - Returns the image attributes.
 			 */
 			buildImagesAttr: function( values ) {
-				var imagesAttr = {},
-					imageId    = this.model.attributes.params.image_id,
-					parentView = FusionPageBuilderViewManager.getView( this.model.get( 'parent' ) ),
-					image      = 'undefined' !== typeof parentView.imageMap ? parentView.imageMap.images[ imageId ] : undefined,
+				var imagesAttr  = {},
+					imageId     = this.model.attributes.params.image_id,
+					parentCid   = this.model.get( 'parent' ),
+					parentView  = FusionPageBuilderViewManager.getView( parentCid ),
+					parentModel  = FusionPageBuilderElements.find( function( model ) {
+						return model.get( 'cid' ) == parentCid;
+					} ),
+					parentValues = jQuery.extend( true, {}, fusionAllElements.fusion_gallery.defaults, _.fusionCleanParameters( parentModel.get( 'params' ) ) ),
+					lightboxID   = '' !== parentValues.lightbox_id ? parentValues.lightbox_id : 'awb_gallery_' + parentCid,
+					image        = 'undefined' !== typeof parentView.imageMap ? parentView.imageMap.images[ imageId ] : undefined,
 					columnSpacing,
 					isPortrait,
 					isLandscape,
@@ -34895,7 +35065,7 @@ parentCid           = this.model.get( 'parent' ),
 						class: 'fusion-lightbox'
 					};
 
-					imagesAttr.link[ 'data-rel' ] = 'iLightbox[awb_gallery_' + this.model.get( 'parent' ) + ']';
+					imagesAttr.link[ 'data-rel' ] = 'iLightbox[' + lightboxID + ']';
 
 					// TODO: fix
 					// if ( 'undefined' !== typeof image.image_data ) {
@@ -36755,16 +36925,25 @@ var FusionPageBuilder = FusionPageBuilder || {};
 						}
 						break;
 					case 'twitter':
-						socialLink = 'https://twitter.com/share?text=' + _.fusionRawUrlEncode( title ) + '&url=' + _.fusionRawUrlEncode( link );
+						socialLink = 'https://x.com/intent/post?text=' + _.fusionRawUrlEncode( title ) + '&url=' + _.fusionRawUrlEncode( link );
+						break;
+					case 'bluesky':
+						socialLink = 'https://bsky.app/intent/compose?text=' + _.fusionRawUrlEncode( title ) + '%20' + _.fusionRawUrlEncode( link ) + '%20' + _.fusionRawUrlEncode( description );
 						break;
 					case 'linkedin':
 						socialLink = 'https://www.linkedin.com/shareArticle?mini=true&url=' + _.fusionRawUrlEncode( link ) + '&amp;title=' + _.fusionRawUrlEncode( title ) + '&amp;summary=' + _.fusionRawUrlEncode( description );
+						break;
+					case 'mastodon':
+						socialLink = 'https://mastodonshare.com/?url=' + _.fusionRawUrlEncode( link ) + '&amp;text=' + _.fusionRawUrlEncode( title ) + '%20' + _.fusionRawUrlEncode( description );
 						break;
 					case 'reddit':
 						socialLink = 'https://reddit.com/submit?url=' + link + '&amp;title=' + title;
 						break;
 					case 'telegram':
 						socialLink = 'https://t.me/share/url?url=' + _.fusionRawUrlEncode( link ) + '&text=' + _.fusionRawUrlEncode( title );
+						break;
+					case 'threads':
+						socialLink = 'https://www.threads.net/intent/post?url=' + _.fusionRawUrlEncode( link ) + '&amp;text=' + _.fusionRawUrlEncode( title ) + '%20' + _.fusionRawUrlEncode( description );
 						break;
 					case 'tumblr':
 						socialLink = 'https://www.tumblr.com/share/link?url=' + _.fusionRawUrlEncode( link ) + '&amp;name=' + _.fusionRawUrlEncode( title ) + '&amp;description=' + _.fusionRawUrlEncode( description );
@@ -38155,6 +38334,10 @@ var FusionPageBuilder = FusionPageBuilder || {};
 					attr[ 'class' ] += ' dark-controls';
 				}
 
+				if ( 'on' ===  values.playback_speed ) {
+					attr[ 'class' ] += ' awb-playback-speed';
+				}
+
 				if ( '' !== values[ 'class' ] ) {
 					attr[ 'class' ] += ' ' + values[ 'class' ];
 				}
@@ -38254,7 +38437,6 @@ var FusionPageBuilder = FusionPageBuilder || {};
 						marker_icon: this.jsVars.icon,
 						overlay_color: this.jsVars.overlay_color,
 						overlay_color_hsl: this.jsVars.overlay_color_hsl,
-						pan_control: this.jsVars.zoom_pancontrol,
 						show_address: this.jsVars.popup,
 						scale_control: this.jsVars.scale,
 						scrollwheel: this.jsVars.scrollwheel,
@@ -39765,8 +39947,59 @@ var FusionPageBuilder = FusionPageBuilder || {};
 			 */
 			onRender: function() {
 				this.afterPatch();
+			},
 
+			initLightbox: function() {
+				const params     = jQuery.extend( true, {}, fusionAllElements[ this.model.get( 'element_type' ) ].defaults, _.fusionCleanParameters( this.model.get( 'params' ) ) );
+				const lightboxID = '' !== params.gallery_id || '0' === params.gallery_id ? 'iLightbox[' + params.gallery_id + ']' : 'single';
+				let galleryLightbox, elements, link;
 
+				// Remove the last active lightbox. If it is one of a gallery, reinit the gallery, but without the image element.
+				if ( this.lightboxID && lightboxID !== this.lightboxID && 'object' === typeof jQuery( '#fb-preview' )[ 0 ].contentWindow.avadaLightBox ) {
+					if ( 'single' === this.lightboxID && 'undefined' !== typeof this.iLightbox ) {
+						this.iLightbox.destroy();
+					} else if ( 'object' === typeof jQuery( '#fb-preview' )[ 0 ].contentWindow.$ilInstances && this.lightboxID in jQuery( '#fb-preview' )[ 0 ].contentWindow.$ilInstances ) {
+						galleryLightbox = jQuery( '#fb-preview' )[ 0 ].contentWindow.$ilInstances[ this.lightboxID ];
+						elements        = jQuery( '#fb-preview' )[ 0 ].contentWindow.jQuery( '.fusion-gallery' ).find( '[data-rel="' + this.lightboxID + '"]' );
+						elements        = elements.add(  jQuery( '#fb-preview' )[ 0 ].contentWindow.jQuery( '.fusion-imageframe' ).not( this.$el.find( '.fusion-imageframe' ) ).find( '[data-rel="' + this.lightboxID + '"]' ) );
+						link            = jQuery( '#fb-preview' )[ 0 ].contentWindow.jQuery( elements );
+
+						if ( 'undefined' !== typeof galleryLightbox ) {
+							galleryLightbox.destroy();
+							delete jQuery( '#fb-preview' )[ 0 ].contentWindow.$ilInstances[ this.lightboxID ];
+
+							if ( link.length ) {
+								jQuery( '#fb-preview' )[ 0 ].contentWindow.$ilInstances[ this.lightboxID ] = link.iLightBox( jQuery( '#fb-preview' )[ 0 ].contentWindow.avadaLightBox.prepare_options( this.lightboxID ) );
+							}
+						}
+					}
+				}
+
+				// Reinit the lightbox. If it is a gallery one, add the image element, otherwise use the single one.
+				if ( ( '' !== params.gallery_id || '0' === params.gallery_id ) && 'object' === typeof jQuery( '#fb-preview' )[ 0 ].contentWindow.$ilInstances ) {
+					galleryLightbox = lightboxID in jQuery( '#fb-preview' )[ 0 ].contentWindow.$ilInstances ? jQuery( '#fb-preview' )[ 0 ].contentWindow.$ilInstances[ lightboxID ] : false;
+					elements        = jQuery( '#fb-preview' )[ 0 ].contentWindow.jQuery( '.fusion-gallery' ).find( '[data-rel="' + lightboxID + '"]' );
+					elements        = elements.add(  jQuery( '#fb-preview' )[ 0 ].contentWindow.jQuery( '.fusion-imageframe' ).find( '[data-rel="' + lightboxID + '"]' ) );
+					link            = jQuery( '#fb-preview' )[ 0 ].contentWindow.jQuery( elements );
+
+					if ( 'object' === typeof jQuery( '#fb-preview' )[ 0 ].contentWindow.avadaLightBox ) {
+						if ( false !== galleryLightbox ) {
+							galleryLightbox.destroy();
+							delete jQuery( '#fb-preview' )[ 0 ].contentWindow.$ilInstances[ lightboxID ];
+						}
+
+						jQuery( '#fb-preview' )[ 0 ].contentWindow.$ilInstances[ lightboxID ] = link.iLightBox( jQuery( '#fb-preview' )[ 0 ].contentWindow.avadaLightBox.prepare_options( lightboxID ) );
+					}
+				} else if ( 'object' === typeof jQuery( '#fb-preview' )[ 0 ].contentWindow.avadaLightBox ) {
+					link  = jQuery( '#fb-preview' )[ 0 ].contentWindow.jQuery( this.$el.find( '.fusion-lightbox' ) );
+
+					if ( link.length ) {
+						this.iLightbox = link.iLightBox( jQuery( '#fb-preview' )[ 0 ].contentWindow.avadaLightBox.prepare_options( lightboxID ) );
+					}
+				}
+
+				// Set the now "old" value of the lightbox ID for the next change.
+				this.lightboxID = '' !== params.gallery_id || '0' === params.gallery_id ? 'iLightbox[' + params.gallery_id + ']' : 'single';
 			},
 
 			/**
@@ -39776,8 +40009,7 @@ var FusionPageBuilder = FusionPageBuilder || {};
 			 * @return {void}
 			 */
 			afterPatch: function() {
-				var params = this.model.get( 'params' ),
-					link  = jQuery( '#fb-preview' )[ 0 ].contentWindow.jQuery( this.$el.find( '.fusion-lightbox' ) );
+				var params = this.model.get( 'params' );
 
 				this.$el.removeClass( 'fusion-element-alignment-right fusion-element-alignment-left' );
 				if ( ! this.flexDisplay() ) {
@@ -39785,15 +40017,8 @@ var FusionPageBuilder = FusionPageBuilder || {};
 						this.$el.addClass( 'fusion-element-alignment-' + params.align );
 					}
 				}
-				if ( 'object' === typeof jQuery( '#fb-preview' )[ 0 ].contentWindow.avadaLightBox ) {
-					if ( 'undefined' !== typeof this.iLightbox ) {
-						this.iLightbox.destroy();
-					}
 
-					if ( link.length ) {
-						this.iLightbox = link.iLightBox( jQuery( '#fb-preview' )[ 0 ].contentWindow.avadaLightBox.prepare_options( 'single' ) );
-					}
-				}
+				this.initLightbox();
 
 				// Image magnify with lightbox or link
 				if ( jQuery( '#fb-preview' )[ 0 ].contentWindow.jQuery( this.$el.find( 'a' ) ).hasClass( 'has-image-magnify' ) && 'function' === typeof jQuery( '#fb-preview' )[ 0 ].contentWindow.jQuery().fusionImageMagnify ) {
@@ -40203,11 +40428,12 @@ var FusionPageBuilder = FusionPageBuilder || {};
 					src = values.element_content;
 				}
 
-				if ( ! this.isImgUrl( src ) ) {
+				if ( ! this.isImgUrl( src ) && ! _.FusionIsValidJSON( src ) ) {
 					// eslint-disable-next-line quotes
 					src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1024 560'%3E%3Cpath fill='%23EAECEF' d='M0 0h1024v560H0z'/%3E%3Cg fill-rule='evenodd' clip-rule='evenodd'%3E%3Cpath fill='%23BBC0C4' d='M378.9 432L630.2 97.4c9.4-12.5 28.3-12.6 37.7 0l221.8 294.2c12.5 16.6.7 40.4-20.1 40.4H378.9z'/%3E%3Cpath fill='%23CED3D6' d='M135 430.8l153.7-185.9c10-12.1 28.6-12.1 38.7 0L515.8 472H154.3c-21.2 0-32.9-24.8-19.3-41.2z'/%3E%3Ccircle fill='%23FFF' cx='429' cy='165.4' r='55.5'/%3E%3C/g%3E%3C/svg%3E";
 					contentAttr.width = 600;
 				}
+
 				if ( 'undefined' !== typeof src && src && '' !== src ) {
 					src             = src.replace( '&#215;', 'x' );
 					contentAttr.src = src;
@@ -41323,8 +41549,9 @@ var FusionPageBuilder = FusionPageBuilder || {};
 					styles += '-webkit-box-shadow: ' + blur + ' ' + blur + ' ' + blurRadius + ' ' + this.stylecolor + ';box-shadow: ' + blur + ' ' + blur + ' ' + blurRadius + ' ' + this.stylecolor + ';';
 				}
 
-				if ( '' !== values.pic_borderradius ) {
-					styles += '-webkit-border-radius:' + values.pic_borderradius + ';-moz-border-radius:' + values.pic_borderradius + ';border-radius:' + values.pic_borderradius + '; overflow:hidden;';
+				if ( '' !== values.pic_borderradius && '0px' !== values.pic_borderradius ) {
+					personShortcodeImageContainer[ 'class' ] += ' person-rounded-overflow';
+					styles += '-webkit-border-radius:' + values.pic_borderradius + ';-moz-border-radius:' + values.pic_borderradius + ';border-radius:' + values.pic_borderradius + ';';
 				}
 				if ( '' !== values.pic_bordersize ) {
 					styles += 'border:' + values.pic_bordersize + ' solid ' + values.pic_bordercolor + ';';
@@ -46595,12 +46822,102 @@ var FusionPageBuilder = FusionPageBuilder || {};
 			 * @since 2.0
 			 * @return {void}
 			 */
+			onRender: function() {
+				var self = this;
+
+				jQuery( '#fb-preview' )[ 0 ].contentWindow.jQuery( document ).ready( function() {
+					self.updateSlider();
+				} );
+			},
+
+			/**
+			 * Runs after view DOM is patched.
+			 *
+			 * @since 2.0
+			 * @return {void}
+			 */
+			beforePatch: function() {
+				var element = this.$el.find( '.fusion-slider-sc.flexslider' );
+
+				if ( 'undefined' !== typeof element.data( 'flexslider' ) ) {
+					element.flexslider( 'destroy' );
+				}
+			},
+
+			/**
+			 * Runs after view DOM is patched.
+			 *
+			 * @since 2.0
+			 * @return {void}
+			 */
 			afterPatch: function() {
 
 				// TODO: save DOM and apply instead of generating
 				this.generateChildElements();
 
-				this._refreshJs();
+				this.updateSlider();
+			},
+
+			/**
+			 * Refresh the JS.
+			 *
+			 * @since 2.0
+			 * @return {void}
+			 */
+			refreshJs: function() {
+				this.updateSlider();
+			},
+
+			/**
+			 * Runs when child view is added.
+			 *
+			 * @since 3.9
+			 * @return {void}
+			 */
+			childViewAdded: function() {
+				this.updateSlider();
+			},
+
+			/**
+			 * Re-init the slider and destroy it prior to it, if needed.
+			 *
+			 * @since 2.0
+			 * @param {Object} atts - The attributes.
+			 * @return {Object}
+			 */	
+			updateSlider: function() {
+				var element = this.$el.find( '.fusion-slider-sc.flexslider' );
+
+				if ( element.length ) {
+					if ( 'undefined' !== typeof element.data( 'flexslider' ) ) {
+						element.flexslider( 'destroy' );
+					}
+
+					// Re-init flexslider.
+					setTimeout( function() {
+						const flexSmoothHeight   = 'undefined' !== typeof element.attr( 'data-slideshow_smooth_height' ) ? Boolean( Number( element.attr( 'data-slideshow_smooth_height' ) ) ) : Boolean( Number( FusionApp.settings.slideshow_smooth_height ) ),
+						slideShowAutoPlay  = 'undefined' !== typeof element.attr( 'data-slideshow_autoplay' ) ? Boolean( Number( element.attr( 'data-slideshow_autoplay' ) ) ) : Boolean( Number( FusionApp.settings.slideshow_autoplay ) ),
+						slideshowSpeed     = 'undefined' !== typeof element.attr( 'data-slideshow_speed' ) ? Number( element.attr( 'data-slideshow_speed' ) ) : Number( FusionApp.settings.slideshow_speed ),
+						slideShowAnimation = 'undefined' !== typeof element.attr( 'data-slideshow_animation' ) ? String( element.attr( 'data-slideshow_animation' ) ) : 'fade',
+						controlNav         = 'undefined' !== typeof element.attr( 'data-slideshow_control_nav' ) ? fusionFlexSliderStrToBool( element.attr( 'data-slideshow_control_nav' ) ) : true,
+						directionNav       = 'undefined' !== typeof element.attr( 'data-slideshow_direction_nav' ) ? fusionFlexSliderStrToBool( element.attr( 'data-slideshow_direction_nav' ) ) : true,
+						prevText           = 'undefined' !== typeof element.attr( 'data-slideshow_prev_text' ) ? '<i class="' + element.attr( 'data-slideshow_prev_text' ) + '"></i>' : '<i class="awb-icon-angle-left"></i>',
+						nextText           = 'undefined' !== typeof element.attr( 'data-slideshow_next_text' ) ? '<i class="' + element.attr( 'data-slideshow_next_text' ) + '"></i>' : '<i class="awb-icon-angle-right"></i>';
+
+						if ( 'undefined' !== typeof element.flexslider ) {
+							element.flexslider( {
+								slideshow: slideShowAutoPlay,
+								slideshowSpeed: slideshowSpeed,
+								smoothHeight: flexSmoothHeight,
+								prevText: prevText,
+								nextText: nextText,
+								animation: slideShowAnimation,
+								controlNav: controlNav,
+								directionNav: directionNav,
+							} );
+						}
+					}, 300 );
+				}
 			},
 
 			/**
@@ -47884,7 +48201,7 @@ var FusionPageBuilder = FusionPageBuilder || {};
 				var parentView = window.FusionPageBuilderViewManager.getView( this.model.get( 'parent' ) ),
 					queryData = this.model.get( 'query_data' );
 
-				if ( true === parentView.model.attributes.showPlaceholder && 'undefined' !== this.model.attributes.params.image && '' !== this.model.attributes.params.image ) {
+				if ( true === parentView.model.attributes.showPlaceholder && 'undefined' !== typeof this.model.attributes.params.image && '' !== this.model.attributes.params.image ) {
 					this.$el.closest( '.fusion-image-carousel' ).removeClass( 'fusion-show-placeholder' );
 					parentView.model.attributes.showPlaceholder = false;
 				}
@@ -55070,6 +55387,18 @@ var FusionPageBuilder = FusionPageBuilder || {};
 					values.id = match[ 2 ];
 				}
 
+				if ( 'undefined' !== typeof values.loop && 'true' === values.loop ) {
+					if ( -1 === values.api_params.indexOf( 'loop=1' ) ) {
+						values.api_params += '&loop=1&playlist=' + values.id;
+					}
+				}
+
+				if ( 'undefined' !== typeof values.controls && 'false' === values.controls ) {
+					if ( -1 === values.api_params.indexOf( 'controls=0' ) ) {
+						values.api_params += '&controls=0';
+					}
+				}
+
 				if ( 'undefined' !== typeof values.start_time && '' !== values.start_time ) {
 					if ( -1 === values.api_params.indexOf( 'start=' ) ) {
 						values.api_params += '&start=' + values.start_time;
@@ -55653,10 +55982,6 @@ var FusionPageBuilder = FusionPageBuilder || {};
 					attrReadingBox[ 'class' ] += ' reading-box-right';
 				} else if ( 'center' === values.content_alignment ) {
 					attrReadingBox[ 'class' ] += ' reading-box-center';
-				}
-
-				if ( 'yes' === values.shadow ) {
-					attrReadingBox[ 'class' ] += ' element-bottomshadow';
 				}
 
 				attrReadingBox.style  = 'background-color:' + values.backgroundcolor + ';';
@@ -66375,7 +66700,7 @@ var FusionPageBuilder = FusionPageBuilder || {};
 					$option  += values.description + '</label>';
 					$option  += '</div>';
 				} else {
-					$option = '<p>' + values.description + '</p><input name="' + values.name + '" type="hidden" value="1"/>';
+					$option = '<p class="label">' + values.description + '</p><input name="' + values.name + '" type="hidden" value="1"/>';
 				}
 
 				if ( '' !== values.tooltip ) {
@@ -66535,7 +66860,13 @@ var FusionPageBuilder = FusionPageBuilder || {};
 					elementData.label += this.getFieldTooltip( values );
 				}
 
-				if ( 'undefined' !== typeof values.placeholder && '' !== values.placeholder ) {
+				if ( 'yes' === values.multiselect ) {
+					let height = values.options.length;
+					height = 5 < height ? '6.5' : height + 1.5;
+					elementData.style = ' style="height:' + height + 'em;"';
+				}
+
+				if ( 'undefined' !== typeof values.placeholder && '' !== values.placeholder && 'yes' !== values.multiselect ) {
 					options += '<option value="" selected disabled>' + values.placeholder + '</option>';
 				}
 
@@ -66548,10 +66879,12 @@ var FusionPageBuilder = FusionPageBuilder || {};
 				} );
 
 				elementHtml  = '<div class="fusion-select-wrapper">';
-				elementHtml += '<select class="fusion-form-input" name="' + values.name + '"' + elementData[ 'class' ] + elementData.required + elementData.style + elementData.holds_private_data + '>';
+				elementHtml += '<select ';
+				elementHtml += 'yes' === values.multiselect ? 'multiple ' : '';
+				elementHtml += 'class="fusion-form-input" name="' + values.name + '"' + elementData[ 'class' ] + elementData.required + elementData.style + elementData.holds_private_data + '>';
 				elementHtml += options;
 				elementHtml += '</select>';
-				elementHtml += '<div class="select-arrow"><svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M1.5 1.75L6 6.25L10.5 1.75" stroke="#6D6D6D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/> </svg>';
+				elementHtml += 'yes' === values.multiselect ? '' : '<div class="select-arrow"><svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M1.5 1.75L6 6.25L10.5 1.75" stroke="#6D6D6D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/> </svg>';
 				elementHtml += '</div>';
 
 				elementHtml = this.generateIconHtml( values, elementHtml );
@@ -67391,6 +67724,38 @@ var FusionPageBuilder = FusionPageBuilder || {};
 		FusionPageBuilder.fusion_form_textarea = FusionPageBuilder.FormComponentView.extend( {
 
 			/**
+			 * Runs on init.
+			 *
+			 * @since 3.11.12
+			 * @return {void}
+			 */
+			onRender: function() {
+				this.updateValue();
+			},
+
+			/**
+			 * Runs after view DOM is patched.
+			 *
+			 * @since 3.11.12
+			 * @return {void}
+			 */
+			afterPatch: function() {
+				this.updateValue();
+			},
+
+			/**
+			 * Adjusts the textarea value.
+			 *
+			 * @since 3.11.12
+			 * @return {void}
+			 */
+			updateValue: function() {
+				const $textarea = jQuery( '#fb-preview' )[ 0 ].contentWindow.jQuery( this.$el.find( 'textarea' ) );
+
+				jQuery( $textarea ).val( jQuery( $textarea ).attr( 'data-value' ) );
+			},
+
+			/**
 			 * Modify template attributes.
 			 *
 			 * @since 3.1
@@ -67410,6 +67775,7 @@ var FusionPageBuilder = FusionPageBuilder || {};
 			generateTextareaField: function ( atts ) {
 				var elementData,
 					elementHtml,
+					initValue,
 					value,
 					html = '';
 
@@ -67418,8 +67784,8 @@ var FusionPageBuilder = FusionPageBuilder || {};
 				elementData = this.generateTooltipHtml( atts, elementData );
 
 				value       = 'undefined' !== typeof elementData.value ? elementData.value : '';
-
-				elementHtml = '<textarea cols="40" rows="' + atts.rows + '" name="' + atts.name + '"' + elementData[ 'class' ] + elementData.required + elementData.disabled + elementData.placeholder + elementData.holds_private_data + '>' + value + '</textarea>';
+				initValue   = 'undefined' !== typeof atts.value ? atts.value : value;
+				elementHtml = '<textarea cols="40" data-value="' + initValue + '" rows="' + atts.rows + '" name="' + atts.name + '"' + elementData[ 'class' ] + elementData.required + elementData.disabled + elementData.placeholder + elementData.holds_private_data + '>' + value + '</textarea>';
 
 				elementHtml = this.generateIconHtml( atts, elementHtml );
 

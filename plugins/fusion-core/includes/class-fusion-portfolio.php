@@ -157,7 +157,7 @@ if ( ! class_exists( 'Fusion_Portfolio' ) ) {
 
 			foreach( $image_sizes as $size => $params ) {
 				if ( ! is_array( $available_image_size ) || in_array( $size, $available_image_size ) ) {
-					add_image_size( $size, implode( ',', $params ) );
+					add_image_size( $size, $params[0], $params[1], $params[2] );
 				}
 			}
 		}		

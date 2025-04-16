@@ -110,7 +110,6 @@ class Fusion_FusionRedux {
 		add_action( 'fusionredux/options/fusion_options/saved', [ $this, 'bc_action_on_save' ], 10, 2 );
 
 		add_action( 'wp_ajax_fusion_reset_all_caches', [ $this, 'reset_caches_handler' ] );
-		add_action( 'wp_ajax_nopriv_fusion_reset_all_caches', [ $this, 'reset_caches_handler' ] );
 
 	}
 
@@ -206,7 +205,6 @@ class Fusion_FusionRedux {
 		add_action( 'fusionredux/options/' . $this->args['option_name'] . '/reset', [ $this, 'reset_cache' ] );
 		add_action( 'fusionredux/options/' . $this->args['option_name'] . '/section/reset', [ $this, 'reset_cache' ] );
 		add_action( 'fusionredux/options/' . $this->args['option_name'] . '/saved', [ $this, 'reset_cache' ] );
-		add_action( 'wp_ajax_custom_option_import', [ $this, 'reset_cache' ] );
 
 		// Save all languages.
 		add_action( 'fusionredux/options/' . $this->args['option_name'] . '/reset', [ $this, 'save_all_languages' ] );
@@ -1536,6 +1534,10 @@ class Fusion_FusionRedux {
 
 		// Check nonce.
 		check_ajax_referer( 'fusionredux_ajax_nonce' . $this->args['option_name'], 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
 
 		if ( is_multisite() && is_main_site() ) {
 			$sites = get_sites();

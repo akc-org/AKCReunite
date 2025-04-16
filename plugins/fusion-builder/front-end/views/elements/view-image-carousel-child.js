@@ -40,7 +40,7 @@ var FusionPageBuilder = FusionPageBuilder || {};
 				var parentView = window.FusionPageBuilderViewManager.getView( this.model.get( 'parent' ) ),
 					queryData = this.model.get( 'query_data' );
 
-				if ( true === parentView.model.attributes.showPlaceholder && 'undefined' !== this.model.attributes.params.image && '' !== this.model.attributes.params.image ) {
+				if ( true === parentView.model.attributes.showPlaceholder && 'undefined' !== typeof this.model.attributes.params.image && '' !== this.model.attributes.params.image ) {
 					this.$el.closest( '.fusion-image-carousel' ).removeClass( 'fusion-show-placeholder' );
 					parentView.model.attributes.showPlaceholder = false;
 				}

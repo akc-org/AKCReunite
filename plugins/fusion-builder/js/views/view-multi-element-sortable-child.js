@@ -129,8 +129,8 @@ var FusionPageBuilder = FusionPageBuilder || {};
 					}
 
 					// Remove HTML tags but keep quotation marks etc.
-					$title = jQuery( '<div/>' ).html( $title ).text();
-					$title = jQuery( '<div/>' ).html( $title ).text();
+					$title = $title .replace( /(<([^>]+)>)/ig, '' );
+
 					if ( $title ) {
 						$title = '<span class="fusion-child-name-label">' + $title + '</span>';
 

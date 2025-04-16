@@ -195,7 +195,7 @@ var FusionPageBuilder = FusionPageBuilder || {};
 		 * @return {void}
 		 */
 		removeChildElements: function( mainContainer, currentCID, elementType  ) {
-			var findString = ( 'fusion_builder_container' === elementType ) ? '.fusion-builder-remove, .fusion-builder-column-remove' : '.fusion-builder-remove';
+			var findString = ( 'fusion_builder_container' === elementType ) ? '.fusion-builder-remove, .fusion-builder-column-remove' : '.fusion-builder-remove, .fusion-builder-row-remove';
 
 			// Remove child elements.
 			jQuery.each( mainContainer.jQuery( '[data-cid="' + currentCID + '"] .fusion-builder-module-controls' ), function() {

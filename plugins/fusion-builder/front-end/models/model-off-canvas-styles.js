@@ -59,8 +59,10 @@ var FusionPageBuilder = FusionPageBuilder || {};
 				filteredOptions.type = 'sliding-bar';
 				filteredOptions.enter_animation = filteredOptions.sb_enter_animation;
 				filteredOptions.enter_animation_speed = filteredOptions.sb_enter_animation_speed;
+				filteredOptions.enter_animation_timing = filteredOptions.sb_enter_animation_timing;
 				filteredOptions.exit_animation = filteredOptions.sb_exit_animation;
 				filteredOptions.exit_animation_speed = filteredOptions.sb_exit_animation_speed;
+				filteredOptions.exit_animation_timing = filteredOptions.sb_exit_animation_timing;
 
 				if ( 'left' === filteredOptions.position || !filteredOptions.position ) {
 					filteredOptions.height = 'full';
@@ -146,9 +148,11 @@ var FusionPageBuilder = FusionPageBuilder || {};
 				'enter_animation': '',
 				'enter_animation_direction': 'static',
 				'enter_animation_speed': 0.5,
+				'enter_animation_timing': 'ease',
 				'exit_animation': '',
 				'exit_animation_direction': 'static',
 				'exit_animation_speed': 0.5,
+				'exit_animation_timing': 'ease',
 
 				'off_canvas_state': 'closed',
 				'sb_height': '',
@@ -157,8 +161,10 @@ var FusionPageBuilder = FusionPageBuilder || {};
 
 				'sb_enter_animation': 'slideShort',
 				'sb_enter_animation_speed': 0.5,
+				'sb_enter_animation_timing': 'ease',
 				'sb_exit_animation': 'slideShort',
 				'sb_exit_animation_speed': 0.5,
+				'sb_exit_animation_timing': 'ease',
 
 				// Design.
 				'background_color': '#ffffff',
@@ -785,7 +791,8 @@ var FusionPageBuilder = FusionPageBuilder || {};
 
 			let     animation = options.enter_animation;
 			const   animationDirection = options.enter_animation_direction && 'static' !== options.enter_animation_direction ? this.capitalize( options.enter_animation_direction ) : '',
-			animationSpeed = options.enter_animation_speed || 1;
+			animationSpeed = options.enter_animation_speed || 1,
+			animationTiming = options.enter_animation_timing || 'ease';
 
 			if ( animation ) {
 				if ( ! this.animationsWithoutDirection.includes( animation ) ) {
@@ -795,7 +802,8 @@ var FusionPageBuilder = FusionPageBuilder || {};
 				offCanvas.attr( 'data-animation-type', animation );
 				offCanvas.css( {
 					'visibility': 'visible',
-					'animation-duration': animationSpeed + 's'
+					'animation-duration': animationSpeed + 's',
+					'animation-timing-function': animationTiming
 				} );
 			}
 			offCanvas.addClass( 'fusion-animated ' + animation );
@@ -822,7 +830,8 @@ var FusionPageBuilder = FusionPageBuilder || {};
 
 			let     animation = options.exit_animation;
 			const   animationDirection = options.exit_animation_direction && 'static' !== options.exit_animation_direction ? this.capitalize( options.exit_animation_direction ) : '',
-			animationSpeed = options.enter_animation_speed || 1;
+			animationSpeed = options.exit_animation_speed || 1,
+			animationTiming = options.exit_animation_timing || 'ease';
 
 			if ( animation ) {
 				if ( ! this.animationsWithoutDirection.includes( animation ) ) {
@@ -832,7 +841,8 @@ var FusionPageBuilder = FusionPageBuilder || {};
 				offCanvas.attr( 'data-animation-type', animation );
 				offCanvas.css( {
 					'visibility': 'visible',
-					'animation-duration': animationSpeed + 's'
+					'animation-duration': animationSpeed + 's',
+					'animation-timing-function': animationTiming
 				} );
 			}
 			offCanvas.addClass( 'fusion-animated ' + animation );

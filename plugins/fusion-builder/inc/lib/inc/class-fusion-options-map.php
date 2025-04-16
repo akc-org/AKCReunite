@@ -67,6 +67,7 @@ class Fusion_Options_Map {
 		'page_title_fading',
 		'live_search',
 		'search_limit_to_post_titles',
+		'search_add_woo_product_skus',
 		'live_search_display_featured_image',
 		'live_search_display_post_type',
 		'lightbox_post_images',

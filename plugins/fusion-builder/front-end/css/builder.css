@@ -8,6 +8,9 @@
 .fusion-builder-live .fusion-child-sortables.has-dynamic-data .fusion-builder-sortable-children {
   margin-top: 70px;
 }
+.fusion-builder-live .fusion-child-sortables.has-dynamic-data-no-children .fusion-builder-sortable-children {
+  display: none;
+}
 .fusion-builder-live .fusion-builder-all-elements-container,
 .fusion-builder-live .fusion-builder-column-layouts-container {
   position: relative;

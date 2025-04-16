@@ -13,12 +13,102 @@ var FusionPageBuilder = FusionPageBuilder || {};
 			 * @since 2.0
 			 * @return {void}
 			 */
+			onRender: function() {
+				var self = this;
+
+				jQuery( '#fb-preview' )[ 0 ].contentWindow.jQuery( document ).ready( function() {
+					self.updateSlider();
+				} );
+			},
+
+			/**
+			 * Runs after view DOM is patched.
+			 *
+			 * @since 2.0
+			 * @return {void}
+			 */
+			beforePatch: function() {
+				var element = this.$el.find( '.fusion-slider-sc.flexslider' );
+
+				if ( 'undefined' !== typeof element.data( 'flexslider' ) ) {
+					element.flexslider( 'destroy' );
+				}
+			},
+
+			/**
+			 * Runs after view DOM is patched.
+			 *
+			 * @since 2.0
+			 * @return {void}
+			 */
 			afterPatch: function() {
 
 				// TODO: save DOM and apply instead of generating
 				this.generateChildElements();
 
-				this._refreshJs();
+				this.updateSlider();
+			},
+
+			/**
+			 * Refresh the JS.
+			 *
+			 * @since 2.0
+			 * @return {void}
+			 */
+			refreshJs: function() {
+				this.updateSlider();
+			},
+
+			/**
+			 * Runs when child view is added.
+			 *
+			 * @since 3.9
+			 * @return {void}
+			 */
+			childViewAdded: function() {
+				this.updateSlider();
+			},
+
+			/**
+			 * Re-init the slider and destroy it prior to it, if needed.
+			 *
+			 * @since 2.0
+			 * @param {Object} atts - The attributes.
+			 * @return {Object}
+			 */	
+			updateSlider: function() {
+				var element = this.$el.find( '.fusion-slider-sc.flexslider' );
+
+				if ( element.length ) {
+					if ( 'undefined' !== typeof element.data( 'flexslider' ) ) {
+						element.flexslider( 'destroy' );
+					}
+
+					// Re-init flexslider.
+					setTimeout( function() {
+						const flexSmoothHeight   = 'undefined' !== typeof element.attr( 'data-slideshow_smooth_height' ) ? Boolean( Number( element.attr( 'data-slideshow_smooth_height' ) ) ) : Boolean( Number( FusionApp.settings.slideshow_smooth_height ) ),
+						slideShowAutoPlay  = 'undefined' !== typeof element.attr( 'data-slideshow_autoplay' ) ? Boolean( Number( element.attr( 'data-slideshow_autoplay' ) ) ) : Boolean( Number( FusionApp.settings.slideshow_autoplay ) ),
+						slideshowSpeed     = 'undefined' !== typeof element.attr( 'data-slideshow_speed' ) ? Number( element.attr( 'data-slideshow_speed' ) ) : Number( FusionApp.settings.slideshow_speed ),
+						slideShowAnimation = 'undefined' !== typeof element.attr( 'data-slideshow_animation' ) ? String( element.attr( 'data-slideshow_animation' ) ) : 'fade',
+						controlNav         = 'undefined' !== typeof element.attr( 'data-slideshow_control_nav' ) ? fusionFlexSliderStrToBool( element.attr( 'data-slideshow_control_nav' ) ) : true,
+						directionNav       = 'undefined' !== typeof element.attr( 'data-slideshow_direction_nav' ) ? fusionFlexSliderStrToBool( element.attr( 'data-slideshow_direction_nav' ) ) : true,
+						prevText           = 'undefined' !== typeof element.attr( 'data-slideshow_prev_text' ) ? '<i class="' + element.attr( 'data-slideshow_prev_text' ) + '"></i>' : '<i class="awb-icon-angle-left"></i>',
+						nextText           = 'undefined' !== typeof element.attr( 'data-slideshow_next_text' ) ? '<i class="' + element.attr( 'data-slideshow_next_text' ) + '"></i>' : '<i class="awb-icon-angle-right"></i>';
+
+						if ( 'undefined' !== typeof element.flexslider ) {
+							element.flexslider( {
+								slideshow: slideShowAutoPlay,
+								slideshowSpeed: slideshowSpeed,
+								smoothHeight: flexSmoothHeight,
+								prevText: prevText,
+								nextText: nextText,
+								animation: slideShowAnimation,
+								controlNav: controlNav,
+								directionNav: directionNav,
+							} );
+						}
+					}, 300 );
+				}
 			},
 
 			/**

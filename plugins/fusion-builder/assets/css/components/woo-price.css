@@ -97,6 +97,11 @@
   background: var(--awb-badge-bg-color);
   border: var(--awb-badge-border-size) solid var(--awb-badge-border-color);
 }
+.fusion-body .fusion-woo-price-tb .legal-price-info {
+  order: 4;
+  width: 100%;
+  margin-top: 0.5em;
+}
 .fusion-body .fusion-woo-price-tb.badge-position-left .fusion-onsale {
   order: 1;
 }

@@ -65,6 +65,26 @@ class AWB_Role_Manager {
 	];
 
 	/**
+	 * Role manager default role capabilities data.
+	 *
+	 * @static
+	 * @access private
+	 * @since 3.11.10
+	 * @var array
+	 */
+	private static $default_role_capabilities;
+
+	/**
+	 * Role manager default capabilities data.
+	 *
+	 * @static
+	 * @access private
+	 * @since 3.11.10
+	 * @var array
+	 */
+	private static $default_role_manager_capabilities;
+
+	/**
 	 * Role manager capabilities data.
 	 *
 	 * @static
@@ -90,6 +110,8 @@ class AWB_Role_Manager {
 	 * @access public
 	 */
 	public function __construct() {
+		$this->set_default_role_capabilities();
+		$this->set_default_role_manager_capabilities();
 		$this->set_role_manager_capabilities();
 
 		add_action( 'awb_add_builder_options_section', [ $this, 'add_role_manager_options_to_builder_options' ] );
@@ -138,58 +160,32 @@ class AWB_Role_Manager {
 	}
 
 	/**
-	 * Get default role manager capabilities.
+	 * Set capabilities for a default role.
 	 *
-	 * @since 3.11.7
+	 * @since 3.11.10
 	 * @access private
 	 * @return array
 	 */
-	public function get_default_role_manager_capabilities() {
-		$default_role_capabilities = $this->get_default_role_capabilities();
-
-		$editor                      = $default_role_capabilities;
-		$editor['fusion_tb_layout']  = $this->get_capability_choices( [ 'on' ] );
-		$editor['fusion_tb_section'] = $this->get_capability_choices( [ 'on', 'on', 'on', 'on' ] );
-		$editor['fusion_form']       = $this->get_capability_choices( [ 'on', 'on', 'on', 'on', 'on' ] );
-		$editor['avada_library']     = $this->get_capability_choices( [ 'on', 'on', 'on', 'on', '', 'on' ] );
-
-		$capabilities = [
-			'editor'      => $editor,
-			'author'      => $default_role_capabilities,
-			'contributor' => $default_role_capabilities,
-			'default'     => $default_role_capabilities,
-		];
-
-		return $capabilities;
-	}
-
-	/**
-	 * Get capabilities for a default role.
-	 *
-	 * @since 3.11.7
-	 * @access private
-	 * @return array
-	 */
-	private function get_default_role_capabilities() {
-		$capabilities = [
-			'awb_global_options' => $this->get_capability_choices( [ 'off' ] ),
-			'awb_prebuilts'      => $this->get_capability_choices( [ 'off' ] ),
-			'awb_studio'         => $this->get_capability_choices( [ 'off' ] ),
-			'fusion_tb_layout'   => $this->get_capability_choices( [ 'off' ] ),
-			'fusion_tb_section'  => $this->get_capability_choices( [ 'off', 'off', 'off', 'off' ] ),
-			'awb_off_canvas'     => $this->get_capability_choices( [ 'on', 'on', 'on', 'on' ] ),
-			'fusion_icons'       => $this->get_capability_choices( [ 'on' ] ),
-			'fusion_form'        => $this->get_capability_choices( [ 'on', 'on', 'on', 'on', 'off' ] ),
-			'slide'              => $this->get_capability_choices( [ 'on', '', '', 'on' ] ),
-			'avada_library'      => $this->get_capability_choices( [ 'on', 'on', 'on', 'on', '', 'off' ] ),
-			'avada_portfolio'    => $this->get_capability_choices( [ 'on', 'on', 'on', 'on' ] ),
-			'avada_faq'          => $this->get_capability_choices( [ 'on', 'on', 'on', 'on' ] ),
-			'post'               => $this->get_capability_choices( [ '', 'on', 'on', 'on' ] ),
-			'page'               => $this->get_capability_choices( [ '', 'on', 'on', 'on' ] ),
-			'product'            => $this->get_capability_choices( [ '', 'on', 'on', 'on' ] ),
-		];
-
-		return $capabilities;
+	private function set_default_role_capabilities() {
+		if ( null === self::$default_role_capabilities ) {
+			self::$default_role_capabilities = [
+				'awb_global_options' => $this->get_capability_choices( [ 'off' ] ),
+				'awb_prebuilts'      => $this->get_capability_choices( [ 'off' ] ),
+				'awb_studio'         => $this->get_capability_choices( [ 'off' ] ),
+				'fusion_tb_layout'   => $this->get_capability_choices( [ 'off' ] ),
+				'fusion_tb_section'  => $this->get_capability_choices( [ 'off', 'off', 'off', 'off' ] ),
+				'awb_off_canvas'     => $this->get_capability_choices( [ 'on', 'on', 'on', 'on' ] ),
+				'fusion_icons'       => $this->get_capability_choices( [ 'on' ] ),
+				'fusion_form'        => $this->get_capability_choices( [ 'on', 'on', 'on', 'on', 'off' ] ),
+				'slide'              => $this->get_capability_choices( [ 'on', '', '', 'on' ] ),
+				'avada_library'      => $this->get_capability_choices( [ 'on', 'on', 'on', 'on', '', 'off' ] ),
+				'avada_portfolio'    => $this->get_capability_choices( [ 'on', 'on', 'on', 'on' ] ),
+				'avada_faq'          => $this->get_capability_choices( [ 'on', 'on', 'on', 'on' ] ),
+				'post'               => $this->get_capability_choices( [ '', 'on', 'on', 'on' ] ),
+				'page'               => $this->get_capability_choices( [ '', 'on', 'on', 'on' ] ),
+				'product'            => $this->get_capability_choices( [ '', 'on', 'on', 'on' ] ),
+			];
+		}
 	}
 
 	/**
@@ -211,6 +207,76 @@ class AWB_Role_Manager {
 		}
 
 		return $selected_choices;
+	}
+
+	/**
+	 * Get capabilities for a default role.
+	 *
+	 * @since 3.11.10
+	 * @access public
+	 * @return array
+	 */
+	public function get_default_role_capabilities() {
+		return self::$default_role_capabilities;
+	}
+
+	/**
+	 * Get default role manager capabilities.
+	 *
+	 * @since 3.11.7
+	 * @access private
+	 * @return array
+	 */
+	public function set_default_role_manager_capabilities() {
+		if ( null === self::$default_role_manager_capabilities ) {
+			self::$default_role_manager_capabilities = [
+				'editor'      => $this->get_editor_default_role_capabilities(),
+				'author'      => $this->get_default_role_capabilities(),
+				'contributor' => $this->get_default_role_capabilities(),
+				'subscriber'  => $this->get_subscriber_default_role_capabilities(),
+				'default'     => $this->get_default_role_capabilities(),
+			];
+		}
+	}
+
+	/**
+	 * Get default capabilities for the Editor role.
+	 *
+	 * @since 3.11.10
+	 * @access private
+	 * @return array
+	 */
+	private function get_editor_default_role_capabilities() {
+		$default_role_capabilities = $this->get_default_role_capabilities();
+
+		$editor                      = $default_role_capabilities;
+		$editor['fusion_tb_layout']  = $this->get_capability_choices( [ 'on' ] );
+		$editor['fusion_tb_section'] = $this->get_capability_choices( [ 'on', 'on', 'on', 'on' ] );
+		$editor['fusion_form']       = $this->get_capability_choices( [ 'on', 'on', 'on', 'on', 'on' ] );
+		$editor['avada_library']     = $this->get_capability_choices( [ 'on', 'on', 'on', 'on', '', 'on' ] );
+
+		return $editor;
+	}
+
+	/**
+	 * Get default capabilities for the Subscriber role.
+	 *
+	 * @since 3.11.10
+	 * @access private
+	 * @return array
+	 */
+	private function get_subscriber_default_role_capabilities() {
+		$subscriber = $this->get_default_role_capabilities();
+
+		foreach ( $subscriber as $post_type => $caps ) {
+			$subscriber[ $post_type ] = array_fill_keys( array_keys( $caps ), 'off' );
+		}
+
+		return $subscriber;
+	}
+
+	public function get_default_role_manager_capabilities() {
+		return self::$default_role_manager_capabilities;
 	}
 
 	/**
@@ -294,8 +360,13 @@ class AWB_Role_Manager {
 		$context   = is_null( $context ) ? $this->get_post_type() : $context;
 
 		// Set the capability based on post types, if it is relevant for posts and pages in the source.
-		if ( 'edit_' === $minimum_capability ) {
-			$minimum_capability = 'page' === $context ? 'edit_pages' : 'edit_posts';
+		if ( 'edit_' === $minimum_capability || 'publish_' === $minimum_capability ) {
+			$post_type_object    = get_post_type_object( $context );
+			$minimum_capability .= 'posts';
+
+			if ( isset( $post_type_object->cap->$minimum_capability ) ) {
+				$minimum_capability = $post_type_object->cap->$minimum_capability;
+			}
 		}
 
 		if ( 'administrator' === $user_role ) {
@@ -560,7 +631,7 @@ class AWB_Role_Manager {
 		}
 
 		// Backend builder access.
-		if ( ! current_user_can( apply_filters( 'awb_role_manager_access_capability', 'edit_posts', $post_type, 'backed_builder_edit' ) ) ) {
+		if ( ! current_user_can( apply_filters( 'awb_role_manager_access_capability', 'edit_', $post_type, 'backed_builder_edit' ) ) ) {
 			wp_die( __( 'Sorry, you are not allowed to access this page.' ), 403 ); // phpcs:ignore WordPress.Security.EscapeOutput
 		}
 	}

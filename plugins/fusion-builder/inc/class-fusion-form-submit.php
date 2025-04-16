@@ -144,8 +144,8 @@ class Fusion_Form_Submit {
 		$to             = ! empty( $form_meta['email'] ) ? $form_meta['email'] : get_option( 'admin_email' );
 		$reply_to_email = ! empty( $form_meta['email_reply_to'] ) ? $form_meta['email_reply_to'] : '';
 		$from_name      = ! empty( $form_meta['email_from'] ) ? $form_meta['email_from'] : 'WordPress';
-		$site_host_name = preg_replace( '(^https?://)', '', home_url() );
-		$from_id        = ! empty( $form_meta['email_from_id'] ) ? $form_meta['email_from_id'] : 'wordpress@' . $site_host_name;
+		$default_email  = 'wordpress@' . preg_replace( '#^www\.#', '', wp_parse_url( network_home_url(), PHP_URL_HOST ) );
+		$from_id        = ! empty( $form_meta['email_from_id'] ) ? $form_meta['email_from_id'] : $default_email;
 		$subject        = ! empty( $form_meta['email_subject'] ) ? $form_meta['email_subject'] : sprintf(
 			/* Translators: The form-ID. */
 			esc_html__( '%s - Form Submission Notification', 'fusion-builder' ),
@@ -419,8 +419,8 @@ class Fusion_Form_Submit {
 				$to             = ! empty( $notification['email'] ) ? $notification['email'] : get_option( 'admin_email' );
 				$reply_to_email = ! empty( $notification['email_reply_to'] ) ? $notification['email_reply_to'] : '';
 				$from_name      = ! empty( $notification['email_from'] ) ? $notification['email_from'] : 'WordPress';
-				$site_host_name = preg_replace( '(^https?://)', '', home_url() );
-				$from_id        = ! empty( $notification['email_from_id'] ) ? $notification['email_from_id'] : 'wordpress@' . $site_host_name;
+				$default_email  = 'wordpress@' . preg_replace( '#^www\.#', '', wp_parse_url( network_home_url(), PHP_URL_HOST ) );
+				$from_id        = ! empty( $notification['email_from_id'] ) ? $notification['email_from_id'] : $default_email;
 				$subject        = ! empty( $notification['email_subject'] ) ? $notification['email_subject'] : sprintf(
 					/* Translators: The form-ID. */
 					esc_html__( '%s - Form Submission Notification', 'fusion-builder' ),
@@ -821,7 +821,7 @@ class Fusion_Form_Submit {
 	}
 
 	/**
-	 * Proces nonce, recaptcha and similar checks.
+	 * Process nonce, recaptcha and similar checks.
 	 * Dies if checks fail.
 	 *
 	 * @access protected

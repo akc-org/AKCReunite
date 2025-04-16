@@ -126,6 +126,8 @@ if ( fusion_is_element_enabled( 'fusion_tb_meta' ) ) {
 					'border_left'              => '0px',
 					'border_right'             => '0px',
 					'border_top'               => '1px',
+					'event_venue_link'         => 'venue_page',
+					'event_organizer_link'     => 'organizer_page',
 					'read_time'                => 200,
 					'reading_time_decimal'     => 'yes',
 					'background_color'         => '',
@@ -498,6 +500,56 @@ if ( fusion_is_element_enabled( 'fusion_tb_meta' ) ) {
 								$content .= '<span class="fusion-tb-event-end-date">' . $event_end_date . '</span>' . $separator;
 							}
 							break;
+						case 'event_venue':
+							$event_venue = function_exists( 'tribe_get_venue' ) ? tribe_get_venue( $post_id ) : '';
+							if ( $event_venue ) {
+								$event_venue_link = '';
+								if ( 'venue_page' === $args['event_venue_link'] ) {
+									$event_venue_link = tribe_get_venue_link( $post_id, false );
+								} elseif ( 'venue_website' === $args['event_venue_link'] ) {
+									$event_venue_link = tribe_get_venue_website_url( $post_id );
+								}
+
+								if ( $event_venue_link ) {
+									$event_venue = '<a href="' . esc_url( $event_venue_link ) . '" target="_blank" aria-label="' . esc_attr( $event_venue ) . '">' . $event_venue . '</a>';
+								}
+
+								$content .= '<span class="fusion-tb-event-venue">' . $event_venue . '</span>' . $separator;
+							}
+							break;
+						case 'event_venue_address':
+							$event_address = function_exists( 'tribe_get_venue_single_line_address' ) ? tribe_get_venue_single_line_address( $post_id, false ) : '';
+							if ( $event_address ) {
+								$event_venue   = function_exists( 'tribe_get_venue' ) ? tribe_get_venue( $post_id ) . _x( ', ', 'Address separator', 'the-events-calendar' ) : '';
+								$event_address = str_replace( $event_venue, '', $event_address );
+								$content      .= '<span class="fusion-tb-event-address">' . $event_address . '</span>' . $separator;
+							}
+							break;
+						case 'event_organizer':
+							$event_organizer = function_exists( 'tribe_get_organizer' ) ? tribe_get_organizer( $post_id ) : '';
+							if ( $event_organizer ) {
+								$event_organizer_link = '';
+								if ( 'organizer_page' === $args['event_organizer_link'] ) {
+									$event_organizer_link = tribe_get_organizer_link( $post_id, false );
+								} elseif ( 'organizer_website' === $args['event_organizer_link'] ) {
+									$event_organizer_link = tribe_get_organizer_website_url( $post_id );
+								} elseif ( 'organizer_email' === $args['event_organizer_link'] ) {
+									$event_organizer_link = 'mailto:' . tribe_get_organizer_email( $post_id );
+								}
+
+								if ( $event_organizer_link ) {
+									$event_organizer = '<a href="' . esc_url( $event_organizer_link ) . '" target="_blank" aria-label="' . esc_attr( $event_organizer ) . '">' . $event_organizer . '</a>';
+								}
+
+								$content .= '<span class="fusion-tb-event-organizer">' . $event_organizer . '</span>' . $separator;
+							}
+							break;
+						case 'event_cost':
+							$event_cost = function_exists( 'tribe_get_formatted_cost' ) ? tribe_get_formatted_cost( $post_id ) : '';
+							if ( $event_cost ) {
+								$content .= '<span class="fusion-tb-event-cost">' . $event_cost . '</span>' . $separator;
+							}
+							break;
 						case 'word_count':
 							$this->set_word_count();
 
@@ -541,6 +593,14 @@ if ( fusion_is_element_enabled( 'fusion_tb_meta' ) ) {
 							$today_views = $element;
 							$content    .= '<span class="fusion-tb-today-views">' . $today_views . '</span>' . $separator;
 							break;
+						case 'post_type':
+							$post_type = get_post_type_object( get_post_type() );
+							$post_type = is_object( $post_type ) ? $post_type->labels->singular_name : '';
+
+							if ( $post_type ) {
+								$content .= '<span class="fusion-tb-post-type">' . $post_type . '</span>' . $separator;
+							}
+							break;
 					}
 				}
 
@@ -573,7 +633,7 @@ if ( fusion_is_element_enabled( 'fusion_tb_meta' ) ) {
 				$event_id = $this->get_post_id();
 				$event    = get_post( $event_id );
 
-				if ( ! $event instanceof WP_Post ) {
+				if ( ! $event instanceof WP_Post || ! function_exists( 'tribe_events_event_schedule_details' ) ) {
 					return '';
 				}
 
@@ -610,7 +670,7 @@ if ( fusion_is_element_enabled( 'fusion_tb_meta' ) ) {
 				$event_id = $this->get_post_id();
 				$event    = get_post( $event_id );
 
-				if ( ! $event instanceof WP_Post ) {
+				if ( ! $event instanceof WP_Post || ! function_exists( 'tribe_get_start_date' ) ) {
 					return '';
 				}
 
@@ -634,7 +694,7 @@ if ( fusion_is_element_enabled( 'fusion_tb_meta' ) ) {
 				$event_id = $this->get_post_id();
 				$event    = get_post( $event_id );
 
-				if ( ! $event instanceof WP_Post ) {
+				if ( ! $event instanceof WP_Post || ! function_exists( 'tribe_get_end_date' ) ) {
 					return '';
 				}
 
@@ -708,21 +768,26 @@ function fusion_component_meta() {
 						'param_name'  => 'meta',
 						'default'     => 'author,published_date,categories,comments,tags',
 						'choices'     => [
-							'author'           => esc_attr__( 'Author', 'fusion-builder' ),
-							'published_date'   => esc_attr__( 'Published Date', 'fusion-builder' ),
-							'modified_date'    => esc_attr__( 'Modified Date', 'fusion-builder' ),
-							'categories'       => esc_attr__( 'Categories', 'fusion-builder' ),
-							'comments'         => esc_attr__( 'Comments', 'fusion-builder' ),
-							'tags'             => esc_attr__( 'Tags', 'fusion-builder' ),
-							'skills'           => esc_attr__( 'Portfolio Skills', 'fusion-builder' ),
-							'sku'              => esc_attr__( 'Product SKU', 'fusion-builder' ),
-							'event_date'       => esc_attr__( 'Event Full Date', 'fusion-builder' ),
-							'event_start_date' => esc_attr__( 'Event Start Date', 'fusion-builder' ),
-							'event_end_date'   => esc_attr__( 'Event End Date', 'fusion-builder' ),
-							'word_count'       => esc_attr__( 'Word Count', 'fusion-builder' ),
-							'read_time'        => esc_attr__( 'Reading Time', 'fusion-builder' ),
-							'total_views'      => esc_attr__( 'Total Views', 'fusion-builder' ),
-							'today_views'      => esc_attr__( 'Daily Views', 'fusion-builder' ),
+							'author'              => esc_attr__( 'Author', 'fusion-builder' ),
+							'published_date'      => esc_attr__( 'Published Date', 'fusion-builder' ),
+							'modified_date'       => esc_attr__( 'Modified Date', 'fusion-builder' ),
+							'categories'          => esc_attr__( 'Categories', 'fusion-builder' ),
+							'comments'            => esc_attr__( 'Comments', 'fusion-builder' ),
+							'tags'                => esc_attr__( 'Tags', 'fusion-builder' ),
+							'skills'              => esc_attr__( 'Portfolio Skills', 'fusion-builder' ),
+							'sku'                 => esc_attr__( 'Product SKU', 'fusion-builder' ),
+							'event_date'          => esc_attr__( 'Event Full Date', 'fusion-builder' ),
+							'event_start_date'    => esc_attr__( 'Event Start Date', 'fusion-builder' ),
+							'event_end_date'      => esc_attr__( 'Event End Date', 'fusion-builder' ),
+							'event_venue'         => esc_attr__( 'Event Venue', 'fusion-builder' ),
+							'event_venue_address' => esc_attr__( 'Event Venue Address', 'fusion-builder' ),
+							'event_organizer'     => esc_attr__( 'Event Organizer', 'fusion-builder' ),
+							'event_cost'          => esc_attr__( 'Event Cost', 'fusion-builder' ),
+							'word_count'          => esc_attr__( 'Word Count', 'fusion-builder' ),
+							'read_time'           => esc_attr__( 'Reading Time', 'fusion-builder' ),
+							'total_views'         => esc_attr__( 'Total Views', 'fusion-builder' ),
+							'today_views'         => esc_attr__( 'Daily Views', 'fusion-builder' ),
+							'post_type'           => esc_attr__( 'Post Type', 'fusion-builder' ),
 						],
 						'callback'    => [
 							'function' => 'fusion_ajax',
@@ -778,6 +843,55 @@ function fusion_component_meta() {
 						],
 					],
 					[
+						'type'        => 'radio_button_set',
+						'heading'     => esc_attr__( 'Event Venue Link', 'fusion-builder' ),
+						'description' => esc_attr__( 'Select which link should be used on the event venue.', 'fusion-builder' ),
+						'param_name'  => 'event_venue_link',
+						'value'       => [
+							'venue_page'    => esc_html__( 'Venue Page', 'fusion-builder' ),
+							'venue_website' => esc_html__( 'Venue Website', 'fusion-builder' ),
+							'none'          => esc_html__( 'None', 'fusion-builder' ),
+						],
+						'default'     => 'venue_page',
+						'callback'    => [
+							'function' => 'fusion_ajax',
+							'action'   => 'get_fusion_tb_meta',
+							'ajax'     => true,
+						],
+						'dependency'  => [
+							[
+								'element'  => 'meta',
+								'value'    => 'event_venue',
+								'operator' => 'contains',
+							],
+						],
+					],
+					[
+						'type'        => 'radio_button_set',
+						'heading'     => esc_attr__( 'Event Organizer Link', 'fusion-builder' ),
+						'description' => esc_attr__( 'Select which link should be used on the event organizer.', 'fusion-builder' ),
+						'param_name'  => 'event_organizer_link',
+						'value'       => [
+							'organizer_page'    => esc_html__( 'Organizer Page', 'fusion-builder' ),
+							'organizer_website' => esc_html__( 'Organizer Website', 'fusion-builder' ),
+							'organizer_email'   => esc_html__( 'Organizer Email', 'fusion-builder' ),
+							'none'              => esc_html__( 'None', 'fusion-builder' ),
+						],
+						'default'     => 'organizer_page',
+						'callback'    => [
+							'function' => 'fusion_ajax',
+							'action'   => 'get_fusion_tb_meta',
+							'ajax'     => true,
+						],
+						'dependency'  => [
+							[
+								'element'  => 'meta',
+								'value'    => 'event_venue',
+								'operator' => 'contains',
+							],
+						],
+					],
+					[
 						'type'        => 'textfield',
 						'heading'     => esc_attr__( 'Reading Time', 'fusion-builder' ),
 						'description' => esc_attr__( 'Average words read per minute. The default value is 200.', 'fusion-builder' ),
@@ -807,6 +921,26 @@ function fusion_component_meta() {
 							'no'  => esc_html__( 'No', 'fusion-builder' ),
 						],
 						'default'     => 'yes',
+						'callback'    => [
+							'function' => 'fusion_ajax',
+							'action'   => 'get_fusion_tb_meta',
+							'ajax'     => true,
+						],
+						'dependency'  => [
+							[
+								'element'  => 'meta',
+								'value'    => 'read_time',
+								'operator' => 'contains',
+							],
+						],
+					],
+					[
+						'type'        => 'textfield',
+						'heading'     => esc_attr__( 'Event Venue', 'fusion-builder' ),
+						'description' => esc_attr__( 'Average words read per minute. The default value is 200.', 'fusion-builder' ),
+						'param_name'  => 'read_time',
+						'value'       => '200',
+						'default'     => '200',
 						'callback'    => [
 							'function' => 'fusion_ajax',
 							'action'   => 'get_fusion_tb_meta',

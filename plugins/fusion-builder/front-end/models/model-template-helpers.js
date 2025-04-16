@@ -1375,6 +1375,10 @@ _.mixin( {
 				label: 'Blogger',
 				color: '#f57d00'
 			},
+			bluesky: {
+				label: 'Bluesky',
+				color: '#0085FF'
+			},
 			deviantart: {
 				label: 'Deviantart',
 				color: '#4dc47d'
@@ -1407,13 +1411,21 @@ _.mixin( {
 				label: 'Forrst',
 				color: '#5b9a68'
 			},
+			github: {
+				label: 'GitHub',
+				color: '#24292e'
+			},			
 			instagram: {
 				label: 'Instagram',
-				color: '#3f729b'
+				color: '#c13584'
 			},
 			linkedin: {
 				label: 'LinkedIn',
 				color: '#0077b5'
+			},
+			mastodon: {
+				label: 'Mastodon',
+				color: '#6364FF'
 			},
 			myspace: {
 				label: 'Myspace',
@@ -1439,6 +1451,10 @@ _.mixin( {
 				label: 'Skype',
 				color: '#00aff0'
 			},
+			snapchat: {
+				label: 'Snapchat',
+				color: '#F7F300',
+			},				
 			soundcloud: {
 				label: 'Soundcloud',
 				color: '#ff8800'
@@ -1455,6 +1471,10 @@ _.mixin( {
 				label: 'Telegram',
 				color: '#0088cc'
 			},
+			threads: {
+				label: 'Threads',
+				color: '#000000',
+			},					
 			tiktok: {
 				label: 'Tiktok',
 				color: '#010101'
@@ -1646,6 +1666,10 @@ _.mixin( {
 				xing: 'xing',
 				yelp: 'yelp',
 				spotify: 'spotify',
+				bluesky: 'bluesky',
+				github: 'github',
+				mastodon: 'mastodon',
+				threads: 'threads',
 				email: 'mail',
 				phone: 'phone'
 			};
@@ -2674,7 +2698,7 @@ _.mixin( {
 
 		const values = self.values;
 		// Early exit if no pattern selected.
-		if ( '' === values.background_slider_images ) {
+		if ( 'undefined' === typeof values.background_slider_images || '' === values.background_slider_images ) {
 			return;
 		}
 
@@ -3036,7 +3060,7 @@ _.mixin( {
 	 * @return {String}
 	 */
 	fusionGetStickyClass: function( value ) {
-		return '' !== value && ! value.includes( ',' ) ? ' fusion-display-' + value + '-only' : '';
+		return 'undefined' !== typeof valu && '' !== value && ! value.includes( ',' ) ? ' fusion-display-' + value + '-only' : '';
 	},
 
 	/**

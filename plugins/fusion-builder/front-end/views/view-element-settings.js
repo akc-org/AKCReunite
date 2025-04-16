@@ -306,6 +306,10 @@ var FusionPageBuilder = FusionPageBuilder || {};
 
 				if ( dynamicData.parent_dynamic_content ) {
 					this.$el.find( '.fusion-child-sortables' ).addClass( 'has-dynamic-data' );
+
+					if ( 'filebird_folder_parent' === dynamicData.parent_dynamic_content.data ) {
+						this.$el.find( '.fusion-child-sortables' ).addClass( 'has-dynamic-data-no-children' );
+					}
 				}
 			}
 
@@ -1351,7 +1355,7 @@ var FusionPageBuilder = FusionPageBuilder || {};
 
 		checkPageTemplate: function() {
 			var option  = this.$el.find( 'li[data-option-id="hundred_percent"]' ),
-				postTypes = [ 'post', 'fusion_template', 'fusion_element' ];
+				postTypes = [ 'post', 'fusion_template', 'fusion_element', 'awb_off_canvas' ];
 
 			if ( 'fusion_builder_container' === this.model.get( 'element_type' ) ) {
 				option.show();

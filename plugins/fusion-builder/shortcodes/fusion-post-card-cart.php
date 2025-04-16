@@ -328,7 +328,7 @@ if ( fusion_is_element_enabled( 'fusion_post_card_cart' ) ) {
 				$post_id = apply_filters( 'fusion_dynamic_post_id', get_the_ID() );
 				if ( ! function_exists( 'wc_get_product' ) || 'product' !== get_post_type( $post_id ) ) {
 					return '';
-				}				
+				}
 
 				$this->defaults = self::get_element_defaults();
 				$this->args     = FusionBuilder::set_shortcode_defaults( $this->defaults, $args, 'fusion_post_card_cart' );
@@ -400,7 +400,7 @@ if ( fusion_is_element_enabled( 'fusion_post_card_cart' ) ) {
 					$js_folder_suffix = FUSION_BUILDER_DEV_MODE ? '/assets/js' : '/assets/min/js';
 					$js_folder_url    = Avada::$template_dir_url . $js_folder_suffix;
 					$js_folder_path   = Avada::$template_dir_path . $js_folder_suffix;
-					$version          = Avada::get_theme_version();					
+					$version          = Avada::get_theme_version();
 
 					if ( '1' === $this->args['enable_quick_view'] ) {
 						$avada_woocommerce->quick_view_init();
@@ -413,12 +413,12 @@ if ( fusion_is_element_enabled( 'fusion_post_card_cart' ) ) {
 							$version,
 							true
 						);
-						
+
 						Fusion_Dynamic_JS::localize_script(
 							'awb-woo-quick-view',
 							'avadaWooCommerceVars',
 							$avada_woocommerce::get_avada_wc_vars()
-						);						
+						);
 					}
 
 					if ( 'yes' === $this->args['show_variations'] ) {
@@ -438,7 +438,7 @@ if ( fusion_is_element_enabled( 'fusion_post_card_cart' ) ) {
 						);
 					}
 				}
-			}		
+			}
 
 			/**
 			 * Fires after post cards rendered.
@@ -482,7 +482,7 @@ if ( fusion_is_element_enabled( 'fusion_post_card_cart' ) ) {
 						jQuery( e.currentTarget ).find( '.add_to_cart_button' ).removeClass( 'disabled wc-variation-selection-needed wc-variation-is-unavailable' );
 						
 						// To avoid change of product URL on variatoon selection.
-						var productLink = jQuery( e.currentTarget ).closest( '.product' ).find( '.woocommerce-product-gallery__image' ).find( 'a' );
+						var productLink = jQuery( e.currentTarget ).closest( '.product' ).find( '.woocommerce-product-gallery__image > a' );
 						if ( productLink.length ) {
 							productLink.attr( 'href', productLink.attr( 'data-o_href' ) );
 						}
@@ -582,7 +582,7 @@ if ( fusion_is_element_enabled( 'fusion_post_card_cart' ) ) {
 					remove_action( 'woocommerce_single_variation', [ $this, 'add_cart_buttons_wrapper' ], 20 );
 
 					if ( '' !== $this->args['clear_content'] ) {
-					remove_filter( 'woocommerce_reset_variations_link', [ $this, 'add_variation_clear_text' ], 10 );
+						remove_filter( 'woocommerce_reset_variations_link', [ $this, 'add_variation_clear_text' ], 10 );
 					}
 
 					add_action( 'woocommerce_reset_variations_link', [ $avada_woocommerce, 'add_single_variation_markup' ] );
@@ -642,9 +642,11 @@ if ( fusion_is_element_enabled( 'fusion_post_card_cart' ) ) {
 				}
 
 				$show_quantity = 'yes' === $this->args['show_quantity_input'] && $product->is_purchasable();
-				if ( ( ( 'yes' === $this->args['show_variations'] && $product->is_type( 'variable' ) ) || $product->is_type( 'simple' ) ) && apply_filters( 'fusion_cart_show_quantity', $show_quantity, $this->args ) ) { ?>
+				if ( ( ( 'yes' === $this->args['show_variations'] && $product->is_type( 'variable' ) ) || $product->is_type( 'simple' ) ) && apply_filters( 'fusion_cart_show_quantity', $show_quantity, $this->args ) ) {
+					?>
 					</div>
-				<?php }
+					<?php
+				}
 			}
 
 			/**
@@ -1106,8 +1108,8 @@ if ( fusion_is_element_enabled( 'fusion_post_card_cart' ) ) {
 					$css_vars_options[] = 'button_details_color_hover';
 					$css_vars_options[] = 'button_details_border_color_hover';
 				} else {
-					$css_vars_options[] = 'product_link_color';
-					$css_vars_options[] = 'product_link_hover_color';
+					$css_vars_options[]                         = 'product_link_color';
+					$css_vars_options[]                         = 'product_link_hover_color';
 					$css_vars_options['product_link_font_size'] = [ 'callback' => [ 'Fusion_Sanitize', 'get_value_with_unit' ] ];
 				}
 

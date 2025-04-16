@@ -15,8 +15,59 @@ var FusionPageBuilder = FusionPageBuilder || {};
 			 */
 			onRender: function() {
 				this.afterPatch();
+			},
 
+			initLightbox: function() {
+				const params     = jQuery.extend( true, {}, fusionAllElements[ this.model.get( 'element_type' ) ].defaults, _.fusionCleanParameters( this.model.get( 'params' ) ) );
+				const lightboxID = '' !== params.gallery_id || '0' === params.gallery_id ? 'iLightbox[' + params.gallery_id + ']' : 'single';
+				let galleryLightbox, elements, link;
 
+				// Remove the last active lightbox. If it is one of a gallery, reinit the gallery, but without the image element.
+				if ( this.lightboxID && lightboxID !== this.lightboxID && 'object' === typeof jQuery( '#fb-preview' )[ 0 ].contentWindow.avadaLightBox ) {
+					if ( 'single' === this.lightboxID && 'undefined' !== typeof this.iLightbox ) {
+						this.iLightbox.destroy();
+					} else if ( 'object' === typeof jQuery( '#fb-preview' )[ 0 ].contentWindow.$ilInstances && this.lightboxID in jQuery( '#fb-preview' )[ 0 ].contentWindow.$ilInstances ) {
+						galleryLightbox = jQuery( '#fb-preview' )[ 0 ].contentWindow.$ilInstances[ this.lightboxID ];
+						elements        = jQuery( '#fb-preview' )[ 0 ].contentWindow.jQuery( '.fusion-gallery' ).find( '[data-rel="' + this.lightboxID + '"]' );
+						elements        = elements.add(  jQuery( '#fb-preview' )[ 0 ].contentWindow.jQuery( '.fusion-imageframe' ).not( this.$el.find( '.fusion-imageframe' ) ).find( '[data-rel="' + this.lightboxID + '"]' ) );
+						link            = jQuery( '#fb-preview' )[ 0 ].contentWindow.jQuery( elements );
+
+						if ( 'undefined' !== typeof galleryLightbox ) {
+							galleryLightbox.destroy();
+							delete jQuery( '#fb-preview' )[ 0 ].contentWindow.$ilInstances[ this.lightboxID ];
+
+							if ( link.length ) {
+								jQuery( '#fb-preview' )[ 0 ].contentWindow.$ilInstances[ this.lightboxID ] = link.iLightBox( jQuery( '#fb-preview' )[ 0 ].contentWindow.avadaLightBox.prepare_options( this.lightboxID ) );
+							}
+						}
+					}
+				}
+
+				// Reinit the lightbox. If it is a gallery one, add the image element, otherwise use the single one.
+				if ( ( '' !== params.gallery_id || '0' === params.gallery_id ) && 'object' === typeof jQuery( '#fb-preview' )[ 0 ].contentWindow.$ilInstances ) {
+					galleryLightbox = lightboxID in jQuery( '#fb-preview' )[ 0 ].contentWindow.$ilInstances ? jQuery( '#fb-preview' )[ 0 ].contentWindow.$ilInstances[ lightboxID ] : false;
+					elements        = jQuery( '#fb-preview' )[ 0 ].contentWindow.jQuery( '.fusion-gallery' ).find( '[data-rel="' + lightboxID + '"]' );
+					elements        = elements.add(  jQuery( '#fb-preview' )[ 0 ].contentWindow.jQuery( '.fusion-imageframe' ).find( '[data-rel="' + lightboxID + '"]' ) );
+					link            = jQuery( '#fb-preview' )[ 0 ].contentWindow.jQuery( elements );
+
+					if ( 'object' === typeof jQuery( '#fb-preview' )[ 0 ].contentWindow.avadaLightBox ) {
+						if ( false !== galleryLightbox ) {
+							galleryLightbox.destroy();
+							delete jQuery( '#fb-preview' )[ 0 ].contentWindow.$ilInstances[ lightboxID ];
+						}
+
+						jQuery( '#fb-preview' )[ 0 ].contentWindow.$ilInstances[ lightboxID ] = link.iLightBox( jQuery( '#fb-preview' )[ 0 ].contentWindow.avadaLightBox.prepare_options( lightboxID ) );
+					}
+				} else if ( 'object' === typeof jQuery( '#fb-preview' )[ 0 ].contentWindow.avadaLightBox ) {
+					link  = jQuery( '#fb-preview' )[ 0 ].contentWindow.jQuery( this.$el.find( '.fusion-lightbox' ) );
+
+					if ( link.length ) {
+						this.iLightbox = link.iLightBox( jQuery( '#fb-preview' )[ 0 ].contentWindow.avadaLightBox.prepare_options( lightboxID ) );
+					}
+				}
+
+				// Set the now "old" value of the lightbox ID for the next change.
+				this.lightboxID = '' !== params.gallery_id || '0' === params.gallery_id ? 'iLightbox[' + params.gallery_id + ']' : 'single';
 			},
 
 			/**
@@ -26,8 +77,7 @@ var FusionPageBuilder = FusionPageBuilder || {};
 			 * @return {void}
 			 */
 			afterPatch: function() {
-				var params = this.model.get( 'params' ),
-					link  = jQuery( '#fb-preview' )[ 0 ].contentWindow.jQuery( this.$el.find( '.fusion-lightbox' ) );
+				var params = this.model.get( 'params' );
 
 				this.$el.removeClass( 'fusion-element-alignment-right fusion-element-alignment-left' );
 				if ( ! this.flexDisplay() ) {
@@ -35,15 +85,8 @@ var FusionPageBuilder = FusionPageBuilder || {};
 						this.$el.addClass( 'fusion-element-alignment-' + params.align );
 					}
 				}
-				if ( 'object' === typeof jQuery( '#fb-preview' )[ 0 ].contentWindow.avadaLightBox ) {
-					if ( 'undefined' !== typeof this.iLightbox ) {
-						this.iLightbox.destroy();
-					}
 
-					if ( link.length ) {
-						this.iLightbox = link.iLightBox( jQuery( '#fb-preview' )[ 0 ].contentWindow.avadaLightBox.prepare_options( 'single' ) );
-					}
-				}
+				this.initLightbox();
 
 				// Image magnify with lightbox or link
 				if ( jQuery( '#fb-preview' )[ 0 ].contentWindow.jQuery( this.$el.find( 'a' ) ).hasClass( 'has-image-magnify' ) && 'function' === typeof jQuery( '#fb-preview' )[ 0 ].contentWindow.jQuery().fusionImageMagnify ) {
@@ -453,11 +496,12 @@ var FusionPageBuilder = FusionPageBuilder || {};
 					src = values.element_content;
 				}
 
-				if ( ! this.isImgUrl( src ) ) {
+				if ( ! this.isImgUrl( src ) && ! _.FusionIsValidJSON( src ) ) {
 					// eslint-disable-next-line quotes
 					src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1024 560'%3E%3Cpath fill='%23EAECEF' d='M0 0h1024v560H0z'/%3E%3Cg fill-rule='evenodd' clip-rule='evenodd'%3E%3Cpath fill='%23BBC0C4' d='M378.9 432L630.2 97.4c9.4-12.5 28.3-12.6 37.7 0l221.8 294.2c12.5 16.6.7 40.4-20.1 40.4H378.9z'/%3E%3Cpath fill='%23CED3D6' d='M135 430.8l153.7-185.9c10-12.1 28.6-12.1 38.7 0L515.8 472H154.3c-21.2 0-32.9-24.8-19.3-41.2z'/%3E%3Ccircle fill='%23FFF' cx='429' cy='165.4' r='55.5'/%3E%3C/g%3E%3C/svg%3E";
 					contentAttr.width = 600;
 				}
+
 				if ( 'undefined' !== typeof src && src && '' !== src ) {
 					src             = src.replace( '&#215;', 'x' );
 					contentAttr.src = src;

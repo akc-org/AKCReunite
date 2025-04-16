@@ -411,16 +411,25 @@ var FusionPageBuilder = FusionPageBuilder || {};
 						}
 						break;
 					case 'twitter':
-						socialLink = 'https://twitter.com/share?text=' + _.fusionRawUrlEncode( title ) + '&url=' + _.fusionRawUrlEncode( link );
+						socialLink = 'https://x.com/intent/post?text=' + _.fusionRawUrlEncode( title ) + '&url=' + _.fusionRawUrlEncode( link );
+						break;
+					case 'bluesky':
+						socialLink = 'https://bsky.app/intent/compose?text=' + _.fusionRawUrlEncode( title ) + '%20' + _.fusionRawUrlEncode( link ) + '%20' + _.fusionRawUrlEncode( description );
 						break;
 					case 'linkedin':
 						socialLink = 'https://www.linkedin.com/shareArticle?mini=true&url=' + _.fusionRawUrlEncode( link ) + '&amp;title=' + _.fusionRawUrlEncode( title ) + '&amp;summary=' + _.fusionRawUrlEncode( description );
+						break;
+					case 'mastodon':
+						socialLink = 'https://mastodonshare.com/?url=' + _.fusionRawUrlEncode( link ) + '&amp;text=' + _.fusionRawUrlEncode( title ) + '%20' + _.fusionRawUrlEncode( description );
 						break;
 					case 'reddit':
 						socialLink = 'https://reddit.com/submit?url=' + link + '&amp;title=' + title;
 						break;
 					case 'telegram':
 						socialLink = 'https://t.me/share/url?url=' + _.fusionRawUrlEncode( link ) + '&text=' + _.fusionRawUrlEncode( title );
+						break;
+					case 'threads':
+						socialLink = 'https://www.threads.net/intent/post?url=' + _.fusionRawUrlEncode( link ) + '&amp;text=' + _.fusionRawUrlEncode( title ) + '%20' + _.fusionRawUrlEncode( description );
 						break;
 					case 'tumblr':
 						socialLink = 'https://www.tumblr.com/share/link?url=' + _.fusionRawUrlEncode( link ) + '&amp;name=' + _.fusionRawUrlEncode( title ) + '&amp;description=' + _.fusionRawUrlEncode( description );

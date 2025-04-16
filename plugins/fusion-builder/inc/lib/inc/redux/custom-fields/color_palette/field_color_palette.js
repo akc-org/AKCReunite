@@ -20,6 +20,9 @@
 			}
 			$paletteContainer.addClass( 'palette-init' );
 
+			// Copy color code.
+			$paletteContainer.on( 'click', '.fusiona-code', copyColorCode );
+
 			// Toggle open and close color.
 			$paletteContainer.on( 'click', '.preview, .fusiona-pen', handleToggleColor );
 
@@ -31,6 +34,24 @@
 
 			// Bind input changes to toggle label.
 			$paletteContainer.on( 'change keyup', '.color-name', handleColorNameChange );
+
+			function copyColorCode() {
+				const colorVar = 'var(--awb-' + jQuery( this ).closest( '.fusion-color-palette-item' ).data( 'slug' ) + ')';
+	
+				if ( 'clipboard' in navigator ) {
+					navigator.clipboard.writeText( colorVar );
+				} else {
+					const textArea = document.createElement( 'textarea' );
+					textArea.value = colorVar;
+					textArea.style.opacity = 0;
+					document.body.appendChild( textArea );
+					textArea.focus();
+					textArea.select();
+	
+					const success = document.execCommand( 'copy' );
+					document.body.removeChild( textArea );
+				}			
+			}
 
 			// Show or hide the color editing options.
 			function handleToggleColor() {

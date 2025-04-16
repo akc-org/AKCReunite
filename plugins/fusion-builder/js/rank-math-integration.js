@@ -21,13 +21,18 @@
 
 	FusionRankMath.prototype.events = function() {
 		$( document ).on( 'fusion-builder-content-updated', function() {
-			$.post( window.fusionBuilderConfig.rest_url + 'awb/rendered_content', { content: window.fusionBuilderGetContent( 'content' ) }, function( result ) {
-
+			$.ajax( {
+					method: 'POST',
+					url: window.fusionBuilderConfig.rest_url + 'awb/rendered_content',
+					data: { content: window.fusionBuilderGetContent( 'content' ) },
+					beforeSend: function ( xhr ) {
+						xhr.setRequestHeader( 'X-WP-Nonce', window.fusionBuilderConfig.rest_nonce );
+					}
+			} ).done( function( result ) {
 				$( '#fusion-builder-rendered-content' ).val( result.content );
 				setTimeout( () => {
 					window.rankMathEditor.refresh( 'content' );
 				}, 100 );
-
 			} );
 		} );
 	};

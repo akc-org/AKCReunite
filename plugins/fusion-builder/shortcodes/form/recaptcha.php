@@ -17,6 +17,16 @@ if ( fusion_is_element_enabled( 'fusion_form_recaptcha' ) ) {
 		class FusionForm_Recaptcha extends Fusion_Form_Component {
 
 			/**
+			 * Array of forms that use reCAPTCHA.
+			 *
+			 * @static
+			 * @access private
+			 * @since 3.11.12
+			 * @var array
+			 */
+			private static $forms = [];
+
+			/**
 			 * Constructor.
 			 *
 			 * @access public
@@ -56,11 +66,14 @@ if ( fusion_is_element_enabled( 'fusion_form_recaptcha' ) ) {
 			 * @return string
 			 */
 			public function render_input_field( $content ) {
+				self::$forms[ $this->params['form_number'] ] = isset( self::$forms[ $this->params['form_number'] ] ) ? self::$forms[ $this->params['form_number'] ] + 1 : 1;
+				$counter                                     = 1 < self::$forms[ $this->params['form_number'] ] ? $this->params['form_number'] . '-' . self::$forms[ $this->params['form_number'] ] : $this->params['form_number'];
+
 				$params = [
 					'color_theme'    => $this->args['color_theme'],
 					'badge_position' => $this->args['badge_position'],
 					'tab_index'      => $this->args['tab_index'],
-					'counter'        => $this->params['form_number'],
+					'counter'        => $counter,
 					'element'        => 'form',
 					'wrapper_class'  => 'fusion-form-recaptcha-wrapper',
 				];

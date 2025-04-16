@@ -792,11 +792,10 @@ function fusion_element_separator() {
 						'heading'     => esc_attr__( 'Separator Wave Size', 'fusion-builder' ),
 						'description' => esc_attr__( 'Controls the width of a single wave iteration. In pixels.', 'fusion-builder' ),
 						'param_name'  => 'amount',
-						'value'       => '',
+						'value'       => '20',
 						'min'         => '0',
 						'max'         => '100',
 						'step'        => '1',
-						'default'     => '20',
 						'group'       => esc_attr__( 'Design', 'fusion-builder' ),
 						'dependency'  => [
 							[

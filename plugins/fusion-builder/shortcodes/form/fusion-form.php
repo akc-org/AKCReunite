@@ -293,10 +293,17 @@ if ( fusion_is_element_enabled( 'fusion_form' ) ) {
 
 				$html = ! empty( $this->args['custom_css'] ) ? '<style>' . $this->args['custom_css'] . '</style>' : '';
 
-				$form  = $this->open_form();
-				$form .= do_shortcode( $content );
+				$form    = $this->open_form();
+				$content = preg_replace_callback(
+					'/\[fusion_text [^\]]+\].+\[\/fusion_text\]/s',
+					function ( $matches ) {
+						return shortcode_unautop( wpautop( $matches[0] ) );
+					},
+					$content
+				);
+				$form   .= do_shortcode( $content );
 
-				if ( 'yes' === $this->params['form_meta']['privacy_store_ip_ua'] && 'post' !== $this->params['form_meta']['form_type'] ) {
+				if ( 'ignore' !== $this->params['form_meta']['privacy_expiration_action'] && 'post' !== $this->params['form_meta']['form_type'] ) {
 					$form .= '<input type="hidden" name="fusion_privacy_store_ip_ua" value="' . ( 'yes' === $this->params['form_meta']['privacy_store_ip_ua'] ? 'true' : 'false' ) . '">';
 					$form .= '<input type="hidden" name="fusion_privacy_expiration_interval" value="' . absint( $this->params['form_meta']['privacy_expiration_interval'] ) . '">';
 					$form .= '<input type="hidden" name="privacy_expiration_action" value="' . esc_attr( $this->params['form_meta']['privacy_expiration_action'] ) . '">';
@@ -478,6 +485,10 @@ if ( fusion_is_element_enabled( 'fusion_form' ) ) {
 					$custom_vars['icon_alignment_top']       = empty( $border_top ) ? '1px' : $border_top;
 					$custom_vars['icon_alignment_bottom']    = empty( $border_bottom ) ? '1px' : $border_bottom;
 					$custom_vars['icon_alignment_font_size'] = $this->is_default_form_meta( 'form_font_size' ) ? '1em' : $this->params['form_meta']['form_font_size'];
+				}
+
+				if ( isset( $this->params['form_meta']['required_field_symbol_decoration'] ) && 'no' === $this->params['form_meta']['required_field_symbol_decoration'] ) {
+					$custom_vars['required_field_symbol_deco'] = 'none';
 				}
 
 				$css_vars_options = [

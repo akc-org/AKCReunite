@@ -62,7 +62,7 @@ class AWB_Clone_Posts {
 	public static function add_clone_option_to_row( $actions, $post ) {
 		$allowed_post_types = apply_filters( 'awb_allowed_clone_post_types', [ 'post', 'page', 'avada_portfolio', 'avada_faq' ] );
 
-		if ( ! in_array( $post->post_type, $allowed_post_types, true ) || ! self::user_can_clone_post_type( $post->post_type ) ) {
+		if ( ! in_array( $post->post_type, $allowed_post_types, true ) || ! self::user_can_clone_post( $post ) ) {
 			return $actions;
 		}
 
@@ -103,7 +103,7 @@ class AWB_Clone_Posts {
 			wp_die( esc_html( $message ) );
 		}
 
-		if ( ! self::user_can_clone_post_type( $post->post_type ) ) {
+		if ( ! self::user_can_clone_post( $post ) ) {
 			wp_die( esc_html( $message ) );
 		}
 
@@ -216,13 +216,14 @@ class AWB_Clone_Posts {
 	 * Check if user can clone a post type.
 	 *
 	 * @since 3.9
-	 * @param string $post_type The post type to check for.
+	 * @param object $post The post object.
 	 * @return bool
 	 */
-	private static function user_can_clone_post_type( $post_type ) {
+	private static function user_can_clone_post( $post ) {
+		$post_type        = $post->post_type;
 		$post_type_object = get_post_type_object( $post_type );
 
-		if ( null !== $post_type_object && current_user_can( $post_type_object->cap->edit_posts ) ) {
+		if ( current_user_can( 'edit_others_posts' ) || ( isset( $post->post_author ) && (int) $post->post_author === get_current_user_id() && null !== $post_type_object && current_user_can( $post_type_object->cap->edit_posts ) ) ) {
 			return true;
 		}
 

@@ -413,7 +413,7 @@ if ( fusion_is_element_enabled( 'fusion_text' ) ) {
 								'transport'       => 'postMessage',
 								'soft_dependency' => true,
 							],
-							'text_user_select'  => [
+							'text_user_select'      => [
 								'type'        => 'radio-buttonset',
 								'label'       => esc_html__( 'User Text Select', 'fusion-builder' ),
 								'description' => esc_html__( 'Controls how and if the text can be selected.', 'fusion-builder' ),
@@ -421,16 +421,16 @@ if ( fusion_is_element_enabled( 'fusion_text' ) ) {
 								'default'     => 'auto',
 								'transport'   => 'postMessage',
 								'choices'     => [
-									'auto'  => esc_html__( 'Selectable', 'fusion-builder' ),
-									'all'   => esc_html__( 'All', 'fusion-builder' ),
-									'none'  => esc_html__( 'Not Selectable', 'fusion-builder' ),
+									'auto' => esc_html__( 'Selectable', 'fusion-builder' ),
+									'all'  => esc_html__( 'All', 'fusion-builder' ),
+									'none' => esc_html__( 'Not Selectable', 'fusion-builder' ),
 								],
-								'css_vars'        => [
+								'css_vars'    => [
 									[
 										'name' => '--text_user_select',
 									],
-								],								
-							],							
+								],
+							],
 						],
 					],
 				];
@@ -582,13 +582,13 @@ function fusion_element_text() {
 						'param_name'  => 'user_select',
 						'default'     => '',
 						'value'       => [
-							''      => esc_html__( 'Default', 'fusion-builder' ),
-							'auto'  => esc_html__( 'Selectable', 'fusion-builder' ),
-							'all'   => esc_html__( 'All', 'fusion-builder' ),
-							'none'  => esc_html__( 'Not Selectable', 'fusion-builder' ),
+							''     => esc_html__( 'Default', 'fusion-builder' ),
+							'auto' => esc_html__( 'Selectable', 'fusion-builder' ),
+							'all'  => esc_html__( 'All', 'fusion-builder' ),
+							'none' => esc_html__( 'Not Selectable', 'fusion-builder' ),
 
 						],
-					],					
+					],
 					[
 						'type'         => 'tinymce',
 						'heading'      => esc_attr__( 'Content', 'fusion-builder' ),

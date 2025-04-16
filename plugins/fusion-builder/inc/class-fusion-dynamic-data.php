@@ -109,6 +109,15 @@ class Fusion_Dynamic_Data {
 	private $color_fields = [ 'colorpickeralpha', 'colorpicker' ];
 
 	/**
+	 * Array of icon fields.
+	 *
+	 * @access private
+	 * @since 3.11.6
+	 * @var array
+	 */
+	private $icon_fields = [ 'iconpicker' ];
+
+	/**
 	 * Class constructor.
 	 *
 	 * @since 2.1
@@ -244,10 +253,14 @@ class Fusion_Dynamic_Data {
 		switch ( $dynamic_id ) {
 			case 'post_featured_image':
 				if ( isset( $dynamic_arg['type'] ) && false !== strpos( $dynamic_arg['type'], 'featured-image-' ) && ! empty( $value ) ) {
-					$out['image_id'] = Fusion_Images::get_attachment_id_from_url( $value );
+					$post_id         = apply_filters( 'fusion_dynamic_post_id', fusion_library()->get_page_id() );
+					$out['image_id'] = fusion_data()->post_meta( $post_id )->get( 'kd_' . $dynamic_arg['type'] . '_' . get_post_type() . '_id' );
+					if ( ! $out['image_id'] ) {
+						$out['image_id'] = Fusion_Images::get_attachment_id_from_url( $value );
+					}
 				} elseif ( ! empty( $value ) && ( is_tax() || is_category() || is_tag() ) ) { // Note: if the tax/cat/tag doesn't have a value, it will default to first post thumbnail.
-					$image_id = Fusion_Images::get_attachment_id_from_url( $value );
-					$image_id = ( $image_id ? $image_id : '' ); // make sure it's empty string and not false.
+					$featured_image = fusion_data()->term_meta( get_queried_object()->term_id )->get( 'featured_image' );
+					$image_id       = isset( $featured_image['id'] ) ? $featured_image['id'] : '';
 
 					if ( 'fusion_imageframe' === $shortcode && 'element_content' === $param_id ) {
 						$out['image_id'] = $image_id;
@@ -255,7 +268,7 @@ class Fusion_Dynamic_Data {
 						$out[ $param_id . '_id' ] = $image_id;
 					}
 				} else {
-					$post_id = apply_filters( 'fusion_dynamic_post_id', get_the_ID() );
+					$post_id = apply_filters( 'fusion_dynamic_post_id', fusion_library()->get_page_id() );
 					if ( 'fusion_imageframe' === $shortcode && 'element_content' === $param_id ) {
 						$out['image_id'] = get_post_thumbnail_id( $post_id );
 					} else {
@@ -279,6 +292,15 @@ class Fusion_Dynamic_Data {
 					} else {
 						$out['image_id'] = $image_id;
 					}
+				} else {
+					$out[ $param_id . '_id' ] = $image_id;
+				}
+				break;
+			case 'woo_category_thumbnail':
+				$image_id = ! empty( $value ) && is_tax( 'product_cat' ) ? get_term_meta( get_queried_object()->term_id, 'thumbnail_id', true ) : '';
+
+				if ( 'fusion_imageframe' === $shortcode && 'element_content' === $param_id ) {
+					$out['image_id'] = $image_id;
 				} else {
 					$out[ $param_id . '_id' ] = $image_id;
 				}
@@ -578,7 +600,6 @@ class Fusion_Dynamic_Data {
 
 		$post_type = get_post_type();
 
-		// Editing a layout section.
 		if ( 'fusion_tb_section' === $post_type ) {
 			return true;
 		}
@@ -1273,6 +1294,26 @@ class Fusion_Dynamic_Data {
 			],
 		];
 
+		$params['action_hook'] = [
+			'label'    => esc_html__( 'Action', 'fusion-builder' ),
+			'id'       => 'action_hook',
+			'group'    => esc_attr__( 'Other', 'fusion-builder' ),
+			'options'  => $all_fields,
+			'callback' => [
+				'function' => 'output_action_hook',
+				'ajax'     => true,
+			],
+			'fields'   => [
+				'action_name' => [
+					'heading'    => esc_html__( 'Action Name', 'fusion-builder' ),
+					'param_name' => 'action_name',
+					'type'       => 'textarea',
+					'value'      => '',
+				],
+			],
+		];
+
+		$params = $this->maybe_add_filebird_fields( $params, $post_data['id'], $post_data['post_type'] );
 		$params = $this->maybe_add_off_canvas_fields( $params, $post_data['id'], $post_data['post_type'] );
 		$params = $this->maybe_add_acf_fields( $params, $post_data['id'], $post_data['post_type'] );
 		$params = $this->maybe_add_woo_fields( $params, $post_data['id'], $post_data['post_type'] );
@@ -1291,6 +1332,44 @@ class Fusion_Dynamic_Data {
 		}
 
 		$this->params = apply_filters( 'fusion_set_dynamic_params', $params );
+	}
+
+	/**
+	 * Adds Off Canvas fields to dynamic sources
+	 *
+	 * @param array  $params    The params.
+	 * @param int    $post_id   The post ID.
+	 * @param string $post_type The post type.
+	 * @return array
+	 */
+	public function maybe_add_filebird_fields( $params, $post_id, $post_type ) {
+
+		if ( class_exists( 'FileBird\Classes\Tree' ) ) {
+
+			$params['filebird_folder_parent'] = [
+				'label'    => esc_html__( 'FileBird Folder', 'fusion-builder' ),
+				'id'       => 'filebird_folder_parent',
+				'group'    => esc_html__( 'FileBird', 'fusion-builder' ),
+				'options'  => [ 'parent' ],
+				'default'  => __( 'FileBird Folder Name Here', 'fusion-builder' ),
+				'exclude'  => [ 'before', 'after', 'fallback' ],
+				'callback' => [
+					'function' => 'get_filebird_folder_image_ids',
+					'ajax'     => false,
+				],
+				'fields'   => [
+					'folder' => [
+						'heading'     => esc_html__( 'Folder', 'fusion-builder' ),
+						'description' => esc_html__( 'Enter the folder name or ID.', 'fusion-builder' ),
+						'param_name'  => 'folder',
+						'default'     => '',
+						'type'        => 'text',
+					],
+				],
+			];
+		}
+
+		return $params;
 	}
 
 	/**
@@ -1376,6 +1455,26 @@ class Fusion_Dynamic_Data {
 	}
 
 	/**
+	 * Gets the TEC subscribe links.
+	 *
+	 * @static
+	 * @access public
+	 * @since 3.11.10
+	 * @return array
+	 */
+	public function get_tec_subscribe_links() {
+		$handler    = tribe( Tribe\Events\Views\V2\iCalendar\iCalendar_Handler::class );
+		$links      = $handler->get_subscribe_links();
+		$link_array = [];
+
+		foreach ( $links as $index => $link ) {
+			$link_array[ $index ] = $link->get_label();
+		}
+
+		return $link_array;
+	}
+
+	/**
 	 * Adds Event start and end dates to dynamic sources
 	 *
 	 * @param array  $params    The params.
@@ -1387,13 +1486,13 @@ class Fusion_Dynamic_Data {
 		$params['event_date'] = [
 			'label'            => esc_html__( 'Event Date', 'fusion-builder' ),
 			'id'               => 'event_date',
-			'group'            => esc_attr__( 'Events Calendar', 'fusion-builder' ),
+			'group'            => esc_html__( 'Events Calendar', 'fusion-builder' ),
 			'options'          => $this->text_fields,
 			'ajax_on_template' => true,
 			'fields'           => [
 				'event_date_type' => [
 					'heading'     => esc_html__( 'Date Type', 'fusion-builder' ),
-					'description' => esc_html__( 'The date format is taken from Events Calendar plugin settings.', 'fusion-builder' ),
+					'description' => esc_html__( 'Choose your preferred date type.', 'fusion-builder' ),
 					'param_name'  => 'event_date_type',
 					'default'     => 'both',
 					'type'        => 'select',
@@ -1402,6 +1501,20 @@ class Fusion_Dynamic_Data {
 						'start_event_date' => esc_html__( 'Start Date', 'fusion-builder' ),
 						'end_event_date'   => esc_html__( 'End Date', 'fusion-builder' ),
 					],
+				],
+				'format'          => [
+					'heading'     => esc_html__( 'Format', 'fusion-builder' ),
+					'description' => __( 'Date format to use. If left empty, the date format will be taken from Events Calendar plugin settings. <a href="https://wordpress.org/support/article/formatting-date-and-time/" target="_blank" rel="noopener noreferrer">Formatting Date and Time</a>' ),
+					'param_name'  => 'format',
+					'value'       => '',
+					'type'        => 'text',
+				],
+				'time_range_sep'  => [
+					'heading'     => esc_html__( 'Time Range Separator', 'fusion-builder' ),
+					'description' => esc_html__( 'Set a time range separator, add whitespace if needed. If left empty, the separator will be taken from Events Calendar plugin settings.' ),
+					'param_name'  => 'time_range_sep',
+					'value'       => '',
+					'type'        => 'text',
 				],
 			],
 			'callback'         => [
@@ -1440,6 +1553,461 @@ class Fusion_Dynamic_Data {
 					'default'     => '',
 					'type'        => 'text',
 				],
+			],
+		];
+
+		$params['event_cost'] = [
+			'label'            => esc_html__( 'Event Cost', 'fusion-builder' ),
+			'id'               => 'event_cost',
+			'group'            => esc_html__( 'Events Calendar', 'fusion-builder' ),
+			'options'          => $this->text_fields,
+			'ajax_on_template' => true,
+			'fields'           => [
+				'currency'          => [
+					'heading'     => esc_html__( 'Display Currency', 'fusion-builder' ),
+					'description' => esc_html__( 'Choose how the currency should be displayed.', 'fusion-builder' ),
+					'param_name'  => 'currency',
+					'default'     => 'symbol',
+					'type'        => 'radio_button_set',
+					'value'       => [
+						'symbol' => esc_html__( 'Symbol', 'fusion-builder' ),
+						'code'   => esc_html__( 'Code', 'fusion-builder' ),
+						'none'   => esc_html__( 'None', 'fusion-builder' ),
+					],
+				],
+				'currency_position' => [
+					'heading'     => esc_html__( 'Currency Position', 'fusion-builder' ),
+					'description' => esc_html__( 'Choose where the currency should be displayed.', 'fusion-builder' ),
+					'param_name'  => 'currency_position',
+					'default'     => '',
+					'type'        => 'radio_button_set',
+					'value'       => [
+						'prefix' => esc_html__( 'Before', 'fusion-builder' ),
+						'suffix' => esc_html__( 'After', 'fusion-builder' ),
+						''       => esc_html__( 'Default', 'fusion-builder' ),
+					],
+				],
+			],
+			'callback'         => [
+				'function' => 'get_event_cost',
+				'ajax'     => true,
+			],
+		];
+
+		$params['event_status'] = [
+			'label'            => esc_html__( 'Event Status', 'fusion-builder' ),
+			'id'               => 'event_status',
+			'group'            => esc_html__( 'Events Calendar', 'fusion-builder' ),
+			'options'          => $this->text_fields,
+			'ajax_on_template' => true,
+			'fields'           => [
+				'display_reason' => [
+					'heading'     => esc_html__( 'Display Reason', 'fusion-builder' ),
+					'description' => esc_html__( 'Choose if the status reason should be displayed.', 'fusion-builder' ),
+					'param_name'  => 'display_reason',
+					'default'     => 'no',
+					'type'        => 'radio_button_set',
+					'value'       => [
+						'yes' => esc_html__( 'Yes', 'fusion-builder' ),
+						'no'  => esc_html__( 'No', 'fusion-builder' ),
+					],
+				],
+			],
+			'callback'         => [
+				'function' => 'get_event_status',
+				'ajax'     => true,
+			],
+		];
+
+		if ( class_exists( 'Tribe__Events__Pro__Main' ) ) {
+			$params['event_series_name'] = [
+				'label'    => esc_html__( 'Event Series Name', 'fusion-builder' ),
+				'id'       => 'event_series_name',
+				'group'    => esc_html__( 'Events Calendar', 'fusion-builder' ),
+				'options'  => $this->text_fields,
+				'callback' => [
+					'function' => 'get_event_series_name',
+					'ajax'     => true,
+				],
+			];
+
+			$params['event_series_url'] = [
+				'label'    => esc_html__( 'Event Series URL', 'fusion-builder' ),
+				'id'       => 'event_series_url',
+				'group'    => esc_html__( 'Events Calendar', 'fusion-builder' ),
+				'options'  => $this->link_and_text_fields,
+				'callback' => [
+					'function' => 'get_event_series_url',
+					'ajax'     => true,
+				],
+			];
+		}
+
+		$params['event_website'] = [
+			'label'    => esc_html__( 'Event Website', 'fusion-builder' ),
+			'id'       => 'event_website',
+			'group'    => esc_html__( 'Events Calendar', 'fusion-builder' ),
+			'options'  => $this->link_and_text_fields,
+			'callback' => [
+				'function' => 'get_event_website',
+				'ajax'     => true,
+			],
+		];
+
+		$params['event_subscribe_link'] = [
+			'label'    => esc_html__( 'Event Subscribe Link', 'fusion-builder' ),
+			'id'       => 'event_subscribe_link',
+			'group'    => esc_html__( 'Events Calendar', 'fusion-builder' ),
+			'options'  => $this->link_and_text_fields,
+			'fields'   => [
+				'calendar' => [
+					'heading'     => esc_html__( 'Calendar', 'fusion-builder' ),
+					'description' => esc_html__( 'Select the calendar for which the subscribe link should be generated.', 'fusion-builder' ),
+					'param_name'  => 'calendar',
+					'default'     => 'all',
+					'type'        => 'select',
+					'value'       => $this->get_tec_subscribe_links(),
+				],
+			],
+			'callback' => [
+				'function' => 'get_event_subscribe_link',
+				'ajax'     => true,
+			],
+		];
+
+		$params['event_venue_name'] = [
+			'label'    => esc_html__( 'Event Venue Name', 'fusion-builder' ),
+			'id'       => 'event_venue_name',
+			'group'    => esc_html__( 'Events Calendar', 'fusion-builder' ),
+			'options'  => $this->text_fields,
+			'callback' => [
+				'function' => 'get_event_venue_name',
+				'ajax'     => true,
+			],
+		];
+
+		$params['event_venue_url'] = [
+			'label'    => esc_html__( 'Event Venue URL', 'fusion-builder' ),
+			'id'       => 'event_venue_url',
+			'group'    => esc_html__( 'Events Calendar', 'fusion-builder' ),
+			'options'  => $this->link_and_text_fields,
+			'callback' => [
+				'function' => 'get_event_venue_url',
+				'ajax'     => true,
+			],
+		];
+
+		$params['event_venue_post_content'] = [
+			'label'    => esc_html__( 'Event Venue Post Content', 'fusion-builder' ),
+			'id'       => 'event_venue_post_content',
+			'group'    => esc_html__( 'Events Calendar', 'fusion-builder' ),
+			'options'  => $this->link_and_text_fields,
+			'fields'   => [
+				'content_type'   => [
+					'type'        => 'radio_button_set',
+					'heading'     => esc_html__( 'Content Display', 'fusion-builder' ),
+					'description' => esc_html__( 'Controls if the post content is displayed as excerpt or full content.', 'fusion-builder' ),
+					'param_name'  => 'content_type',
+					'default'     => 'excerpt',
+					'value'       => [
+						'excerpt'      => esc_html__( 'Excerpt', 'fusion-builder' ),
+						'full_content' => esc_html__( 'Full Content', 'fusion-builder' ),
+					],
+				],
+				'excerpt_length' => [
+					'type'        => 'range',
+					'heading'     => esc_html__( 'Excerpt Length', 'fusion-builder' ),
+					'description' => sprintf( __( 'Controls the number of %s in the excerpt.', 'fusion-builder' ), Fusion_Settings::get_instance()->get_default_description( 'excerpt_base', false, 'no_desc' ) ),
+					'param_name'  => 'excerpt_length',
+					'value'       => '55',
+					'min'         => '0',
+					'max'         => '500',
+					'step'        => '1',
+				],
+			],
+			'callback' => [
+				'function' => 'get_event_venue_post_content',
+				'ajax'     => true,
+			],
+		];
+
+		$params['event_venue_address'] = [
+			'label'    => esc_html__( 'Event Venue Address', 'fusion-builder' ),
+			'id'       => 'event_venue_address',
+			'group'    => esc_html__( 'Events Calendar', 'fusion-builder' ),
+			'options'  => $this->text_fields,
+			'callback' => [
+				'function' => 'get_event_venue_address',
+				'ajax'     => true,
+			],
+		];
+
+		$params['event_venue_city'] = [
+			'label'    => esc_html__( 'Event Venue City', 'fusion-builder' ),
+			'id'       => 'event_venue_city',
+			'group'    => esc_html__( 'Events Calendar', 'fusion-builder' ),
+			'options'  => $this->text_fields,
+			'callback' => [
+				'function' => 'get_event_venue_city',
+				'ajax'     => true,
+			],
+		];
+
+		$params['event_venue_country'] = [
+			'label'    => esc_html__( 'Event Venue Country', 'fusion-builder' ),
+			'id'       => 'event_venue_country',
+			'group'    => esc_html__( 'Events Calendar', 'fusion-builder' ),
+			'options'  => $this->text_fields,
+			'callback' => [
+				'function' => 'get_event_venue_country',
+				'ajax'     => true,
+			],
+		];
+
+		$params['event_venue_state_province'] = [
+			'label'    => esc_html__( 'Event Venue State / Province', 'fusion-builder' ),
+			'id'       => 'event_venue_state_province',
+			'group'    => esc_html__( 'Events Calendar', 'fusion-builder' ),
+			'options'  => $this->text_fields,
+			'callback' => [
+				'function' => 'get_event_venue_state_province',
+				'ajax'     => true,
+			],
+		];
+
+		$params['event_venue_zip'] = [
+			'label'    => esc_html__( 'Event Venue Postal Code', 'fusion-builder' ),
+			'id'       => 'event_venue_zip',
+			'group'    => esc_html__( 'Events Calendar', 'fusion-builder' ),
+			'options'  => $this->text_fields,
+			'callback' => [
+				'function' => 'get_event_venue_zip',
+				'ajax'     => true,
+			],
+		];
+
+		$params['event_venue_phone'] = [
+			'label'    => esc_html__( 'Event Venue Phone', 'fusion-builder' ),
+			'id'       => 'event_venue_phone',
+			'group'    => esc_html__( 'Events Calendar', 'fusion-builder' ),
+			'options'  => $this->text_fields,
+			'callback' => [
+				'function' => 'get_event_venue_phone',
+				'ajax'     => true,
+			],
+		];
+
+		$params['event_venue_website'] = [
+			'label'    => esc_html__( 'Event Venue Website', 'fusion-builder' ),
+			'id'       => 'event_venue_website',
+			'group'    => esc_html__( 'Events Calendar', 'fusion-builder' ),
+			'options'  => $this->link_and_text_fields,
+			'callback' => [
+				'function' => 'get_event_venue_website',
+				'ajax'     => true,
+			],
+		];
+
+		$params['event_venue_gmap_link'] = [
+			'label'    => esc_html__( 'Event Venue Google Maps Link', 'fusion-builder' ),
+			'id'       => 'event_venue_gmap_link',
+			'group'    => esc_html__( 'Events Calendar', 'fusion-builder' ),
+			'options'  => $this->link_and_text_fields,
+			'callback' => [
+				'function' => 'get_event_venue_gmap_link',
+				'ajax'     => true,
+			],
+		];
+
+		$params['event_venue_full_address'] = [
+			'label'    => esc_html__( 'Event Venue Full Address', 'fusion-builder' ),
+			'id'       => 'event_venue_full_address',
+			'group'    => esc_html__( 'Events Calendar', 'fusion-builder' ),
+			'options'  => $this->text_fields,
+			'callback' => [
+				'function' => 'get_event_venue_full_address',
+				'ajax'     => true,
+			],
+		];
+
+		if ( class_exists( 'Tribe__Events__Pro__Main' ) ) {
+			$params['event_venue_address_latitude'] = [
+				'label'    => esc_html__( 'Event Venue Address Latitude', 'fusion-builder' ),
+				'id'       => 'event_venue_address_latitude',
+				'group'    => esc_html__( 'Events Calendar', 'fusion-builder' ),
+				'options'  => $this->link_and_text_fields,
+				'callback' => [
+					'function' => 'get_event_venue_address_latitude',
+					'ajax'     => true,
+				],
+			];
+
+			$params['event_venue_address_longitude'] = [
+				'label'    => esc_html__( 'Event Venue Address Longitude', 'fusion-builder' ),
+				'id'       => 'event_venue_address_longitude',
+				'group'    => esc_html__( 'Events Calendar', 'fusion-builder' ),
+				'options'  => $this->link_and_text_fields,
+				'callback' => [
+					'function' => 'get_event_venue_address_longitude',
+					'ajax'     => true,
+				],
+			];
+		}
+
+		$params['event_organizer_name'] = [
+			'label'    => esc_html__( 'Event Organizer Name', 'fusion-builder' ),
+			'id'       => 'event_organizer_name',
+			'group'    => esc_html__( 'Events Calendar', 'fusion-builder' ),
+			'options'  => $this->text_fields,
+			'callback' => [
+				'function' => 'get_event_organizer_name',
+				'ajax'     => true,
+			],
+		];
+
+		$params['event_organizer_url'] = [
+			'label'    => esc_html__( 'Event Organizer URL', 'fusion-builder' ),
+			'id'       => 'event_organizer_url',
+			'group'    => esc_html__( 'Events Calendar', 'fusion-builder' ),
+			'options'  => $this->link_and_text_fields,
+			'callback' => [
+				'function' => 'get_event_organizer_url',
+				'ajax'     => true,
+			],
+		];
+
+		$params['event_organizer_post_content'] = [
+			'label'    => esc_html__( 'Event Organizer Post Content', 'fusion-builder' ),
+			'id'       => 'event_organizer_post_content',
+			'group'    => esc_html__( 'Events Calendar', 'fusion-builder' ),
+			'options'  => $this->link_and_text_fields,
+			'callback' => [
+				'function' => 'get_event_organizer_post_content',
+				'ajax'     => true,
+			],
+		];
+
+		$params['event_organizer_post_content'] = [
+			'label'    => esc_html__( 'Event Organizer Post Content', 'fusion-builder' ),
+			'id'       => 'event_organizer_post_content',
+			'group'    => esc_html__( 'Events Calendar', 'fusion-builder' ),
+			'options'  => $this->link_and_text_fields,
+			'fields'   => [
+				'content_type'   => [
+					'type'        => 'radio_button_set',
+					'heading'     => esc_html__( 'Content Display', 'fusion-builder' ),
+					'description' => esc_html__( 'Controls if the post content is displayed as excerpt or full content.', 'fusion-builder' ),
+					'param_name'  => 'content_type',
+					'default'     => 'excerpt',
+					'value'       => [
+						'excerpt'      => esc_html__( 'Excerpt', 'fusion-builder' ),
+						'full_content' => esc_html__( 'Full Content', 'fusion-builder' ),
+					],
+				],
+				'excerpt_length' => [
+					'type'        => 'range',
+					'heading'     => esc_html__( 'Excerpt Length', 'fusion-builder' ),
+					'description' => sprintf( __( 'Controls the number of %s in the excerpt.', 'fusion-builder' ), Fusion_Settings::get_instance()->get_default_description( 'excerpt_base', false, 'no_desc' ) ),
+					'param_name'  => 'excerpt_length',
+					'value'       => '55',
+					'min'         => '0',
+					'max'         => '500',
+					'step'        => '1',
+				],
+			],
+			'callback' => [
+				'function' => 'get_event_organizer_post_content',
+				'ajax'     => true,
+			],
+		];
+
+		$params['event_organizer_phone'] = [
+			'label'    => esc_html__( 'Event Organizer Phone', 'fusion-builder' ),
+			'id'       => 'event_organizer_phone',
+			'group'    => esc_html__( 'Events Calendar', 'fusion-builder' ),
+			'options'  => $this->text_fields,
+			'callback' => [
+				'function' => 'get_event_organizer_phone',
+				'ajax'     => true,
+			],
+		];
+
+		$params['event_organizer_email'] = [
+			'label'    => esc_html__( 'Event Organizer Email', 'fusion-builder' ),
+			'id'       => 'event_organizer_email',
+			'group'    => esc_html__( 'Events Calendar', 'fusion-builder' ),
+			'options'  => $this->text_fields,
+			'callback' => [
+				'function' => 'get_event_organizer_email',
+				'ajax'     => true,
+			],
+		];
+
+		$params['event_organizer_website'] = [
+			'label'    => esc_html__( 'Event Organizer Website', 'fusion-builder' ),
+			'id'       => 'event_organizer_website',
+			'group'    => esc_html__( 'Events Calendar', 'fusion-builder' ),
+			'options'  => $this->link_and_text_fields,
+			'callback' => [
+				'function' => 'get_event_organizer_website',
+				'ajax'     => true,
+			],
+		];
+
+		if ( class_exists( 'Tribe__Tickets__Main', false ) ) {
+			$params['event_ticket_capacity'] = [
+				'label'    => esc_html__( 'Event Ticket Capacity', 'fusion-builder' ),
+				'id'       => 'event_ticket_capacity',
+				'group'    => esc_html__( 'Events Calendar', 'fusion-builder' ),
+				'options'  => $this->text_fields,
+				/*
+				'fields'   => [
+					'ticket_id'          => [
+						'heading'     => esc_html__( 'Ticket ID', 'fusion-builder' ),
+						'description' => esc_html__( 'Specify the ID of the ticket you want to get the capacity for. Leave empty to get total capacity of all tickets related to the event.', 'fusion-builder' ),
+						'param_name'  => 'ticket_id',
+						'value'       => '',
+						'type'        => 'text',
+					],
+				],
+				*/
+				'callback' => [
+					'function' => 'get_event_ticket_capacity',
+					'ajax'     => true,
+				],
+			];
+
+			$params['event_ticket_availability'] = [
+				'label'    => esc_html__( 'Event Ticket Availability', 'fusion-builder' ),
+				'id'       => 'event_ticket_availability',
+				'group'    => esc_html__( 'Events Calendar', 'fusion-builder' ),
+				'options'  => $this->text_fields,
+				/*
+				'fields'   => [
+					'ticket_id'          => [
+						'heading'     => esc_html__( 'Ticket ID', 'fusion-builder' ),
+						'description' => esc_html__( 'Specify the ID of the ticket you want to get the number of available/purchaseable tickets for. Leave empty to get totally available tickets related to the event.', 'fusion-builder' ),
+						'param_name'  => 'ticket_id',
+						'value'       => '',
+						'type'        => 'text',
+					],
+				],
+				*/
+				'callback' => [
+					'function' => 'get_event_ticket_availability',
+					'ajax'     => true,
+				],
+			];
+		}
+
+		$params['main_events_page_url'] = [
+			'label'    => esc_html__( 'Main Events Page URL', 'fusion-builder' ),
+			'id'       => 'main_events_page_url',
+			'group'    => esc_html__( 'Events Calendar', 'fusion-builder' ),
+			'options'  => $this->link_and_text_fields,
+			'callback' => [
+				'function' => 'get_main_events_page_url',
+				'ajax'     => true,
 			],
 		];
 
@@ -1554,20 +2122,41 @@ class Fusion_Dynamic_Data {
 			$repeater_options     = false;
 			$relationship_options = false;
 			$color_options        = false;
+			$icon_options         = false;
 			$string_option_types  = [ 'text', 'textarea', 'number', 'range', 'wysiwyg', 'raw_textarea', 'raw_text' ];
 			$bulk_image_options   = [];
 			$all_fields           = array_unique( array_merge( $this->link_and_text_fields, $this->file_fields, $this->number_fields, [ 'iconpicker' ], $this->color_fields ) );
 
 			// In builder get fields active for post type for each group.
 			if ( $this->get_builder_status() ) {
-				$groups = acf_get_field_groups( [ 'post_id' => $post_id ] );
+				$groups   = acf_get_field_groups( [ 'post_id' => $post_id ] );
+				$groups[] = [ 'key' => 'options' ];
+
 				foreach ( $groups as $group ) {
 
-					// Get fields for group and check for text or image types.
-					$fields = acf_get_fields( $group['key'] );
+					// Get fields for options pages.
+					if ( 'options' === $group['key'] ) {
+						$option_pages_fields = get_fields( 'options' );
+						$fields              = [];
 
+						if ( $option_pages_fields && is_array( $option_pages_fields ) ) {
+							foreach ( $option_pages_fields as $slug => $value ) {
+								$fields[] = acf_get_field( $slug, 'option' );
+							}
+						}
+					} else {
+
+						// Get fields for group.
+						$fields = acf_get_fields( $group['key'] );
+					}
+
+					// check fields for types.
 					if ( $fields && is_array( $fields ) ) {
 						foreach ( $fields as $field ) {
+							if ( 'options' === $group['key'] ) {
+								$field['name'] = 'awb_acfop_' . $field['name'];
+							}
+
 							if ( in_array( $field['type'], $string_option_types, true ) ) {
 								$text_options[ $field['name'] ] = $field['label'];
 							} elseif ( 'image' === $field['type'] ) {
@@ -1584,6 +2173,8 @@ class Fusion_Dynamic_Data {
 								$relationship_options = true;
 							} elseif ( 'color_picker' === $field['type'] ) {
 								$color_options = true;
+							} elseif ( 'icon_picker' === $field['type'] ) {
+								$icon_options[ $field['name'] ] = $field['label'];
 							}
 						}
 					}
@@ -1813,6 +2404,31 @@ class Fusion_Dynamic_Data {
 				];
 			}
 
+			// In builder and have image options add option, on front-end add for callback availability.
+			if ( ! $this->get_builder_status() || ! empty( $icon_options ) || $this->is_template_edited() ) {
+				$params['acf_iconpicker'] = [
+					'label'    => esc_html__( 'ACF Icon Picker', 'fusion-builder' ),
+					'id'       => 'acf_iconpicker',
+					'group'    => esc_attr__( 'Advanced Custom Fields', 'fusion-builder' ),
+					'callback' => [
+						'function' => 'acf_get_iconpicker_field',
+						'ajax'     => true,
+					],
+					'exclude'  => [ 'before', 'after', 'fallback' ],
+					'options'  => array_unique( array_merge( $this->icon_fields, $this->image_fields ) ),
+					'fields'   => [
+						'field' => [
+							'heading'     => esc_html__( 'Field', 'fusion-builder' ),
+							'description' => $this->is_template_edited() ? esc_html__( 'Enter field name you want to use.', 'fusion-builder' ) : esc_html__( 'Which field you want to use.', 'fusion-builder' ),
+							'param_name'  => 'field',
+							'default'     => '',
+							'type'        => $this->is_template_edited() ? 'text' : 'select',
+							'value'       => $icon_options,
+						],
+					],
+				];
+			}
+
 			// In builder and have video options add option, on front-end add for callback availability.
 			if ( ! $this->get_builder_status() || ! empty( $file_options ) || $this->is_template_edited() ) {
 				$params['acf_file'] = [
@@ -1921,6 +2537,39 @@ class Fusion_Dynamic_Data {
 		];
 
 		if ( is_product() || 'product' === $post_type || $this->is_template_edited() || ! $this->get_builder_status() ) {
+			$params['product_last_purchased'] = [
+				/* translators: Single post type date. */
+				'label'    => esc_html__( 'Product Last Purchased', 'fusion-builder' ),
+				'id'       => 'product_last_purchased',
+				'group'    => esc_attr__( 'WooCommerce', 'fusion-builder' ),
+				'options'  => $this->text_fields,
+				'default'  => current_time( get_option( 'date_format' ) ),
+				'callback' => [
+					'function' => 'woo_get_product_last_purchased',
+					'ajax'     => true,
+				],
+				'fields'   => [
+					'limit_to_user' => [
+						'type'        => 'radio_button_set',
+						'heading'     => esc_html__( 'Limit To Current User', 'fusion-builder' ),
+						'description' => esc_html__( 'Decide if the purchase check should be limited to the currently visiting user.', 'fusion-builder' ),
+						'param_name'  => 'limit_to_user',
+						'default'     => 'yes',
+						'value'       => [
+							'yes' => esc_attr__( 'Yes', 'fusion-builder' ),
+							'no'  => esc_attr__( 'No', 'fusion-builder' ),
+						],
+					],
+					'format'        => [
+						'heading'     => esc_html__( 'Date Format', 'fusion-builder' ),
+						'description' => __( 'Date format to use. <a href="https://wordpress.org/support/article/formatting-date-and-time/" target="_blank" rel="noopener noreferrer">Formatting Date and Time</a>' ),
+						'param_name'  => 'date_format',
+						'value'       => get_option( 'date_format' ),
+						'type'        => 'text',
+					],
+				],
+			];
+
 			$params['woo_price'] = [
 				'label'    => esc_html__( 'Product Price', 'fusion-builder' ),
 				'id'       => 'woo_price',
@@ -1978,7 +2627,7 @@ class Fusion_Dynamic_Data {
 			$params['woo_sku'] = [
 				'label'    => esc_html__( 'Product SKU', 'fusion-builder' ),
 				'id'       => 'woo_sku',
-				'group'    => esc_attr__( 'WooCommerce', 'fusion-builder' ),
+				'group'    => esc_html__( 'WooCommerce', 'fusion-builder' ),
 				'options'  => $this->text_fields,
 				'default'  => '123',
 				'callback' => [
@@ -1990,7 +2639,7 @@ class Fusion_Dynamic_Data {
 			$params['woo_stock'] = [
 				'label'    => esc_html__( 'Product Stock', 'fusion-builder' ),
 				'id'       => 'woo_stock',
-				'group'    => esc_attr__( 'WooCommerce', 'fusion-builder' ),
+				'group'    => esc_html__( 'WooCommerce', 'fusion-builder' ),
 				'options'  => $this->text_fields,
 				'default'  => '10',
 				'callback' => [
@@ -1999,10 +2648,22 @@ class Fusion_Dynamic_Data {
 				],
 			];
 
+			$params['woo_product_total_sales'] = [
+				'label'    => esc_html__( 'Product Total Sales', 'fusion-builder' ),
+				'id'       => 'woo_product_total_sales',
+				'group'    => esc_html__( 'WooCommerce', 'fusion-builder' ),
+				'options'  => $this->text_fields,
+				'default'  => '10',
+				'callback' => [
+					'function' => 'woo_get_product_total_sales',
+					'ajax'     => true,
+				],
+			];
+
 			$params['woo_gallery'] = [
 				'label'    => esc_html__( 'Woo Gallery', 'fusion-builder' ),
 				'id'       => 'woo_gallery',
-				'group'    => esc_attr__( 'WooCommerce', 'fusion-builder' ),
+				'group'    => esc_html__( 'WooCommerce', 'fusion-builder' ),
 				'options'  => [ 'multiple_upload' ],
 				'exclude'  => [ 'before', 'after', 'fallback' ],
 				'callback' => [
@@ -2014,7 +2675,7 @@ class Fusion_Dynamic_Data {
 			$params['woo_add_to_cart'] = [
 				'label'    => esc_html__( 'Add To Cart', 'fusion-builder' ),
 				'id'       => 'woo_add_to_cart',
-				'group'    => esc_attr__( 'WooCommerce', 'fusion-builder' ),
+				'group'    => esc_html__( 'WooCommerce', 'fusion-builder' ),
 				'options'  => $this->link_fields,
 				'exclude'  => [ 'before', 'after' ],
 				'callback' => [
@@ -2026,7 +2687,7 @@ class Fusion_Dynamic_Data {
 			$params['woo_quick_view'] = [
 				'label'    => esc_html__( 'Quick View', 'fusion-builder' ),
 				'id'       => 'woo_quick_view',
-				'group'    => esc_attr__( 'WooCommerce', 'fusion-builder' ),
+				'group'    => esc_html__( 'WooCommerce', 'fusion-builder' ),
 				'options'  => $this->link_fields,
 				'exclude'  => [ 'before', 'after' ],
 				'callback' => [
@@ -2038,7 +2699,7 @@ class Fusion_Dynamic_Data {
 			$params['woo_category_thumbnail'] = [
 				'label'    => esc_html__( 'Category Thumbnail', 'fusion-builder' ),
 				'id'       => 'woo_category_thumbnail',
-				'group'    => esc_attr__( 'WooCommerce', 'fusion-builder' ),
+				'group'    => esc_html__( 'WooCommerce', 'fusion-builder' ),
 				'options'  => $this->image_fields,
 				'exclude'  => [ 'before', 'after' ],
 				'callback' => [
@@ -2051,7 +2712,7 @@ class Fusion_Dynamic_Data {
 		$params['woo_shop_page_url'] = [
 			'label'    => esc_html__( 'Shop Page URL', 'fusion-builder' ),
 			'id'       => 'woo_shop_page_url',
-			'group'    => esc_attr__( 'WooCommerce', 'fusion-builder' ),
+			'group'    => esc_html__( 'WooCommerce', 'fusion-builder' ),
 			'options'  => $this->link_and_text_fields,
 			'callback' => [
 				'function' => 'woo_shop_page_url',
@@ -2062,7 +2723,7 @@ class Fusion_Dynamic_Data {
 		$params['woo_cart_page_url'] = [
 			'label'    => esc_html__( 'Cart Page URL', 'fusion-builder' ),
 			'id'       => 'woo_cart_page_url',
-			'group'    => esc_attr__( 'WooCommerce', 'fusion-builder' ),
+			'group'    => esc_html__( 'WooCommerce', 'fusion-builder' ),
 			'options'  => $this->link_and_text_fields,
 			'callback' => [
 				'function' => 'woo_cart_page_url',
@@ -2073,7 +2734,7 @@ class Fusion_Dynamic_Data {
 		$params['woo_checkout_page_url'] = [
 			'label'    => esc_html__( 'Checkout Page URL', 'fusion-builder' ),
 			'id'       => 'woo_checkout_page_url',
-			'group'    => esc_attr__( 'WooCommerce', 'fusion-builder' ),
+			'group'    => esc_html__( 'WooCommerce', 'fusion-builder' ),
 			'options'  => $this->link_and_text_fields,
 			'callback' => [
 				'function' => 'woo_checkout_page_url',
@@ -2084,7 +2745,7 @@ class Fusion_Dynamic_Data {
 		$params['woo_myaccount_page_url'] = [
 			'label'    => esc_html__( 'My Account Page URL', 'fusion-builder' ),
 			'id'       => 'woo_myaccount_page_url',
-			'group'    => esc_attr__( 'WooCommerce', 'fusion-builder' ),
+			'group'    => esc_html__( 'WooCommerce', 'fusion-builder' ),
 			'options'  => $this->link_and_text_fields,
 			'callback' => [
 				'function' => 'woo_myaccount_page_url',
@@ -2096,7 +2757,7 @@ class Fusion_Dynamic_Data {
 		$params['woo_tnc_page_url'] = [
 			'label'    => esc_html__( 'Terms & Conditions URL', 'fusion-builder' ),
 			'id'       => 'woo_tnc_page_url',
-			'group'    => esc_attr__( 'WooCommerce', 'fusion-builder' ),
+			'group'    => esc_html__( 'WooCommerce', 'fusion-builder' ),
 			'options'  => $this->link_fields,
 			'callback' => [
 				'function' => 'woo_tnc_page_url',
@@ -2107,7 +2768,7 @@ class Fusion_Dynamic_Data {
 		$params['woo_sale_date'] = [
 			'label'    => esc_html__( 'Sale Date', 'fusion-builder' ),
 			'id'       => 'woo_sale_date',
-			'group'    => esc_attr__( 'WooCommerce', 'fusion-builder' ),
+			'group'    => esc_html__( 'WooCommerce', 'fusion-builder' ),
 			'options'  => $this->date_time_picker,
 			'default'  => '',
 			'callback' => [
@@ -2140,7 +2801,7 @@ class Fusion_Dynamic_Data {
 		$params['woo_cart_count'] = [
 			'label'    => esc_html__( 'Cart Count', 'fusion-builder' ),
 			'id'       => 'woo_cart_count',
-			'group'    => esc_attr__( 'WooCommerce', 'fusion-builder' ),
+			'group'    => esc_html__( 'WooCommerce', 'fusion-builder' ),
 			'options'  => $this->text_fields,
 			'fields'   => [
 				'singular_text' => [
@@ -2167,7 +2828,7 @@ class Fusion_Dynamic_Data {
 		$params['woo_cart_total'] = [
 			'label'    => esc_html__( 'Cart Total', 'fusion-builder' ),
 			'id'       => 'woo_get_cart_total',
-			'group'    => esc_attr__( 'WooCommerce', 'fusion-builder' ),
+			'group'    => esc_html__( 'WooCommerce', 'fusion-builder' ),
 			'options'  => $this->text_fields,
 			'callback' => [
 				'function' => 'woo_get_cart_total',
@@ -2180,7 +2841,7 @@ class Fusion_Dynamic_Data {
 			$params['woo_order_number'] = [
 				'label'    => esc_html__( 'Order Number', 'fusion-builder' ),
 				'id'       => 'woo_order_number',
-				'group'    => esc_attr__( 'WooCommerce', 'fusion-builder' ),
+				'group'    => esc_html__( 'WooCommerce', 'fusion-builder' ),
 				'options'  => $this->text_fields,
 				'callback' => [
 					'function' => 'awb_woo_order_number',
@@ -2192,7 +2853,7 @@ class Fusion_Dynamic_Data {
 			$params['woo_order_date'] = [
 				'label'    => esc_html__( 'Order Date', 'fusion-builder' ),
 				'id'       => 'woo_order_date',
-				'group'    => esc_attr__( 'WooCommerce', 'fusion-builder' ),
+				'group'    => esc_html__( 'WooCommerce', 'fusion-builder' ),
 				'options'  => $this->text_fields,
 				'callback' => [
 					'function' => 'awb_woo_order_date',
@@ -2204,7 +2865,7 @@ class Fusion_Dynamic_Data {
 			$params['woo_order_billing_email'] = [
 				'label'    => esc_html__( 'Order Billing Email', 'fusion-builder' ),
 				'id'       => 'woo_order_billing_email',
-				'group'    => esc_attr__( 'WooCommerce', 'fusion-builder' ),
+				'group'    => esc_html__( 'WooCommerce', 'fusion-builder' ),
 				'options'  => $this->text_fields,
 				'callback' => [
 					'function' => 'awb_woo_order_billing_email',
@@ -2216,7 +2877,7 @@ class Fusion_Dynamic_Data {
 			$params['woo_order_total'] = [
 				'label'    => esc_html__( 'Order Total', 'fusion-builder' ),
 				'id'       => 'woo_order_total',
-				'group'    => esc_attr__( 'WooCommerce', 'fusion-builder' ),
+				'group'    => esc_html__( 'WooCommerce', 'fusion-builder' ),
 				'options'  => $this->text_fields,
 				'callback' => [
 					'function' => 'awb_woo_order_total',
@@ -2228,7 +2889,7 @@ class Fusion_Dynamic_Data {
 			$params['woo_order_payment_method'] = [
 				'label'    => esc_html__( 'Order Payment Method', 'fusion-builder' ),
 				'id'       => 'woo_order_payment_method',
-				'group'    => esc_attr__( 'WooCommerce', 'fusion-builder' ),
+				'group'    => esc_html__( 'WooCommerce', 'fusion-builder' ),
 				'options'  => $this->text_fields,
 				'callback' => [
 					'function' => 'awb_woo_order_payment_method',

@@ -363,24 +363,30 @@ class FusionCore_Plugin {
 
 		if ( ! $fusion_settings ) {
 			$fusion_settings_array = [
-				'portfolio_slug' => 'portfolio-items',
-				'faq_slug'       => 'faq-items',
-				'status_eslider' => '1',
+				'portfolio_slug'       => 'portfolio-items',
+				'portfolio_with_front' => true,
+				'faq_slug'             => 'faq-items',
+				'faq_with_front'       => true,
+				'status_eslider'       => '1',
 			];
 			if ( class_exists( 'Fusion_Settings' ) ) {
 				$fusion_settings = Fusion_Settings::get_instance();
 
 				$fusion_settings_array = [
-					'portfolio_slug' => $fusion_settings->get( 'portfolio_slug' ),
-					'faq_slug'       => $fusion_settings->get( 'faq_slug' ),
-					'status_eslider' => $fusion_settings->get( 'status_eslider' ),
+					'portfolio_slug'       => $fusion_settings->get( 'portfolio_slug' ),
+					'portfolio_with_front' => '0' === $fusion_settings->get( 'portfolio_with_front' ) ? false : true,
+					'faq_slug'             => $fusion_settings->get( 'faq_slug' ),
+					'faq_with_front'       => '0' === $fusion_settings->get( 'faq_with_front' ) ? false : true,
+					'status_eslider'       => $fusion_settings->get( 'status_eslider' ),
 				];
 			}
 		} else {
 			$fusion_settings_array = [
-				'portfolio_slug' => $fusion_settings->get( 'portfolio_slug' ),
-				'faq_slug'       => $fusion_settings->get( 'faq_slug' ),
-				'status_eslider' => $fusion_settings->get( 'status_eslider' ),
+				'portfolio_slug'       => $fusion_settings->get( 'portfolio_slug' ),
+				'portfolio_with_front' => '0' === $fusion_settings->get( 'portfolio_with_front' ) ? false : true,
+				'faq_slug'             => $fusion_settings->get( 'faq_slug' ),
+				'faq_with_front'       => '0' === $fusion_settings->get( 'faq_with_front' ) ? false : true,
+				'status_eslider'       => $fusion_settings->get( 'status_eslider' ),
 			];
 		}
 
@@ -407,7 +413,8 @@ class FusionCore_Plugin {
 					'show_ui'      => apply_filters( 'awb_role_manager_access_capability', true, 'avada_portfolio' ),
 					'show_in_menu' => apply_filters( 'awb_role_manager_access_capability', true, 'avada_portfolio' ),
 					'rewrite'      => [
-						'slug' => $fusion_settings_array['portfolio_slug'],
+						'slug'       => $fusion_settings_array['portfolio_slug'],
+						'with_front' => $fusion_settings_array['portfolio_with_front'],
 					],
 					'show_in_rest' => true,
 					'supports'     => [ 'title', 'editor', 'excerpt', 'author', 'thumbnail', 'comments', 'revisions', 'custom-fields', 'page-attributes', 'post-formats' ],
@@ -486,7 +493,8 @@ class FusionCore_Plugin {
 					'show_ui'      => apply_filters( 'awb_role_manager_access_capability', true, 'avada_faq' ),
 					'show_in_menu' => apply_filters( 'awb_role_manager_access_capability', true, 'avada_faq' ),
 					'rewrite'      => [
-						'slug' => $fusion_settings_array['faq_slug'],
+						'slug'       => $fusion_settings_array['faq_slug'],
+						'with_front' => $fusion_settings_array['faq_with_front'],
 					],
 					'show_in_rest' => true,
 					'supports'     => [ 'title', 'editor', 'excerpt', 'author', 'thumbnail', 'comments', 'revisions', 'custom-fields', 'page-attributes', 'post-formats' ],

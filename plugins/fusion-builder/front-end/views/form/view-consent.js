@@ -42,7 +42,7 @@ var FusionPageBuilder = FusionPageBuilder || {};
 					$option  += values.description + '</label>';
 					$option  += '</div>';
 				} else {
-					$option = '<p>' + values.description + '</p><input name="' + values.name + '" type="hidden" value="1"/>';
+					$option = '<p class="label">' + values.description + '</p><input name="' + values.name + '" type="hidden" value="1"/>';
 				}
 
 				if ( '' !== values.tooltip ) {

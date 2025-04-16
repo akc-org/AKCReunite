@@ -18,7 +18,13 @@ var FusionPageBuilder = FusionPageBuilder || {};
 			 */
 			onRender: function() {
 				var self = this,
-					parentView = FusionPageBuilderViewManager.getView( this.model.get( 'parent' ) );
+					parentCid   = this.model.get( 'parent' ),
+					parentView  = FusionPageBuilderViewManager.getView( parentCid );
+					parentModel = FusionPageBuilderElements.find( function( model ) {
+						return model.get( 'cid' ) == parentCid;
+					} ),
+					parentValues = jQuery.extend( true, {}, fusionAllElements.fusion_gallery.defaults, _.fusionCleanParameters( parentModel.get( 'params' ) ) ),
+					lightboxID          = '' !== parentValues.lightbox_id ? parentValues.lightbox_id : 'awb_gallery_' + parentCid;
 
 				if ( 'undefined' !== typeof this.model.attributes.selectors ) {
 					this.model.attributes.selectors[ 'class' ] += ' ' + this.className;
@@ -40,6 +46,10 @@ var FusionPageBuilder = FusionPageBuilder || {};
 					}
 				}, 50 );
 
+				if ( 'undefined' === typeof this.lightboxID ) {
+					this.lightboxID = 'iLightbox[' + lightboxID + ']';
+				}
+
 				this.initLightbox();
 			},
 
@@ -60,13 +70,35 @@ var FusionPageBuilder = FusionPageBuilder || {};
 			 */
 			initLightbox: function( remove ) {
 				var parentCid           = this.model.get( 'parent' ),
-					galleryLightboxName = 'iLightbox[awb_gallery_' + parentCid + ']',
+					parentModel = FusionPageBuilderElements.find( function( model ) {
+						return model.get( 'cid' ) == parentCid;
+					} ),
+					parentValues = jQuery.extend( true, {}, fusionAllElements.fusion_gallery.defaults, _.fusionCleanParameters( parentModel.get( 'params' ) ) ),
+					lightboxID          = '' !== parentValues.lightbox_id ? parentValues.lightbox_id : 'awb_gallery_' + parentCid,
+					galleryLightboxName = 'iLightbox[' + lightboxID + ']',
 					galleryLightbox,
 					elements,
 					link;
 
 				if ( 'object' !== typeof jQuery( '#fb-preview' )[ 0 ].contentWindow.$ilInstances ) {
 					return;
+				}
+
+				// Remove the last active lightbox. If it is one of a gallery, reinit the gallery, but without the image element.
+				if ( this.lightboxID && galleryLightboxName !== this.lightboxID && 'object' === typeof jQuery( '#fb-preview' )[ 0 ].contentWindow.avadaLightBox && this.lightboxID in jQuery( '#fb-preview' )[ 0 ].contentWindow.$ilInstances ) {
+					galleryLightbox   = jQuery( '#fb-preview' )[ 0 ].contentWindow.$ilInstances[ this.lightboxID ];
+					elements          = jQuery( '#fb-preview' )[ 0 ].contentWindow.jQuery( '.fusion-gallery' ).not( this.$el.closest( '.fusion-gallery' ) ).find( '[data-rel="' + this.lightboxID + '"]' );
+					elements          = elements.add(  jQuery( '#fb-preview' )[ 0 ].contentWindow.jQuery( '.fusion-imageframe' ).find( '[data-rel="' + this.lightboxID + '"]' ) );
+					link              = jQuery( '#fb-preview' )[ 0 ].contentWindow.jQuery( elements );
+
+					if ( 'undefined' !== typeof galleryLightbox ) {
+						galleryLightbox.destroy();
+						delete jQuery( '#fb-preview' )[ 0 ].contentWindow.$ilInstances[ this.lightboxID ];
+
+						if ( link.length ) {
+							jQuery( '#fb-preview' )[ 0 ].contentWindow.$ilInstances[ this.lightboxID ] = link.iLightBox( jQuery( '#fb-preview' )[ 0 ].contentWindow.avadaLightBox.prepare_options( this.lightboxID ) );
+						}
+					}
 				}
 
 				galleryLightbox = jQuery( '#fb-preview' )[ 0 ].contentWindow.$ilInstances[ galleryLightboxName ];
@@ -76,16 +108,20 @@ var FusionPageBuilder = FusionPageBuilder || {};
 				} else {
 					elements = this.$el.closest( '.fusion-gallery' ).find( '[data-rel="' + galleryLightboxName + '"]' );
 				}
-
 				link = jQuery( '#fb-preview' )[ 0 ].contentWindow.jQuery( elements );
 
 				if ( 'object' === typeof jQuery( '#fb-preview' )[ 0 ].contentWindow.avadaLightBox ) {
 					if ( 'undefined' !== typeof galleryLightbox ) {
 						galleryLightbox.destroy();
+						delete jQuery( '#fb-preview' )[ 0 ].contentWindow.$ilInstances[ galleryLightboxName ];
+					}
 
-						link.iLightBox( jQuery( '#fb-preview' )[ 0 ].contentWindow.avadaLightBox.prepare_options( galleryLightboxName ) );
+					if ( link.length ) {
+						jQuery( '#fb-preview' )[ 0 ].contentWindow.$ilInstances[ galleryLightboxName ] = link.iLightBox( jQuery( '#fb-preview' )[ 0 ].contentWindow.avadaLightBox.prepare_options( galleryLightboxName ) );
 					}
 				}
+
+				this.lightboxID = galleryLightboxName;
 			},
 
 			/**
@@ -96,7 +132,7 @@ var FusionPageBuilder = FusionPageBuilder || {};
 			 */
 			beforeRemove: function() {
 				var self = this,
-parentCid           = this.model.get( 'parent' ),
+					parentCid           = this.model.get( 'parent' ),
 					parentView          = FusionPageBuilderViewManager.getView( parentCid );
 
 				if ( 'undefined' !== typeof parentView.fusionIsotope ) {
@@ -283,10 +319,16 @@ parentCid           = this.model.get( 'parent' ),
 			 * @return {Object} - Returns the image attributes.
 			 */
 			buildImagesAttr: function( values ) {
-				var imagesAttr = {},
-					imageId    = this.model.attributes.params.image_id,
-					parentView = FusionPageBuilderViewManager.getView( this.model.get( 'parent' ) ),
-					image      = 'undefined' !== typeof parentView.imageMap ? parentView.imageMap.images[ imageId ] : undefined,
+				var imagesAttr  = {},
+					imageId     = this.model.attributes.params.image_id,
+					parentCid   = this.model.get( 'parent' ),
+					parentView  = FusionPageBuilderViewManager.getView( parentCid ),
+					parentModel  = FusionPageBuilderElements.find( function( model ) {
+						return model.get( 'cid' ) == parentCid;
+					} ),
+					parentValues = jQuery.extend( true, {}, fusionAllElements.fusion_gallery.defaults, _.fusionCleanParameters( parentModel.get( 'params' ) ) ),
+					lightboxID   = '' !== parentValues.lightbox_id ? parentValues.lightbox_id : 'awb_gallery_' + parentCid,
+					image        = 'undefined' !== typeof parentView.imageMap ? parentView.imageMap.images[ imageId ] : undefined,
 					columnSpacing,
 					isPortrait,
 					isLandscape,
@@ -373,7 +415,7 @@ parentCid           = this.model.get( 'parent' ),
 						class: 'fusion-lightbox'
 					};
 
-					imagesAttr.link[ 'data-rel' ] = 'iLightbox[awb_gallery_' + this.model.get( 'parent' ) + ']';
+					imagesAttr.link[ 'data-rel' ] = 'iLightbox[' + lightboxID + ']';
 
 					// TODO: fix
 					// if ( 'undefined' !== typeof image.image_data ) {

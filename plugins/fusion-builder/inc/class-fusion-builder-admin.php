@@ -469,7 +469,7 @@ class Fusion_Builder_Admin {
 	 */
 	public static function get_social_media_links() {
 		$social_media_markup = '<a href="https://www.facebook.com/ThemeFusion-101565403356430/" target="_blank" class="fusion-social-media nav-tab dashicons dashicons-facebook-alt"></a>
-		<a href="https://twitter.com/theme_fusion" target="_blank" class="fusion-social-media nav-tab dashicons dashicons-twitter"></a>
+		<a href="https://x.com/theme_fusion" target="_blank" class="fusion-social-media nav-tab dashicons dashicons-twitter"></a>
 		<a href="https://www.instagram.com/themefusion/" target="_blank" class="fusion-social-media nav-tab dashicons dashicons-instagram"></a>
 		<a href="https://www.youtube.com/channel/UC_C7uAOAH9RMzZs-CKCZ62w" target="_blank" class="fusion-social-media nav-tab fusiona-youtube"></a>';
 
@@ -507,6 +507,7 @@ class Fusion_Builder_Admin {
 	 */
 	public static function save_layout_order( $layout_id = '', $operation = 'add' ) {
 		if ( $layout_id || isset( $_POST['awb_layout_order'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
+			$layout_id        = (string) $layout_id;
 			$builder_settings = get_option( 'fusion_builder_settings', [ 'awb_layout_order' => '' ] );
 
 			if ( $layout_id ) {

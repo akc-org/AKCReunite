@@ -442,7 +442,7 @@ if ( fusion_is_element_enabled( 'fusion_countdown' ) ) {
 				$attr = [
 					'class'  => 'fusion-countdown-link',
 					'target' => $this->args['link_target'],
-					'href'   => $this->args['link_url'],
+					'href'   => esc_url( $this->args['link_url'] ),
 				];
 
 				if ( '_blank' === $this->args['link_target'] ) {

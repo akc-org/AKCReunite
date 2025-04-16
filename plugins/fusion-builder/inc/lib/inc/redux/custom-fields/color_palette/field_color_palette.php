@@ -109,6 +109,7 @@ if ( ! class_exists( 'FusionReduxFramework_color_palette' ) ) {
 					<span class="preview" style="background-color:<?php echo esc_attr( $color_data['color'] ); ?>;"></span>
 					<span class="label"><?php echo esc_html( $color_data['label'] ); ?></span>
 					<div class="actions">
+						<span class="fusiona-code"></span>
 						<span class="fusiona-pen"></span>
 						<?php if ( $is_removable_color ) : ?>
 							<span class="fusiona-trash-o"></span>

@@ -19,6 +19,15 @@ if ( fusion_is_element_enabled( 'fusion_post_cards' ) ) {
 			class FusionTB_Post_Card_Archives extends Fusion_Component {
 
 				/**
+				 * The element counter.
+				 *
+				 * @access private
+				 * @since 3.11.10
+				 * @var int
+				 */
+				private $element_counter = 1;
+
+				/**
 				 * Flag to indicate are we on archive page.
 				 *
 				 * @access protected
@@ -26,6 +35,15 @@ if ( fusion_is_element_enabled( 'fusion_post_cards' ) ) {
 				 * @var bool
 				 */
 				protected $is_archive = false;
+
+				/**
+				 * Holds the main vars of the origina $wp_query.
+				 *
+				 * @access protected
+				 * @since 3.11.10
+				 * @var array
+				 */
+				protected $original_query_vars = [];
 
 				/**
 				 * Constructor.
@@ -161,12 +179,14 @@ if ( fusion_is_element_enabled( 'fusion_post_cards' ) ) {
 									'parent'     => $queried->term_id,
 									'fields'     => 'ids',
 									'number'     => max( (int) $this->args['number_posts'], 0 ),
+									'orderby'    => 'menu_order',
 								]
 							);
 
 							if ( ! empty( $terms ) && ! is_wp_error( $terms ) ) {
 								$this->args['parent_term']                          = $queried->term_id;
 								$this->args[ 'include_term_' . $queried->taxonomy ] = implode( ',', $terms );
+								$this->args['orderby_term']                         = 'menu_order';
 								$this->args = wp_parse_args(
 									[
 										'terms_by' => $queried->taxonomy,
@@ -195,6 +215,43 @@ if ( fusion_is_element_enabled( 'fusion_post_cards' ) ) {
 					if ( 'terms' === $this->args['source'] ) {
 						return $query;
 					}
+
+					// If there is several Post Card Archives elements.
+					if ( ! empty( $wp_query->get( 'awb_pc_archives' ) ) && 0 < $wp_query->found_posts ) {
+						if ( ! empty( $this->original_query_vars ) ) {
+
+							// Reset the main query to the original posts.
+							$wp_query->posts = $this->original_query_vars['posts'];
+						} else {
+
+							// On first element, make sure we store the original vars.
+							$this->original_query_vars = [
+								'posts'         => $wp_query->posts,
+								'found_posts'   => $wp_query->found_posts,
+								'max_num_pages' => $wp_query->max_num_pages,
+							];
+						}
+
+						$posts_per_page       = -1 === (int) $this->args['number_posts'] ? $this->original_query_vars['found_posts'] : $this->args['number_posts'];
+						$wp_query->posts      = (int) $this->args['offset'] < count( $wp_query->posts ) ? array_slice( $wp_query->posts, (int) $this->args['offset'], $posts_per_page ) : [];
+						$wp_query->post_count = count( $wp_query->posts );
+
+						// Last Post Card Archives element. Reset data, so that pagination works.
+						if ( $wp_query->get( 'awb_pc_archives' ) === $this->element_counter ) {
+							$wp_query->found_posts   = $this->original_query_vars['found_posts'];
+							$wp_query->max_num_pages = ceil( $wp_query->found_posts / ( (int) $this->args['offset'] + $posts_per_page ) );
+
+							$this->original_query_vars = [];
+						} else {
+
+							// Any but last Post Card Archoves element. Set vars, so that only posts that we want will be rendered and that pagination is skipped.
+							$wp_query->found_posts   = count( $wp_query->posts );
+							$wp_query->max_num_pages = count( $wp_query->posts );
+						}
+
+						$wp_query->rewind_posts();
+					}
+
 					return $wp_query;
 				}
 
@@ -223,11 +280,12 @@ if ( fusion_is_element_enabled( 'fusion_post_cards' ) ) {
 					} elseif ( fusion_is_preview_frame() && ! in_array( $option, [ 'search', 'archives', 'term' ], true ) ) {
 
 						// Invalid source selection, return empty so view placeholder shows.
+						$this->element_counter++;
 						return '';
 
 					} elseif ( ! fusion_is_preview_frame() && ! isset( $_GET['awb-studio-content'] ) && $this->should_render() ) { // phpcs:ignore WordPress.Security.NonceVerification
 
-						// Pass main query to fusion-blog.
+						// Pass main query to Post Card element.
 						add_filter( 'fusion_post_cards_shortcode_query_override', [ $this, 'fusion_post_cards_shortcode_query_override' ] );
 						$cards = $this->render_card();
 						if ( empty( $cards ) && 'terms' !== $this->args['source'] ) {
@@ -243,6 +301,7 @@ if ( fusion_is_element_enabled( 'fusion_post_cards' ) ) {
 
 						// No cards, mean none of post type, display placeholder message.
 						if ( empty( $cards ) && current_user_can( 'manage_options' ) ) {
+							$this->element_counter++;
 							return '<div class="fusion-builder-placeholder">' . esc_html__( 'No posts found.', 'fusion-builder' ) . '</div>';
 						}
 
@@ -253,6 +312,8 @@ if ( fusion_is_element_enabled( 'fusion_post_cards' ) ) {
 					$html .= '</div>';
 
 					$this->on_render();
+
+					$this->element_counter++;
 
 					return apply_filters( 'fusion_component_' . $this->shortcode_handle . '_content', $html, $args );
 				}
@@ -292,15 +353,34 @@ if ( fusion_is_element_enabled( 'fusion_post_cards' ) ) {
 
 							if ( $has_archives_component ) {
 								$pattern = get_shortcode_regex( [ 'fusion_tb_post_card_archives' ] );
+
 								if ( preg_match_all( '/' . $pattern . '/s', $content, $matches )
 									&& array_key_exists( 2, $matches )
 									&& in_array( 'fusion_tb_post_card_archives', $matches[2], true ) ) {
-									$search_atts  = shortcode_parse_atts( $matches[3][0] );
+
+									$number_of_post_card_archives = count( $matches[3] );
+
+									$search_atts  = shortcode_parse_atts( $matches[3][ $number_of_post_card_archives - 1 ] );
 									$number_posts = ( isset( $_GET['product_count'] ) ) ? (int) $_GET['product_count'] : $search_atts['number_posts']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-									$query->set( 'paged', ( get_query_var( 'paged' ) ) ? get_query_var( 'paged' ) : 1 );
-									if ( '0' !== $number_posts ) {
+
+									if ( ! empty( $search_atts['offset'] ) ) {
+
+										if ( 1 < $number_of_post_card_archives ) {
+
+											// We have more than on Post Card Archives element. Add offset to posts per page and don't set the offset.
+											$number_posts = (int) $search_atts['offset'] + (int) $number_posts;
+
+											$query->set( 'awb_pc_archives', $number_of_post_card_archives );
+										} else {
+											$query->set( 'offset', $search_atts['offset'] );
+										}
+									}
+
+									if ( $number_posts ) {
 										$query->set( 'posts_per_page', $number_posts );
 									}
+
+									$query->set( 'paged', ( get_query_var( 'paged' ) ) ? get_query_var( 'paged' ) : 1 );
 								}
 							}
 						}
@@ -499,10 +579,10 @@ if ( fusion_is_element_enabled( 'fusion_post_cards' ) ) {
 						],
 						[
 							'type'        => 'range',
-							'heading'     => esc_attr__( 'Posts Per Page', 'fusion-builder' ),
+							'heading'     => esc_attr__( 'Posts Per Page / Per Element', 'fusion-builder' ),
 							'description' => sprintf(
 								/* translators: %1$s: Portfolio Link. %2$s: Products Link. */
-								esc_attr__( 'Select number of posts per page.  Set to -1 to display all. Set to 0 to use the post type default number of posts. For %1$s and %2$s this comes from the global options. For all others Settings > Reading.', 'fusion-builder' ),
+								esc_attr__( 'Select number of posts per page, or per Post Card Archives element if there are several elements within one layout section. Set to -1 to display all. Set to 0 to use the post type default number of posts. For %1$s and %2$s this comes from the global options. For all others Settings > Reading.', 'fusion-builder' ),
 								'<a href="' . admin_url( 'themes.php?page=avada_options#portfolio_archive_items' ) . '" target="_blank">' . esc_attr__( 'portfolio', 'fusion-builder' ) . '</a>',
 								'<a href="' . admin_url( 'themes.php?page=avada_options#woo_items' ) . '" target="_blank">' . esc_attr__( 'products', 'fusion-builder' ) . '</a>'
 							),
@@ -510,6 +590,21 @@ if ( fusion_is_element_enabled( 'fusion_post_cards' ) ) {
 							'value'       => 0,
 							'min'         => '-1',
 							'max'         => '50',
+							'step'        => '1',
+							'callback'    => [
+								'function' => 'fusion_ajax',
+								'action'   => 'get_fusion_tb_post_card_archives',
+								'ajax'     => true,
+							],
+						],
+						[
+							'type'        => 'range',
+							'heading'     => esc_attr__( 'Posts Offset', 'fusion-builder' ),
+							'description' => esc_attr__( 'The number of posts to skip. ex: 1.', 'fusion-builder' ),
+							'param_name'  => 'offset',
+							'value'       => '0',
+							'min'         => '0',
+							'max'         => '24',
 							'step'        => '1',
 							'callback'    => [
 								'function' => 'fusion_ajax',

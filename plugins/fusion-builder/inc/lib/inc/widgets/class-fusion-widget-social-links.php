@@ -454,6 +454,7 @@ class Fusion_Widget_Social_Links extends WP_Widget {
 		$instance['linkedin_link']      = isset( $new_instance['linkedin_link'] ) ? $new_instance['linkedin_link'] : '';
 		$instance['blogger_link']       = isset( $new_instance['blogger_link'] ) ? $new_instance['blogger_link'] : '';
 		$instance['skype_link']         = isset( $new_instance['skype_link'] ) ? $new_instance['skype_link'] : '';
+		$instance['snapchat_link']      = isset( $new_instance['snapchat_link'] ) ? $new_instance['snapchat_link'] : '';
 		$instance['teams_link']         = isset( $new_instance['teams_link'] ) ? $new_instance['teams_link'] : '';
 		$instance['forrst_link']        = isset( $new_instance['forrst_link'] ) ? $new_instance['forrst_link'] : '';
 		$instance['myspace_link']       = isset( $new_instance['myspace_link'] ) ? $new_instance['myspace_link'] : '';
@@ -522,6 +523,7 @@ class Fusion_Widget_Social_Links extends WP_Widget {
 			'reddit_link'        => '',
 			'rss_link'           => '',
 			'skype_link'         => '',
+			'snapchat_link'      => '',
 			'teams_link'         => '',
 			'soundcloud_link'    => '',
 			'spotify_link'       => '',

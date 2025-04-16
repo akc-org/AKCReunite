@@ -16,14 +16,21 @@
 
   FusionYoast.prototype.events = function( ) {
 	jQuery( document ).on( 'fusion-builder-content-updated', function() {
-		jQuery.post( window.fusionBuilderConfig.rest_url + 'awb/rendered_content', { content: window.fusionBuilderGetContent( 'content' ) }, function( result ) {
-		jQuery( '#fusion-builder-rendered-content' ).val( result.content );
 
-		window.setTimeout( function() {
-			window.YoastSEO.app.pluginReloaded( 'FusionYoast' );
-		}, 500 );
-	} );
+		$.ajax( {
+			method: 'POST',
+			url: window.fusionBuilderConfig.rest_url + 'awb/rendered_content',
+			data: { content: window.fusionBuilderGetContent( 'content' ) },
+			beforeSend: function ( xhr ) {
+				xhr.setRequestHeader( 'X-WP-Nonce', window.fusionBuilderConfig.rest_nonce );
+			}
+		} ).done( function( result ) {
+			jQuery( '#fusion-builder-rendered-content' ).val( result.content );
 
+			window.setTimeout( function() {
+				window.YoastSEO.app.pluginReloaded( 'FusionYoast' );
+			}, 500 );
+		} );
 	} );
   };
 

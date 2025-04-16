@@ -335,8 +335,7 @@ var FusionPageBuilder = FusionPageBuilder || {};
 					}
 
 					// Remove HTML tags but keep quotation marks etc.
-					elementName = jQuery( '<div/>' ).html( elementName ).text();
-					elementName = jQuery( '<div/>' ).html( elementName ).text();
+					elementName = elementName.replace( /(<([^>]+)>)/ig, '' );
 
 					moduleSettings = {
 						type: 'element',
@@ -477,17 +476,25 @@ var FusionPageBuilder = FusionPageBuilder || {};
 					return;
 				}
 
-				const self = this;
+				const self          = this,
+					$moduleSettings = jQuery( `[data-option-id=${param}]` ).closest( '.fusion-builder-option-advanced-module-settings' ),
+					$children       = $moduleSettings.find( '.fusion-builder-sortable-options li' ),
+					parentModel     = FusionPageBuilderApp.collection.find( function( model ) {
+						return model.get( 'cid' ) === self.attributes.parentCid;
+					} ),
+					dynamicData     = 'undefined' !== typeof parentModel.attributes.params.dynamic_params ? JSON.parse( _.unescape( FusionPageBuilderApp.base64Decode( parentModel.attributes.params.dynamic_params ) ) ) : {};
 
 				// Add dynamic class.
-				jQuery( `[data-option-id=${param}]` ).closest( '.fusion-builder-option-advanced-module-settings' ).addClass( 'has-dynamic-data' );
+				$moduleSettings.addClass( 'has-dynamic-data' );
 
 				// Remove children.
-				const $children = jQuery( `[data-option-id=${param}]` ).closest( '.fusion-builder-option-advanced-module-settings' ).find( '.fusion-builder-sortable-options li' );
-
 				$children.each( function() {
 					jQuery( this ).find( '.fusion-builder-multi-setting-remove' ).click();
 				} );
+
+				if ( 'undefined' !== dynamicData.parent_dynamic_content.data && 'filebird_folder_parent' === dynamicData.parent_dynamic_content.data ) {
+					$moduleSettings.addClass( 'has-dynamic-data-no-children' );
+				}
 
 				// Add the dynamic child.
 				this.addChildElement( null, null, { dynamic_parent: true } );
@@ -505,7 +512,7 @@ var FusionPageBuilder = FusionPageBuilder || {};
 				}
 
 				// Remove dynamic class.
-				jQuery( `[data-option-id=${param}]` ).closest( '.fusion-builder-option-advanced-module-settings' ).removeClass( 'has-dynamic-data' );
+				jQuery( `[data-option-id=${param}]` ).closest( '.fusion-builder-option-advanced-module-settings' ).removeClass( 'has-dynamic-data' ).removeClass( 'has-dynamic-data-no-children' );
 
 				// Remove children.
 				// Remove all children.

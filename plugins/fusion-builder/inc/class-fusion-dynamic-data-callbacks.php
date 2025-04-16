@@ -73,239 +73,6 @@ class Fusion_Dynamic_Data_Callbacks {
 	}
 
 	/**
-	 * ACF select field.
-	 *
-	 * @static
-	 * @access public
-	 * @since 3.9
-	 * @param array $args Arguments.
-	 * @return string
-	 */
-	public static function acf_get_select_field( $args ) {
-		if ( ! isset( $args['field'] ) || ! class_exists( 'ACF' ) ) {
-			return '';
-		}
-
-		$post_id = self::get_post_id();
-
-		if ( false !== strpos( $post_id, '-archive' ) ) {
-			if ( is_author() ) {
-				$post_id = 'user_' . str_replace( '-archive', '', $post_id );
-			} else {
-				$post_id = get_term_by( 'term_taxonomy_id', str_replace( '-archive', '', $post_id ) );
-			}
-
-			$value = get_field( $args['field'], $post_id );
-		}
-
-		$value = get_field( $args['field'], get_post( $post_id ) );
-		if ( is_array( $value ) ) {
-			$separator = isset( $args['separator'] ) ? (string) $args['separator'] : ', ';
-			$value     = implode( $separator, $value );
-		}
-		return $value;
-	}
-
-	/**
-	 * ACF Repeater parent.
-	 *
-	 * @static
-	 * @access public
-	 * @since 3.9
-	 * @param array $args Arguments.
-	 * @return void
-	 */
-	public static function acf_get_repeater_parent( $args ) {
-	}
-
-	/**
-	 * ACF Repeater field.
-	 *
-	 * @static
-	 * @access public
-	 * @since 3.9
-	 * @param array $args Arguments.
-	 * @return string
-	 */
-	public static function acf_get_repeater_sub_field( $args ) {
-		if ( ! class_exists( 'ACF' ) ) {
-			return '';
-		}
-
-		$content = get_sub_field( $args['sub_field'] );
-
-		if ( is_array( $content ) ) {
-			$type = isset( $content['type'] ) ? $content['type'] : '';
-
-			if ( 'image' === $type ) {
-				$content = $content['url'];
-			}
-		}
-
-		return $content;
-	}
-
-	/**
-	 * ACF select field.
-	 *
-	 * @static
-	 * @access public
-	 * @since 3.9
-	 * @param array $args Arguments.
-	 * @return string
-	 */
-	public static function acf_get_repeater_single_field( $args ) {
-
-		if ( ! class_exists( 'ACF' ) ) {
-			return '';
-		}
-
-		$field = isset( $args['field'] ) ? $args['field'] : false;
-		$index = isset( $args['index'] ) ? $args['index'] : false;
-		$key   = isset( $args['key'] ) ? $args['key'] : false;
-
-		if ( ! $field || ! $index || ! $key ) {
-			return '';
-		}
-
-		$post_id = self::get_post_id();
-
-		if ( false !== strpos( $post_id, '-archive' ) ) {
-			if ( is_author() ) {
-				$post_id = 'user_' . str_replace( '-archive', '', $post_id );
-			} else {
-				$post_id = get_term_by( 'term_taxonomy_id', str_replace( '-archive', '', $post_id ) );
-			}
-
-			$value = get_field( $args['field'], $post_id );
-		}
-
-		$value = get_field( $field, get_post( $post_id ) );
-		$index = intval( $index ) - 1;
-
-		$value = isset( $value[ $index ][ $key ] ) ? $value[ $index ][ $key ] : '';
-
-		if ( is_array( $value ) ) {
-			$type = isset( $value['type'] ) ? $value['type'] : '';
-			if ( 'image' === $type || 'link' === $type ) {
-				$value = isset( $value['url'] ) ? $value['url'] : '';
-			}
-		}
-
-		return $value;
-	}
-
-	/**
-	 * ACF Relationship.
-	 *
-	 * @static
-	 * @access public
-	 * @since 2.1
-	 * @param array $args    Arguments.
-	 * @return string
-	 */
-	public static function acf_get_relationship( $args ) {
-		$output = '';
-		if ( ! isset( $args['field'] ) || ! class_exists( 'ACF' ) ) {
-			return $output;
-		}
-		$post_id = self::get_post_id();
-
-		$posts_ids = get_field( $args['field'], $post_id, false );
-
-		if ( ! empty( $posts_ids ) ) {
-			$output      = [];
-			$separator   = isset( $args['separator'] ) ? $args['separator'] : '';
-			$should_link = isset( $args['link'] ) && 'no' === $args['link'] ? false : true;
-
-			foreach ( $posts_ids as $id ) {
-				$str = '';
-				if ( $should_link ) {
-					$str .= '<a href="' . get_permalink( $id ) . '" title="' . esc_attr( get_the_title( $id ) ) . '">';
-				}
-
-				$str .= esc_html( get_the_title( $id ) );
-
-				if ( $should_link ) {
-					$str .= '</a>';
-				}
-
-				$output[] = $str;
-			}
-
-			return '' !== $separator ? join( $separator . ' ', $output ) : join( ' ', $output );
-		}
-
-		return $output;
-	}
-
-	/**
-	 * Get ACF select field value.
-	 *
-	 * @since 3.9
-	 */
-	public function ajax_acf_get_select_field() {
-		check_ajax_referer( 'fusion_load_nonce', 'fusion_load_nonce' );
-		$return_data = [];
-
-		if ( isset( $_POST['field'] ) && isset( $_POST['post_id'] ) && function_exists( 'get_field' ) ) {
-			$return_data['content'] = get_field( wp_unslash( $_POST['field'] ), wp_unslash( $_POST['post_id'] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
-			$separator              = isset( $_POST['separator'] ) ? (string) wp_unslash( $_POST['separator'] ) : ', '; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
-			if ( is_array( $return_data['content'] ) ) {
-				$return_data['content'] = implode( $separator, $return_data['content'] );
-			}
-		}
-
-		echo wp_json_encode( $return_data );
-		wp_die();
-	}
-
-	/**
-	 * Get ACF repeat field single value.
-	 *
-	 * @since 3.9
-	 */
-	public function ajax_acf_get_repeat_field_single() {
-		check_ajax_referer( 'fusion_load_nonce', 'fusion_load_nonce' );
-		$return_data = [];
-
-		if ( isset( $_POST['field'] ) && isset( $_POST['post_id'] ) && function_exists( 'get_field' ) ) {
-			$return_data['content'] = get_field( wp_unslash( $_POST['field'] ), wp_unslash( $_POST['post_id'] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
-		}
-
-		echo wp_json_encode( $return_data );
-		wp_die();
-	}
-
-	/**
-	 * Get ACF field value.
-	 *
-	 * @since 2.1
-	 */
-	public function ajax_acf_get_field() {
-		check_ajax_referer( 'fusion_load_nonce', 'fusion_load_nonce' );
-		$return_data = [];
-
-		if ( isset( $_POST['field'] ) && isset( $_POST['post_id'] ) && function_exists( 'get_field' ) ) {
-			$field_value = get_field( wp_unslash( $_POST['field'] ), wp_unslash( $_POST['post_id'] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
-			if ( ! isset( $_POST['image'] ) || ! $_POST['image'] ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
-				$return_data['content'] = $field_value;
-			} elseif ( is_array( $field_value ) && isset( $field_value['url'] ) ) {
-				$return_data['content'] = $field_value['url'];
-			} elseif ( is_integer( $field_value ) ) {
-				$return_data['content'] = wp_get_attachment_url( $field_value );
-			} elseif ( is_string( $field_value ) ) {
-				$return_data['content'] = $field_value;
-			} else {
-				$return_data['content'] = $field_value;
-			}
-		}
-
-		echo wp_json_encode( $return_data );
-		wp_die();
-	}
-
-	/**
 	 * Runs the defined callback.
 	 *
 	 * @access public
@@ -352,6 +119,27 @@ class Fusion_Dynamic_Data_Callbacks {
 		(string) $shortcode_string = isset( $args['shortcode'] ) ? $args['shortcode'] : '';
 		return do_shortcode( $shortcode_string );
 	}
+
+	/**
+	 * eturns the output of an action hook..
+	 *
+	 * @static
+	 * @access public
+	 * @since 3.11.10
+	 * @param arrsy $args Arguments.
+	 * @return string
+	 */
+	public static function output_action_hook( $args ) {
+		$action_names = explode( "\n", $args['action_name'] );
+
+		ob_start();
+		foreach ( $action_names as $action_name ) {
+			do_action( $action_name );
+		}
+
+		return ob_get_clean();
+	}
+
 
 	/**
 	 * Featured image.
@@ -532,6 +320,10 @@ class Fusion_Dynamic_Data_Callbacks {
 			} elseif ( is_tax( 'post_format', 'post-format-chat' ) ) {
 				$title = _x( 'Chats', 'post format archive title', 'fusion-builder' );
 			}
+		} elseif ( Fusion_Helper::is_events_archive() && is_tax() ) {
+
+			// Special handling for TEC term pages, because is_post_type_archive() returns true there.
+			$title = self::get_taxonomy_term_title( $include_context );
 		} elseif ( is_post_type_archive() ) {
 			$title = post_type_archive_title( '', false );
 
@@ -540,22 +332,37 @@ class Fusion_Dynamic_Data_Callbacks {
 				$title = sprintf( __( 'Archives: %s', 'fusion-builder' ), $title );
 			}
 		} elseif ( is_tax() ) {
-			$title = single_term_title( '', false );
-
-			if ( $include_context ) {
-				$tax = get_taxonomy( get_queried_object()->taxonomy );
-
-				if ( $tax ) {
-					/* translators: Taxonomy term archive title. %1$s: Taxonomy singular name, %2$s: Current taxonomy term. */
-					$title = sprintf( __( '%1$s: %2$s', 'fusion-builder' ), $tax->labels->singular_name, $title );
-				}
-			}
+			$title = self::get_taxonomy_term_title( $include_context );
 		} elseif ( is_archive() ) {
 			$title = __( 'Archives', 'fusion-builder' );
 		} elseif ( is_404() ) {
 			$title = __( '404', 'fusion-builder' );
 		} else {
 			$title = self::fusion_get_post_title( $args );
+		}
+
+		return $title;
+	}
+
+	/**
+	 * Get taxonomy term title.
+	 *
+	 * @static
+	 * @access public
+	 * @since 3.11.11
+	 * @param bool $include_context Flag to set if the term context should be added.
+	 * @return string The term title.
+	 */
+	public static function get_taxonomy_term_title( $include_context ) {
+		$title = single_term_title( '', false );
+
+		if ( $include_context ) {
+			$tax = get_taxonomy( get_queried_object()->taxonomy );
+
+			if ( $tax ) {
+				/* translators: Taxonomy term archive title. %1$s: Taxonomy singular name, %2$s: Current taxonomy term. */
+				$title = sprintf( __( '%1$s: %2$s', 'fusion-builder' ), $tax->labels->singular_name, $title );
+			}
 		}
 
 		return $title;
@@ -1037,6 +844,55 @@ class Fusion_Dynamic_Data_Callbacks {
 	}
 
 	/**
+	 * Get images from FileBird folder.
+	 *
+	 * @static
+	 * @access public
+	 * @since 3.11.12
+	 * @param array $args Arguments.
+	 * @return string
+	 */
+	public static function get_filebird_folder_image_ids( $args ) {
+		if ( ! class_exists( 'FileBird\Classes\Tree' ) ) {
+			return [];
+		}
+
+		if ( ! is_numeric( $args['folder'] ) ) {
+			$folders   = FileBird\Classes\Tree::getFolders( null );
+			$folder_id = self::get_filebird_folder_id( $folders, $args );
+		} else {
+			$folder_id = $args['folder'];
+		}
+
+		$image_ids = FileBird\Classes\Helpers::getAttachmentIdsByFolderId( $folder_id );
+
+		return $image_ids;
+	}
+
+	/**
+	 * Recursively gets the correct folder ID.
+	 *
+	 * @static
+	 * @access public
+	 * @since 3.11.12
+	 * @param array $folders The available folders.
+	 * @param array $args Arguments.
+	 * @return string
+	 */
+	public static function get_filebird_folder_id( $folders, $args ) {
+		foreach ( $folders as $folder ) {
+			if ( isset( $folder['text'] ) && $args['folder'] === $folder['text'] ) {
+				$folder_id = $folder['id'];
+				break;
+			} elseif ( ! empty( $folder['children'] ) ) {
+				$folder_id = self::get_filebird_folder_id( $folder['children'], $args );
+			}
+		}
+
+		return isset( $folder_id ) ? $folder_id : 0;
+	}
+
+	/**
 	 * Toggle Off Canvas.
 	 *
 	 * @static
@@ -1093,6 +949,60 @@ class Fusion_Dynamic_Data_Callbacks {
 	}
 
 	/**
+	 * Gets a global ACF option page field. Returns false otherwise.
+	 *
+	 * @static
+	 * @access public
+	 * @since 3.11.10
+	 * @param string $field_name The ACF field name.
+	 * @param bool   $include_field_object Flag to decide if the field object should be included.
+	 * @return mixed|bool The vallue of teh ACF field or false when it isn't from an option page.
+	 */
+	public static function get_acf_op_option( $field_name, $include_field_object = false ) {
+		if ( 'awb_acfop_' === substr( $field_name, 0, 10 ) ) {
+			$option_page_id = 'option';
+			if ( 1 === preg_match( '/awb_acfop_.+__/', $field_name, $check ) ) {
+				$option_page_id = trim( str_replace( 'awb_acfop_', '', $check[0] ), '__' );
+			}
+
+			$field_name = str_replace( 'awb_acfop_', '', $field_name );
+
+			if ( $include_field_object ) {
+				return [
+					'value'  => get_field( $field_name, $option_page_id ),
+					'object' => acf_maybe_get_field( $field_name, $option_page_id ),
+				];
+			}
+
+			return get_field( $field_name, $option_page_id );
+		}
+
+		return false;
+	}
+
+	/**
+	 * ACF get post id..
+	 *
+	 * @static
+	 * @access public
+	 * @since 3.11.11
+	 * @return string The post id.
+	 */
+	public static function acf_get_post_id() {
+		$post_id = self::get_post_id();
+
+		if ( false !== strpos( $post_id, '-archive' ) ) {
+			if ( is_author() ) {
+				$post_id = 'user_' . str_replace( '-archive', '', $post_id );
+			} else {
+				$post_id = get_term_by( 'term_taxonomy_id', str_replace( '-archive', '', $post_id ) );
+			}
+		}
+
+		return $post_id;
+	}
+
+	/**
 	 * ACF text field.
 	 *
 	 * @static
@@ -1106,19 +1016,32 @@ class Fusion_Dynamic_Data_Callbacks {
 			return '';
 		}
 
-		$post_id = self::get_post_id();
-
-		if ( false !== strpos( $post_id, '-archive' ) ) {
-			if ( is_author() ) {
-				$post_id = 'user_' . str_replace( '-archive', '', $post_id );
-			} else {
-				$post_id = get_term_by( 'term_taxonomy_id', str_replace( '-archive', '', $post_id ) );
-			}
-
-			return get_field( $args['field'], $post_id );
+		if ( $op_field = self::get_acf_op_option( $args['field'] ) ) {
+			return $op_field;
 		}
 
-		return get_field( $args['field'], get_post( $post_id ) );
+		$post_id = self::acf_get_post_id();
+
+		return get_field( $args['field'], $post_id );
+	}
+
+	/**
+	 * ACF select field.
+	 *
+	 * @static
+	 * @access public
+	 * @since 3.9
+	 * @param array $args Arguments.
+	 * @return string
+	 */
+	public static function acf_get_select_field( $args ) {
+		$select_data = self::acf_get_field( $args );
+
+		if ( is_array( $select_data ) ) {
+			$separator   = isset( $args['separator'] ) ? (string) $args['separator'] : ', ';
+			$select_data = implode( $separator, $select_data );
+		}
+		return $select_data;
 	}
 
 	/**
@@ -1131,22 +1054,13 @@ class Fusion_Dynamic_Data_Callbacks {
 	 * @return string
 	 */
 	public static function acf_get_link_field( $args ) {
-		if ( ! isset( $args['field'] ) ) {
-			return '';
-		}
-		$link = '';
+		$link_data = self::acf_get_field( $args );
+		$link      = '';
 
-		$post_id = self::get_post_id();
-		if ( false !== strpos( $post_id, '-archive' ) ) {
-			$image_data = get_field( $args['field'], get_term_by( 'term_taxonomy_id', str_replace( '-archive', '', $post_id ) ) );
-		} else {
-			$image_data = get_field( $args['field'], get_post( $post_id ) );
-		}
-
-		if ( is_array( $image_data ) && isset( $image_data['url'] ) ) {
-			$link = $image_data['url'];
-		} elseif ( is_string( $image_data ) ) {
-			$link = $image_data;
+		if ( is_array( $link_data ) && isset( $link_data['url'] ) ) {
+			$link = $link_data['url'];
+		} elseif ( is_string( $link_data ) ) {
+			$link = $link_data;
 		}
 
 		return $link;
@@ -1162,16 +1076,8 @@ class Fusion_Dynamic_Data_Callbacks {
 	 * @return string
 	 */
 	public static function acf_get_color_field( $args ) {
-		if ( ! isset( $args['field'] ) ) {
-			return '';
-		}
-
-		$post_id = self::get_post_id();
-		if ( false !== strpos( $post_id, '-archive' ) ) {
-			$color_data = get_field( $args['field'], get_term_by( 'term_taxonomy_id', str_replace( '-archive', '', $post_id ) ) );
-		} else {
-			$color_data = get_field( $args['field'], get_post( $post_id ) );
-		}
+		$color_data = self::acf_get_field( $args );
+		$color      = '';
 
 		if ( is_array( $color_data ) ) {
 			$defaults = [
@@ -1181,12 +1087,12 @@ class Fusion_Dynamic_Data_Callbacks {
 				'alpha' => 1,
 			];
 			$args     = array_merge( $defaults, $color_data );
-			return 'rgba(' . $color_data['red'] . ',' . $color_data['green'] . ',' . $color_data['blue'] . ',' . $color_data['alpha'] . ')';
+			$color    = 'rgba(' . $color_data['red'] . ',' . $color_data['green'] . ',' . $color_data['blue'] . ',' . $color_data['alpha'] . ')';
 		} elseif ( is_string( $color_data ) ) {
-			return $color_data;
+			$color = $color_data;
 		}
 
-		return '';
+		return $color;
 	}
 
 	/**
@@ -1199,26 +1105,57 @@ class Fusion_Dynamic_Data_Callbacks {
 	 * @return string
 	 */
 	public static function acf_get_image_field( $args ) {
-		if ( ! isset( $args['field'] ) ) {
-			return '';
-		}
-
-		$post_id = self::get_post_id();
-		if ( false !== strpos( $post_id, '-archive' ) ) {
-			$image_data = get_field( $args['field'], get_term_by( 'term_taxonomy_id', str_replace( '-archive', '', $post_id ) ) );
-		} else {
-			$image_data = get_field( $args['field'], get_post( $post_id ) );
-		}
+		$image_data = self::acf_get_field( $args );
+		$image      = '';
 
 		if ( is_array( $image_data ) && isset( $image_data['url'] ) ) {
-			return $image_data['url'];
+			$image = $image_data['url'];
 		} elseif ( is_integer( $image_data ) ) {
-			return wp_get_attachment_url( $image_data );
+			$image = wp_get_attachment_url( $image_data );
 		} elseif ( is_string( $image_data ) ) {
-			return $image_data;
+			$image = $image_data;
 		}
 
-		return '';
+		return $image;
+	}
+
+	/**
+	 * ACF get icon picker field.
+	 *
+	 * @static
+	 * @access public
+	 * @since 2.1
+	 * @param array $args Arguments.
+	 * @return string
+	 */
+	public static function acf_get_iconpicker_field( $args, $value = '' ) {
+		$icon_data = $value ? $value : self::acf_get_field( $args );
+		$icon      = '';
+
+		if ( is_array( $icon_data ) ) {
+			if ( 'dashicons' === $icon_data['type'] ) {
+				wp_enqueue_style( 'dashicons' );
+				$icon = $icon_data['value'];
+			} elseif ( 'media_library' === $icon['type'] ) {
+				$icon = wp_get_attachment_url( $icon_data['value'] );
+			} elseif ( 'url' === $icon['type'] ) {
+				$icon = $icon_data['value'];
+			} elseif ( 'avada_icon' === $icon['type'] ) {
+				$icon = 'fusion-prefix-' . str_replace( 'fusion-prefix-', '', $icon_data['value'] );
+			}
+		} else {
+			if ( 'dashicons-' === substr( $icon_data, 0, 10 ) ) {
+				wp_enqueue_style( 'dashicons' );
+			}
+
+			if ( 'fusion-prefix-' !== substr( $icon_data, 0, 14 ) && 'dashicons-' !== substr( $icon_data, 0, 10 ) && 'http://' !== substr( $icon_data, 0, 7 ) && 'https://' !== substr( $icon_data, 0, 8 ) ) {
+				$icon_data = 'fusion-prefix-' . $icon_data;
+			}
+
+			$icon = $icon_data;
+		}
+
+		return $icon;
 	}
 
 	/**
@@ -1231,26 +1168,233 @@ class Fusion_Dynamic_Data_Callbacks {
 	 * @return string
 	 */
 	public static function acf_get_file_field( $args ) {
-		if ( ! isset( $args['field'] ) ) {
+		$file_data = self::acf_get_field( $args );
+		$file      = '';
+
+		if ( is_array( $file_data ) && isset( $file_data['url'] ) ) {
+			$file = $file_data['url'];
+		} elseif ( is_integer( $file_data ) ) {
+			$file = wp_get_attachment_url( $file_data );
+		} elseif ( is_string( $file_data ) ) {
+			$file = $file_data;
+		}
+
+		return $file;
+	}
+
+	/**
+	 * ACF Repeater parent.
+	 *
+	 * @static
+	 * @access public
+	 * @since 3.9
+	 * @param array $args Arguments.
+	 * @return void
+	 */
+	public static function acf_get_repeater_parent( $args ) {
+	}
+
+	/**
+	 * ACF Repeater field.
+	 *
+	 * @static
+	 * @access public
+	 * @since 3.9
+	 * @param array $args Arguments.
+	 * @return string
+	 */
+	public static function acf_get_repeater_sub_field( $args ) {
+		$field_object = get_sub_field_object( $args['sub_field'] );
+
+		if ( ! is_array( $field_object ) ) {
 			return '';
 		}
 
-		$post_id = self::get_post_id();
-		if ( false !== strpos( $post_id, '-archive' ) ) {
-			$video_data = get_field( $args['field'], get_term_by( 'term_taxonomy_id', str_replace( '-archive', '', $post_id ) ) );
+		$value = $field_object['value'];
+
+		if ( 'icon_picker' === $field_object['type'] ) {
+			$value = self::acf_get_iconpicker_field( $args, $value );
+		}
+
+		if ( is_array( $value ) ) {
+			$type = isset( $value['type'] ) ? $value['type'] : '';
+			if ( 'image' === $type || 'link' === $type ) {
+				$value = $value['url'];
+			}
+		}
+
+		return $value;
+	}
+
+	/**
+	 * ACF repeater single field.
+	 *
+	 * @static
+	 * @access public
+	 * @since 3.9
+	 * @param array $args Arguments.
+	 * @return string
+	 */
+	public static function acf_get_repeater_single_field( $args ) {
+		$field = ! empty( $args['field'] ) ? $args['field'] : false;
+		$key   = ! empty( $args['key'] ) ? str_replace( 'awb_acfop_', '', $args['key'] ) : false;
+		$index = ! empty( $args['index'] ) ? $args['index'] : 1;
+		$index = intval( $index ) - 1;
+
+		if ( ! $field || ! $key ) {
+			return '';
+		}
+
+		// Check if we get values from an option page. If so, we need to get values and the object differently.
+		$op_field = self::get_acf_op_option( $field, true );
+
+		if ( $op_field ) {
+			$field_object  = $op_field['object'];
+			$repeater_data = $op_field['value'];
+
 		} else {
-			$video_data = get_field( $args['field'], get_post( $post_id ) );
+			$post_id       = self::acf_get_post_id();
+			$field_object  = get_field_object( $field, $post_id );
+			$repeater_data = isset( $field_object['value'] ) ? $field_object['value'] : '';
 		}
 
-		if ( is_array( $video_data ) && isset( $video_data['url'] ) ) {
-			return $video_data['url'];
-		} elseif ( is_integer( $video_data ) ) {
-			return wp_get_attachment_url( $video_data );
-		} elseif ( is_string( $video_data ) ) {
-			return $video_data;
+		$value          = isset( $repeater_data[ $index ][ $key ] ) ? $repeater_data[ $index ][ $key ] : '';
+		$sub_fields     = isset( $field_object['sub_fields'] ) ? $field_object['sub_fields'] : '';
+		$sub_filed_type = '';
+
+		if ( $value ) {
+			if ( $sub_fields ) {
+				foreach ( $sub_fields as $field_index => $field_data ) {
+					if ( $key === $field_data['name'] ) {
+						$sub_filed_type = $field_data['type'];
+						break;
+					}
+				}
+
+				if ( 'icon_picker' === $sub_filed_type ) {
+					$value = self::acf_get_iconpicker_field( $args, $value );
+				}
+			}
+
+			if ( is_array( $value ) ) {
+				$type = isset( $value['type'] ) ? $value['type'] : '';
+				if ( 'image' === $type || 'link' === $type ) {
+					$value = isset( $value['url'] ) ? $value['url'] : '';
+				}
+			}
 		}
 
-		return '';
+		return $value;
+	}
+
+	/**
+	 * ACF Relationship.
+	 *
+	 * @static
+	 * @access public
+	 * @since 2.1
+	 * @param array $args    Arguments.
+	 * @return string
+	 */
+	public static function acf_get_relationship( $args ) {
+		$output = '';
+		if ( ! isset( $args['field'] ) ) {
+			return $output;
+		}
+		$post_id = self::get_post_id();
+
+		$posts_ids = get_field( $args['field'], $post_id, false );
+
+		if ( ! empty( $posts_ids ) ) {
+			$output      = [];
+			$separator   = isset( $args['separator'] ) ? $args['separator'] : '';
+			$should_link = isset( $args['link'] ) && 'no' === $args['link'] ? false : true;
+
+			foreach ( $posts_ids as $id ) {
+				$str = '';
+				if ( $should_link ) {
+					$str .= '<a href="' . get_permalink( $id ) . '" title="' . esc_attr( get_the_title( $id ) ) . '">';
+				}
+
+				$str .= esc_html( get_the_title( $id ) );
+
+				if ( $should_link ) {
+					$str .= '</a>';
+				}
+
+				$output[] = $str;
+			}
+
+			return '' !== $separator ? join( $separator . ' ', $output ) : join( ' ', $output );
+		}
+
+		return $output;
+	}
+
+	/**
+	 * Get ACF select field value.
+	 *
+	 * @since 3.9
+	 */
+	public function ajax_acf_get_select_field() {
+		check_ajax_referer( 'fusion_load_nonce', 'fusion_load_nonce' );
+		$return_data = [];
+
+		if ( isset( $_POST['field'] ) && isset( $_POST['post_id'] ) && function_exists( 'get_field' ) ) {
+			$return_data['content'] = get_field( wp_unslash( $_POST['field'] ), wp_unslash( $_POST['post_id'] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+			$separator              = isset( $_POST['separator'] ) ? (string) wp_unslash( $_POST['separator'] ) : ', '; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+			if ( is_array( $return_data['content'] ) ) {
+				$return_data['content'] = implode( $separator, $return_data['content'] );
+			}
+		}
+
+		echo wp_json_encode( $return_data );
+		wp_die();
+	}
+
+	/**
+	 * Get ACF repeat field single value.
+	 *
+	 * @since 3.9
+	 */
+	public function ajax_acf_get_repeat_field_single() {
+		check_ajax_referer( 'fusion_load_nonce', 'fusion_load_nonce' );
+		$return_data = [];
+
+		if ( isset( $_POST['field'] ) && isset( $_POST['post_id'] ) && function_exists( 'get_field' ) ) {
+			$return_data['content'] = get_field( wp_unslash( $_POST['field'] ), wp_unslash( $_POST['post_id'] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+		}
+
+		echo wp_json_encode( $return_data );
+		wp_die();
+	}
+
+	/**
+	 * Get ACF field value.
+	 *
+	 * @since 2.1
+	 */
+	public function ajax_acf_get_field() {
+		check_ajax_referer( 'fusion_load_nonce', 'fusion_load_nonce' );
+		$return_data = [];
+
+		if ( isset( $_POST['field'] ) && isset( $_POST['post_id'] ) && function_exists( 'get_field' ) ) {
+			$field_value = get_field( wp_unslash( $_POST['field'] ), wp_unslash( $_POST['post_id'] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+			if ( ! isset( $_POST['image'] ) || ! $_POST['image'] ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+				$return_data['content'] = $field_value;
+			} elseif ( is_array( $field_value ) && isset( $field_value['url'] ) ) {
+				$return_data['content'] = $field_value['url'];
+			} elseif ( is_integer( $field_value ) ) {
+				$return_data['content'] = wp_get_attachment_url( $field_value );
+			} elseif ( is_string( $field_value ) ) {
+				$return_data['content'] = $field_value;
+			} else {
+				$return_data['content'] = $field_value;
+			}
+		}
+
+		echo wp_json_encode( $return_data );
+		wp_die();
 	}
 
 	/**
@@ -1261,9 +1405,8 @@ class Fusion_Dynamic_Data_Callbacks {
 	 * @return string
 	 */
 	public static function get_event_date_to_display( $args, $post_id = 0 ) {
-		if ( ! $post_id ) {
-			$post_id = self::get_post_id();
-		}
+		$post_id = ! empty( $args['event_id'] ) ? $args['event_id'] : self::get_post_id();
+
 		$post = get_post( $post_id );
 		if ( ! $post instanceof WP_Post ) {
 			return '';
@@ -1274,26 +1417,249 @@ class Fusion_Dynamic_Data_Callbacks {
 			return '';
 		}
 
-		$date = '';
-		if ( ! isset( $args['event_date_type'] ) ) {
-			$args['event_date_type'] = 'both';
-		}
+		$args['event_date_type'] = isset( $args['event_date_type'] ) ? $args['event_date_type'] : 'both';
+		$args['format']          = ! empty( $args['format'] ) ? $args['format'] : '';
 
 		if ( 'start_event_date' === $args['event_date_type'] ) {
-			$date = tribe_get_start_date( $post_id );
+			$date = tribe_get_start_date( $post_id, true, $args['format'] );
 		} elseif ( 'end_event_date' === $args['event_date_type'] ) {
-			$date = tribe_get_end_date( $post_id );
+			$date = tribe_get_end_date( $post_id, true, $args['format'] );
 		} else {
 			add_filter( 'tribe_events_recurrence_tooltip', [ self::class, 'remove_event_recurring_info' ], 999 );
-			$date = tribe_events_event_schedule_details( $post_id );
+			$date = tribe_events_event_schedule_details( $post_id, '', '', false );
 			remove_filter( 'tribe_events_recurrence_tooltip', [ self::class, 'remove_event_recurring_info' ], 999 );
+
+			$time_separator  = tribe_get_option( 'dateTimeSeparator', ' @ ' );
+			$range_separator = tribe_get_option( 'timeRangeSeparator', ' - ' );
+
+			if ( $args['format'] ) {
+
+				// Single day event, make sure they have date added to the end time.
+				if ( ! tribe_event_is_multiday( $post_id ) && ! tribe_event_is_all_day( $post_id ) ) {
+					$date_without_time = preg_replace( '~' . preg_quote( $time_separator, '~' ) . '.+~', '', $date );
+					$date              = str_replace( $range_separator, $range_separator . $date_without_time . $time_separator, $date );
+				}
+
+				$date           = explode( $range_separator, $date );
+				$formatted_date = '';
+
+				foreach ( $date as $date_part ) {
+
+					// Remove dummy time in case it gets added because of user set format and apply the format to the date.
+					$formatted_date .= str_replace( [ '00:00', '0:00', '00.00', '0.00' ], '', date( $args['format'], strtotime( str_replace( $time_separator, ' ', $date_part ) ) ) ) . $range_separator;
+				}
+
+				$date = trim( $formatted_date, $range_separator );
+
+				// Remove the time separator set in TEC settings, in case of full day event and same separator being set in date format.
+				if ( tribe_event_is_all_day( $post_id ) ) {
+					$date = str_replace( trim( $time_separator ), '', $date );
+				}
+			}
 		}
 
-		if ( ! $date ) {
-			$date = '';
+		if ( ! empty( $args['time_range_sep'] ) ) {
+			$date = str_replace( $range_separator, $args['time_range_sep'], $date );
 		}
+
+		$date = $date ? $date : '';
 
 		return $date;
+	}
+
+	/**
+	 * Gets Events Calendar date value. Returns an array with a date.
+	 *
+	 * @param array $args    The args.
+	 * @param int   $post_id The post ID.
+	 * @return array
+	 */
+	public static function get_event_date( $args, $post_id = 0 ) {
+		$post_id = ! empty( $args['event_id'] ) ? $args['event_id'] : self::get_post_id();
+
+		if ( 'end_event_date' === $args['event_date'] ) {
+			$date               = tribe_get_end_date( $post_id, true, Tribe__Date_Utils::DBDATETIMEFORMAT );
+			$args['start_date'] = tribe_get_start_date( $post_id, true, Tribe__Date_Utils::DBDATETIMEFORMAT );
+		} else {
+			$date = tribe_get_start_date( $post_id, true, Tribe__Date_Utils::DBDATETIMEFORMAT );
+		}
+
+		return [
+			'date' => $date,
+			'args' => $args,
+		];
+	}
+
+	/**
+	 * Gets Events Calendar event cost.
+	 *
+	 * @static
+	 * @since 7.11.10
+	 * @access public
+	 * @param array $args    The args.
+	 * @param int   $post_id The post ID.
+	 * @return string
+	 */
+	public static function get_event_cost( $args ) {
+		$post_id         = ! empty( $args['event_id'] ) ? $args['event_id'] : self::get_post_id();
+		$cost            = tribe_get_cost( $post_id, 'none' !== $args['currency'] );
+		$currency_symbol = get_post_meta( $post_id, '_EventCurrencySymbol', true );
+		$currency_symbol = $currency_symbol ? $currency_symbol : tribe_get_option( 'defaultCurrencySymbol', '$' );
+
+		if ( '' !== $args['currency_position'] ) {
+
+			// If there is several tickets, there will be a cost range sep.
+			$cost_parts = explode( _x( ' – ', 'Cost range separator', 'the-events-calendar' ), $cost );
+
+			if ( isset( $cost_parts[1] ) ) {
+
+				// Filter each cost part. If a cost püart is empty after filtering, it will have been "FREE".
+				$cost_parts_0 = filter_var( str_replace( $currency_symbol, '', $cost_parts[0] ), FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION );
+				if ( $cost_parts_0 ) {
+					$cost_parts[0] = $cost_parts_0;
+					$cost_parts[0] = 'prefix' === $args['currency_position'] ? $currency_symbol . $cost_parts[0] : $cost_parts[0] . $currency_symbol;
+				}
+
+				$cost_parts_1 = filter_var( str_replace( $currency_symbol, '', $cost_parts[1] ), FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION );
+				if ( $cost_parts_1 ) {
+					$cost_parts[1] = $cost_parts_1;
+					$cost_parts[1] = 'prefix' === $args['currency_position'] ? $currency_symbol . $cost_parts[1] : $cost_parts[1] . $currency_symbol;
+				}
+
+				// Put it together again.
+				$cost = implode( _x( ' – ', 'Cost range separator', 'the-events-calendar' ), $cost_parts );
+			} else {
+				$cost_val = filter_var( $cost, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION );
+
+				if ( $cost_val ) {
+					$cost = 'prefix' === $args['currency_position'] ? $currency_symbol . $cost_val : $cost_val . $currency_symbol;
+				}
+			}
+		}
+
+		if ( 'code' === $args['currency'] ) {
+			$currency_code = get_post_meta( $post_id, '_EventCurrencyCode', true );
+			$currency_code = $currency_code ? $currency_code : tribe_get_option( 'defaultCurrencyCode', 'USD' );
+
+			$cost = trim( str_replace( $currency_symbol, ' ' . $currency_code . ' ', $cost ) );
+		}
+
+		return $cost;
+	}
+
+	/**
+	 * Gets Events Calendar event status.
+	 *
+	 * @static
+	 * @since 7.11.10
+	 * @access public
+	 * @param array $args    The args.
+	 * @param int   $post_id The post ID.
+	 * @return string
+	 */
+	public static function get_event_status( $args ) {
+		$post_id = ! empty( $args['event_id'] ) ? $args['event_id'] : self::get_post_id();
+		$status  = get_post_meta( $post_id, '_tribe_events_status', true );
+
+		if ( $status && class_exists( 'Tribe\Events\Event_Status\Status_Labels' ) ) {
+			$function_name = 'get_' . $status . '_label';
+			$status        = tribe( 'Tribe\Events\Event_Status\Status_Labels' )->$function_name();
+		} else {
+			$status = ucwords( $status );
+		}
+
+		$status = '<span class="awb-tec-status">' . $status . '</span>';
+
+		if ( 'yes' === $args['display_reason'] ) {
+			$status .= '<br /><span class="awb-tec-status__description">' . wp_kses_post( get_post_meta( $post_id, '_tribe_events_status_reason', true ) ) . '</span>';
+		}
+
+		return $status;
+	}
+
+	/**
+	 * Gets Events Calendar event series name.
+	 *
+	 * @static
+	 * @since 7.11.10
+	 * @access public
+	 * @param array $args    The args.
+	 * @param int   $post_id The post ID.
+	 * @return string
+	 */
+	public static function get_event_series_name( $args ) {
+		$post_id     = ! empty( $args['event_id'] ) ? $args['event_id'] : self::get_post_id();
+		$post_id     = tribe( TEC\Events_Pro\Custom_Tables\V1\Templates\Single_Event_Modifications::class )->normalize_post_id( $post_id );
+		$series_post = function_exists( 'tec_event_series' ) ? tec_event_series( $post_id ) : '';
+
+		if ( ! $series_post instanceof WP_Post ) {
+			return '';
+		}
+
+		$name = apply_filters( 'the_title', $series_post->post_title, $series_post->ID );
+
+		return $name;
+	}
+
+	/**
+	 * Gets Events Calendar event series URL.
+	 *
+	 * @static
+	 * @since 7.11.10
+	 * @access public
+	 * @param array $args    The args.
+	 * @param int   $post_id The post ID.
+	 * @return string
+	 */
+	public static function get_event_series_url( $args ) {
+		$post_id     = ! empty( $args['event_id'] ) ? $args['event_id'] : self::get_post_id();
+		$post_id     = tribe( TEC\Events_Pro\Custom_Tables\V1\Templates\Single_Event_Modifications::class )->normalize_post_id( $post_id );
+		$series_post = function_exists( 'tec_event_series' ) ? tec_event_series( $post_id ) : '';
+
+		if ( ! $series_post instanceof WP_Post ) {
+			return '';
+		}
+
+		$url = get_post_permalink( $series_post->ID );
+
+		return $url;
+	}
+
+	/**
+	 * Gets Events Calendar event website.
+	 *
+	 * @static
+	 * @since 7.11.10
+	 * @access public
+	 * @param array $args    The args.
+	 * @param int   $post_id The post ID.
+	 * @return string
+	 */
+	public static function get_event_website( $args ) {
+		$post_id = ! empty( $args['event_id'] ) ? $args['event_id'] : self::get_post_id();
+		return tribe_get_event_website_url( $post_id );
+	}
+
+
+	/**
+	 * Gets Events Calendar event subscribe link.
+	 *
+	 * @static
+	 * @since 7.11.10
+	 * @access public
+	 * @param array $args    The args.
+	 * @param int   $post_id The post ID.
+	 * @return string
+	 */
+	public static function get_event_subscribe_link( $args ) {
+		$post_id = ! empty( $args['event_id'] ) ? $args['event_id'] : self::get_post_id();
+
+		$handler = tribe( Tribe\Events\Views\V2\iCalendar\iCalendar_Handler::class );
+		$links   = $handler->get_subscribe_links();
+
+		if ( isset( $links[ $args['calendar'] ] ) ) {
+			return $links[ $args['calendar'] ]->get_uri();
+		}
 	}
 
 	/**
@@ -1308,31 +1674,482 @@ class Fusion_Dynamic_Data_Callbacks {
 	}
 
 	/**
-	 * Gets Events Calendar date value. Returns an array with a date.
+	 * Gets Events Calendar event venue data.
 	 *
+	 * @static
+	 * @since 7.11.10
+	 * @access public
 	 * @param array $args    The args.
 	 * @param int   $post_id The post ID.
-	 * @return array
+	 * @return string
 	 */
-	public static function get_event_date( $args, $post_id = 0 ) {
-		if ( isset( $args['event_id'] ) && ! empty( $args['event_id'] ) ) {
-			$post_id = $args['event_id'];
-		}
-		if ( ! $post_id ) {
-			$post_id = self::get_post_id();
-		}
+	public static function get_event_venue_data( $type, $args ) {
+		$post_id = ! empty( $args['event_id'] ) ? $args['event_id'] : self::get_post_id();
 
-		if ( 'end_event_date' === $args['event_date'] ) {
-			$date               = tribe_get_end_date( $post_id, true, Tribe__Date_Utils::DBDATETIMEFORMAT );
-			$args['start_date'] = tribe_get_start_date( $post_id, true, Tribe__Date_Utils::DBDATETIMEFORMAT );
+		switch ( $type ) {
+			case 'name':
+				return tribe_get_venue( $post_id );
+			case 'url':
+				return tribe_get_venue_link( $post_id, false );
+				break;
+			case 'post_content':
+				return self::get_event_related_post_content( tribe_get_venue_id( $post_id ), $args );
+				break;
+			case 'address':
+				return tribe_get_address( $post_id );
+				break;
+			case 'city':
+				return tribe_get_city( $post_id );
+				break;
+			case 'country':
+				return tribe_get_country( $post_id );
+				break;
+			case 'state':
+				return tribe_get_stateprovince( $post_id );
+				break;
+			case 'zip':
+				return tribe_get_zip( $post_id );
+				break;
+			case 'phone':
+				return tribe_get_phone( $post_id );
+				break;
+			case 'website':
+				return tribe_get_venue_website_url( $post_id );
+				break;
+			case 'gmap_link':
+				return tribe_get_map_link( $post_id );
+				break;
+			case 'full_address':
+				return tribe_get_venue_single_line_address( $post_id, false );
+				break;
+			case 'coordinates':
+				return tribe_get_coordinates( $post_id );
+				break;
+		}
+	}
+
+	/**
+	 * Gets Events Calendar event venue name.
+	 *
+	 * @static
+	 * @since 7.11.10
+	 * @access public
+	 * @param array $args    The args.
+	 * @return string
+	 */
+	public static function get_event_venue_name( $args ) {
+		$venue_name = self::get_event_venue_data( 'name', $args );
+		return is_null( $venue_name ) ? '' : $venue_name;
+	}
+
+	/**
+	 * Gets Events Calendar event venue URL.
+	 *
+	 * @static
+	 * @since 7.11.10
+	 * @access public
+	 * @param array $args    The args.
+	 * @return string
+	 */
+	public static function get_event_venue_url( $args ) {
+		return self::get_event_venue_data( 'url', $args );
+	}
+
+	/**
+	 * Gets Events Calendar event venue post content.
+	 *
+	 * @static
+	 * @since 7.11.10
+	 * @access public
+	 * @param array $args    The args.
+	 * @return string
+	 */
+	public static function get_event_venue_post_content( $args ) {
+		return self::get_event_venue_data( 'post_content', $args );
+	}
+
+	/**
+	 * Gets Events Calendar event related post content.
+	 *
+	 * @static
+	 * @since 7.11.10
+	 * @access public
+	 * @param array $args    The args.
+	 * @return string
+	 */
+	public static function get_event_related_post_content( $post_id, $args ) {
+		if ( has_excerpt( $post_id ) ) {
+			$content = do_shortcode( get_the_excerpt( $post_id ) );
 		} else {
-			$date = tribe_get_start_date( $post_id, true, Tribe__Date_Utils::DBDATETIMEFORMAT );
+			$content = get_the_content( null, false, $post_id );
+			$content = apply_filters( 'the_content', $content );
+			$content = str_replace( ']]>', ']]&gt;', $content );
+
+			if ( 'excerpt' === $args['content_type'] ) {
+				$content = wp_strip_all_tags( $content );
+
+				if ( 'characters' === fusion_get_option( 'excerpt_base' ) ) {
+					$content = mb_substr( $content, 0, $args['excerpt_length'] );
+				} else {
+					if ( str_word_count( $content, 0 ) > $args['excerpt_length'] ) {
+						$pos     = array_keys( str_word_count( $content, 2 ) );
+						$content = substr( $content, 0, $pos[ $args['excerpt_length'] ] ) . fusion_get_option( 'excerpt_read_more_symbol' );
+					}
+				}
+			}
 		}
 
-		return [
-			'date' => $date,
-			'args' => $args,
+		return $content;
+	}
+
+	/**
+	 * Gets Events Calendar event venue address.
+	 *
+	 * @static
+	 * @since 7.11.10
+	 * @access public
+	 * @param array $args    The args.
+	 * @return string
+	 */
+	public static function get_event_venue_address( $args ) {
+		return self::get_event_venue_data( 'address', $args );
+	}
+
+	/**
+	 * Gets Events Calendar event venue city.
+	 *
+	 * @static
+	 * @since 7.11.10
+	 * @access public
+	 * @param array $args    The args.
+	 * @return string
+	 */
+	public static function get_event_venue_city( $args ) {
+		return self::get_event_venue_data( 'city', $args );
+	}
+
+	/**
+	 * Gets Events Calendar event venue country.
+	 *
+	 * @static
+	 * @since 7.11.10
+	 * @access public
+	 * @param array $args    The args.
+	 * @return string
+	 */
+	public static function get_event_venue_country( $args ) {
+		return self::get_event_venue_data( 'country', $args );
+	}
+
+	/**
+	 * Gets Events Calendar event venue state.
+	 *
+	 * @static
+	 * @since 7.11.10
+	 * @access public
+	 * @param array $args    The args.
+	 * @return string
+	 */
+	public static function get_event_venue_state_province( $args ) {
+		return self::get_event_venue_data( 'state', $args );
+	}
+
+	/**
+	 * Gets Events Calendar event venue zip code.
+	 *
+	 * @static
+	 * @since 7.11.10
+	 * @access public
+	 * @param array $args    The args.
+	 * @return string
+	 */
+	public static function get_event_venue_zip( $args ) {
+		return self::get_event_venue_data( 'zip', $args );
+	}
+
+
+	/**
+	 * Gets Events Calendar event venue phone.
+	 *
+	 * @static
+	 * @since 7.11.10
+	 * @access public
+	 * @param array $args    The args.
+	 * @return string
+	 */
+	public static function get_event_venue_phone( $args ) {
+		return self::get_event_venue_data( 'phone', $args );
+	}
+
+	/**
+	 * Gets Events Calendar event venue website.
+	 *
+	 * @static
+	 * @since 7.11.10
+	 * @access public
+	 * @param array $args    The args.
+	 * @return string
+	 */
+	public static function get_event_venue_website( $args ) {
+		return self::get_event_venue_data( 'website', $args );
+	}
+
+	/**
+	 * Gets Events Calendar event venue Google maps link.
+	 *
+	 * @static
+	 * @since 7.11.10
+	 * @access public
+	 * @param array $args    The args.
+	 * @return string
+	 */
+	public static function get_event_venue_gmap_link( $args ) {
+		return self::get_event_venue_data( 'gmap_link', $args );
+	}
+
+	/**
+	 * Gets Events Calendar event venue full address.
+	 *
+	 * @static
+	 * @since 7.11.10
+	 * @access public
+	 * @param array $args    The args.
+	 * @return string
+	 */
+	public static function get_event_venue_full_address( $args ) {
+		add_filter( 'tribe_events_venue_single_line_address_parts', [ self::class, 'add_venue_address' ], 10, 2 );
+		$address = self::get_event_venue_data( 'full_address', $args );
+		remove_filter( 'tribe_events_venue_single_line_address_parts', [ self::class, 'add_venue_address' ], 10, 2 );
+
+		return is_null( $address ) ? '' : $address;
+	}
+
+	/**
+	 * Adds the street address to the TEC single line address.
+	 *
+	 * @static
+	 * @since 7.11.10
+	 * @access public
+	 * @param array Array of address parts
+	 * @param int Event ID
+	 * @return string The full address including venue name.
+	 */
+	public static function add_venue_address( $venue_address, $event_id ) {
+		$args = [
+			'event_id' => $event_id,
 		];
+
+		$address = self::get_event_venue_address( $args );
+
+		array_unshift( $venue_address, $address );
+
+		return $venue_address;
+	}
+
+	/**
+	 * Gets Events Calendar event venue address longitude.
+	 *
+	 * @static
+	 * @since 7.11.10
+	 * @access public
+	 * @param array $args    The args.
+	 * @return string
+	 */
+	public static function get_event_venue_address_longitude( $args ) {
+		return self::get_event_venue_address_coordinates( 'lng', $args );
+	}
+
+	/**
+	 * Gets Events Calendar event venue address latitude.
+	 *
+	 * @static
+	 * @since 7.11.10
+	 * @access public
+	 * @param array $args    The args.
+	 * @return string
+	 */
+	public static function get_event_venue_address_latitude( $args ) {
+		return self::get_event_venue_address_coordinates( 'lat', $args );
+	}
+
+	/**
+	 * Gets Events Calendar event venue address coorinates.
+	 *
+	 * @static
+	 * @since 7.11.10
+	 * @access public
+	 * @param string $type   The coordinate type to retunr. Either lat|lng|both.
+	 * @param array  $args    The args.
+	 * @return string|array
+	 */
+	public static function get_event_venue_address_coordinates( $type, $args ) {
+		$coordinates = self::get_event_venue_data( 'coordinates', $args );
+
+		return 'both' === $type ? $coordinates : $coordinates[ $type ];
+	}
+
+	/**
+	 * Gets Events Calendar event organizer data.
+	 *
+	 * @static
+	 * @since 7.11.10
+	 * @access public
+	 * @param string $type   The type of data to be retrieved.
+	 * @param array  $args    The args.
+	 * @return string
+	 */
+	public static function get_event_organizer_data( $type, $args ) {
+		$post_id = ! empty( $args['event_id'] ) ? $args['event_id'] : self::get_post_id();
+
+		switch ( $type ) {
+			case 'name':
+				return tribe_get_organizer( $post_id );
+				break;
+			case 'url':
+				return tribe_get_organizer_link( $post_id, false );
+				break;
+			case 'post_content':
+				return self::get_event_related_post_content( tribe_get_organizer_id( $post_id ), $args );
+				break;
+			case 'phone':
+				return tribe_get_organizer_phone( $post_id );
+				break;
+			case 'email':
+				return tribe_get_organizer_email( $post_id );
+				break;
+			case 'website':
+				return tribe_get_organizer_website_url( $post_id );
+				break;
+		}
+	}
+
+	/**
+	 * Gets Events Calendar event organizer name.
+	 *
+	 * @static
+	 * @since 7.11.10
+	 * @access public
+	 * @param array $args    The args.
+	 * @return string
+	 */
+	public static function get_event_organizer_name( $args ) {
+		return self::get_event_organizer_data( 'name', $args );
+	}
+
+	/**
+	 * Gets Events Calendar event organizer URL.
+	 *
+	 * @static
+	 * @since 7.11.10
+	 * @access public
+	 * @param array $args    The args.
+	 * @return string
+	 */
+	public static function get_event_organizer_url( $args ) {
+		return self::get_event_organizer_data( 'url', $args );
+	}
+
+	/**
+	 * Gets Events Calendar event organizer post content.
+	 *
+	 * @static
+	 * @since 7.11.10
+	 * @access public
+	 * @param array $args    The args.
+	 * @return string
+	 */
+	public static function get_event_organizer_post_content( $args ) {
+		return self::get_event_organizer_data( 'post_content', $args );
+	}
+
+	/**
+	 * Gets Events Calendar event organizer phone number.
+	 *
+	 * @static
+	 * @since 7.11.10
+	 * @access public
+	 * @param array $args    The args.
+	 * @return string
+	 */
+	public static function get_event_organizer_phone( $args ) {
+		return self::get_event_organizer_data( 'phone', $args );
+	}
+
+	/**
+	 * Gets Events Calendar event organizer email.
+	 *
+	 * @static
+	 * @since 7.11.10
+	 * @access public
+	 * @param array $args    The args.
+	 * @return string
+	 */
+	public static function get_event_organizer_email( $args ) {
+		return self::get_event_organizer_data( 'email', $args );
+	}
+
+	/**
+	 * Gets Events Calendar event organizer website.
+	 *
+	 * @static
+	 * @since 7.11.10
+	 * @access public
+	 * @param array $args    The args.
+	 * @return string
+	 */
+	public static function get_event_organizer_website( $args ) {
+		return self::get_event_organizer_data( 'website', $args );
+	}
+
+	/**
+	 * Gets Events Calendar event ticket capacity.
+	 *
+	 * @static
+	 * @since 7.11.10
+	 * @access public
+	 * @param array $args    The args.
+	 * @return string
+	 */
+	public static function get_event_ticket_capacity( $args ) {
+		$post_id = ! empty( $args['event_id'] ) ? $args['event_id'] : self::get_post_id();
+
+		if ( ! empty( $args['ticket_id'] ) ) {
+			return tribe_tickets_get_readable_amount( tribe_tickets_get_capacity( $args['ticket_id'] ) );
+		}
+
+		return tribe_tickets_get_readable_amount( tribe_get_event_capacity( $post_id ) );
+	}
+
+	/**
+	 * Gets Events Calendar event ticket availability.
+	 *
+	 * @static
+	 * @since 7.11.10
+	 * @access public
+	 * @param array $args    The args.
+	 * @return string
+	 */
+	public static function get_event_ticket_availability( $args ) {
+		$post_id = ! empty( $args['event_id'] ) ? $args['event_id'] : self::get_post_id();
+
+		if ( ! empty( $args['ticket_id'] ) ) {
+			return tribe_tickets_get_readable_amount( tribe( 'tickets.handler' )->get_ticket_max_purchase( $args['ticket_id'] ) );
+		}
+
+		return tribe_tickets_get_readable_amount( tribe_events_count_available_tickets( $post_id ) );
+	}
+
+	/**
+	 * Gets Events Calendar main events page URL.
+	 *
+	 * @static
+	 * @since 7.11.10
+	 * @access public
+	 * @param array $args    The args.
+	 * @return string
+	 */
+	public static function get_main_events_page_url( $args ) {
+		return esc_url( tribe_get_events_link() );
 	}
 
 	/**
@@ -1389,6 +2206,102 @@ class Fusion_Dynamic_Data_Callbacks {
 		] : '';
 	}
 
+	/**
+	 * Get product last purchase date.
+	 *
+	 * @static
+	 * @access public
+	 * @since 2.1
+	 * @param array $args    Arguments.
+	 * @param int   $post_id The post-ID.
+	 * @return string
+	 */
+	public static function woo_get_product_last_purchased( $args, $post_id = 0 ) {
+		global $wpdb;
+
+		$purchase_date = '';
+
+		if ( ! $post_id ) {
+			$post_id = self::get_post_id();
+		}
+
+		$user_id = get_current_user_id();
+
+		if ( $post_id && isset( $args['limit_to_user'] ) ) {
+			if ( 'yes' === $args['limit_to_user'] && $user_id ) {
+				if ( 'yes' === get_option( 'woocommerce_custom_orders_table_enabled' ) ) {
+					$purchase_date = $wpdb->get_var(
+						$wpdb->prepare(
+							"
+						SELECT opl.date_created FROM {$wpdb->prefix}wc_order_product_lookup opl
+						LEFT JOIN {$wpdb->prefix}wc_orders o ON opl.order_id = o.id
+						WHERE o.type = 'shop_order' AND o.status IN ('wc-processing','wc-completed')
+						AND o.customer_id = '%d' AND ( opl.product_id = %d OR opl.variation_id = %d )
+						ORDER BY opl.order_id DESC LIMIT 1
+					",
+							$user_id,
+							$post_id,
+							$post_id
+						)
+					);
+
+				} else {
+					$purchase_date = $wpdb->get_var(
+						$wpdb->prepare(
+							"
+						$purchase_date = SELECT p.post_date FROM {$wpdb->prefix}posts p
+						INNER JOIN {$wpdb->prefix}postmeta pm ON p.ID = pm.post_id
+						INNER JOIN {$wpdb->prefix}woocommerce_order_items oi ON oi.order_id = p.ID
+						INNER JOIN {$wpdb->prefix}woocommerce_order_itemmeta oim ON oi.order_item_id = oim.order_item_id
+						WHERE p.post_type = 'shop_order' AND p.post_status IN ('wc-processing','wc-completed')
+						AND pm.meta_key = '_customer_user' AND pm.meta_value = '%d'
+						AND oim.meta_key IN ('_product_id','_variation_id') AND oim.meta_value = '%d'
+						ORDER BY p.ID DESC LIMIT 1
+					",
+							$user_id,
+							$post_id
+						)
+					);
+				}
+			} else {
+				if ( 'yes' === get_option( 'woocommerce_custom_orders_table_enabled' ) ) {
+					$purchase_date = $wpdb->get_var(
+						$wpdb->prepare(
+							"
+						SELECT opl.date_created FROM {$wpdb->prefix}wc_order_product_lookup opl
+						LEFT JOIN {$wpdb->prefix}wc_orders o ON opl.order_id = o.id
+						WHERE o.type = 'shop_order' AND o.status IN ('wc-processing','wc-completed')
+						AND ( opl.product_id = %d OR opl.variation_id = %d )
+						ORDER BY opl.order_id DESC LIMIT 1
+					",
+							$post_id,
+							$post_id
+						)
+					);
+
+				} else {
+					$purchase_date = $wpdb->get_var(
+						$wpdb->prepare(
+							"
+						$purchase_date = SELECT p.post_date FROM {$wpdb->prefix}posts p
+						INNER JOIN {$wpdb->prefix}postmeta pm ON p.ID = pm.post_id
+						INNER JOIN {$wpdb->prefix}woocommerce_order_items oi ON oi.order_id = p.ID
+						INNER JOIN {$wpdb->prefix}woocommerce_order_itemmeta oim ON oi.order_item_id = oim.order_item_id
+						WHERE p.post_type = 'shop_order' AND p.post_status IN ('wc-processing','wc-completed')
+						AND oim.meta_key IN ('_product_id','_variation_id') AND oim.meta_value = '%d'
+						ORDER BY p.ID DESC LIMIT 1
+					",
+							$post_id
+						)
+					);
+				}
+			}
+
+			$purchase_date = ! empty( $args['format'] ) ? date( $args['format'], strtotime( $purchase_date ) ) : $purchase_date;
+		}
+
+		return $purchase_date;
+	}
 
 	/**
 	 * Get product price.
@@ -1488,6 +2401,32 @@ class Fusion_Dynamic_Data_Callbacks {
 		$stock = $_product->get_stock_quantity();
 
 		return null !== $stock ? $stock : '';
+	}
+
+	/**
+	 * Get product total sales.
+	 *
+	 * @static
+	 * @access public
+	 * @since 3.11.12
+	 * @param array $args    Arguments.
+	 * @param int   $post_id The post-ID.
+	 * @return string
+	 */
+	public static function woo_get_product_total_sales( $args, $post_id = 0 ) {
+		if ( ! $post_id ) {
+			$post_id = self::get_post_id();
+		}
+
+		$_product = wc_get_product( $post_id );
+
+		if ( ! $_product ) {
+			return '';
+		}
+
+		$total_sales = (string) $_product->get_total_sales();
+
+		return null !== $total_sales ? $total_sales : '';
 	}
 
 	/**

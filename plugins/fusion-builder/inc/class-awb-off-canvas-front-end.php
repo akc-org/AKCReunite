@@ -95,9 +95,11 @@ class AWB_Off_Canvas_Front_End extends AWB_Layout_Conditions {
 				'enter_animation'                => '',
 				'enter_animation_direction'      => 'static',
 				'enter_animation_speed'          => 0.5,
+				'enter_animation_timing'         => 'ease',
 				'exit_animation'                 => '',
 				'exit_animation_direction'       => 'static',
 				'exit_animation_speed'           => 0.5,
+				'exit_animation_timing'          => 'ease',
 
 				'off_canvas_state'               => 'closed',
 				'sb_height'                      => '',
@@ -108,8 +110,10 @@ class AWB_Off_Canvas_Front_End extends AWB_Layout_Conditions {
 
 				'sb_enter_animation'             => 'slideShort',
 				'sb_enter_animation_speed'       => 0.5,
+				'sb_enter_animation_timing'      => 'ease',
 				'sb_exit_animation'              => 'slideShort',
 				'sb_exit_animation_speed'        => 0.5,
+				'sb_exit_animation_timing'       => 'ease',
 				// Design.
 				'background_color'               => '#ffffff',
 				'background_image'               => '',
@@ -175,6 +179,8 @@ class AWB_Off_Canvas_Front_End extends AWB_Layout_Conditions {
 				'on_add_to_cart'                 => 'no',
 
 				// Rules.
+				'publish_date_after'             => '',
+				'publish_date_until'             => '',
 				'frequency'                      => 'forever',
 				'frequency_xtimes'               => '',
 				'frequency_xdays'                => '',
@@ -236,7 +242,7 @@ class AWB_Off_Canvas_Front_End extends AWB_Layout_Conditions {
 	 * @return string Off Canvas template.
 	 */
 	public static function render( $id, $force = false, $content_filter = true ) {
-		if ( ( ! self::is_current_user_can( $id ) || ! self::is_current_device_fit( $id ) ) && ! $force ) {
+		if ( ( ! self::is_currently_published( $id ) || ! self::is_current_user_can( $id ) || ! self::is_current_device_fit( $id ) ) && ! $force ) {
 			return;
 		}
 		$content   = self::get_content( $id, $content_filter );
@@ -254,6 +260,12 @@ class AWB_Off_Canvas_Front_End extends AWB_Layout_Conditions {
 			}
 		}
 
+		// Custom Code.
+		$custom_code = '';
+		if ( ! fusion_is_preview_frame() ) { // Prevent override & duplicated custom code in LE.
+			$custom_code = fusion_data()->post_meta( $id )->get( 'space_body_close' );
+		}
+
 		// Custom CSS.
 		if ( ! fusion_is_preview_frame() ) { // Prevent override & duplicated custom CSS in LE.
 			$custom_css = get_post_meta( $id, '_fusion_builder_custom_css', true );
@@ -262,7 +274,7 @@ class AWB_Off_Canvas_Front_End extends AWB_Layout_Conditions {
 
 		$style = $style ? '<style>' . $style . '</style>' : '';
 
-		$html  = $style . '<div ' . self::wrap_attr( $id ) . '><div class="awb-off-canvas" tabindex="-1">' . $close_btn . '<div ' . self::attr( $id ) . '>' . $content . '</div></div></div>';
+		$html  = $custom_code . $style . '<div ' . self::wrap_attr( $id ) . '><div class="awb-off-canvas" tabindex="-1">' . $close_btn . '<div ' . self::attr( $id ) . '>' . $content . '</div></div></div>';
 		$html .= self::get_script( $id );
 
 		return apply_filters( 'fusion_off_canvas_content', $html );
@@ -607,10 +619,12 @@ class AWB_Off_Canvas_Front_End extends AWB_Layout_Conditions {
 		if ( 'sliding-bar' !== $options['type'] ) {
 			return $options;
 		}
-		$options['enter_animation']       = $options['sb_enter_animation'];
-		$options['enter_animation_speed'] = $options['sb_enter_animation_speed'];
-		$options['exit_animation']        = $options['sb_exit_animation'];
-		$options['exit_animation_speed']  = $options['sb_exit_animation_speed'];
+		$options['enter_animation']        = $options['sb_enter_animation'];
+		$options['enter_animation_speed']  = $options['sb_enter_animation_speed'];
+		$options['enter_animation_timing'] = $options['sb_enter_animation_timing'];
+		$options['exit_animation']         = $options['sb_exit_animation'];
+		$options['exit_animation_speed']   = $options['sb_exit_animation_speed'];
+		$options['exit_animation_timing']  = $options['sb_exit_animation_timing'];
 
 		if ( 'left' === $options['position'] ) {
 			$options['height']                    = 'full';
@@ -665,7 +679,43 @@ class AWB_Off_Canvas_Front_End extends AWB_Layout_Conditions {
 	}
 
 	/**
-	 * Test users rules against current user .
+	 * Check if Off-Canvas is currently published.
+	 *
+	 * @access public
+	 * @since 3.6
+	 * @param string $id Off-Canvas ID.
+	 * @return bool Will be true if the Off-Canvas is currently published.
+	 */
+	public static function is_currently_published( $id ) {
+		$publish_date_after = fusion_data()->post_meta( $id )->get( 'publish_date_after' );
+		$publish_date_until = fusion_data()->post_meta( $id )->get( 'publish_date_until' );
+
+		// Authors can always see it.
+		if ( current_user_can( 'publish_posts' ) ) {
+			return true;
+		}
+
+		// Published, all can see.
+		if ( empty( $publish_date_after ) && empty( $publish_date_until ) ) {
+			return true;
+		}
+
+		// Set to show until or after.
+		$publish_date_after = strtotime( $publish_date_after );
+		$publish_date_until = strtotime( $publish_date_until );
+		$current_time       = current_time( 'timestamp' );
+
+		if ( ! empty( $publish_date_after ) && ! empty( $publish_date_until ) ) {
+			return $current_time > $publish_date_after && $current_time <= $publish_date_until;
+		} elseif ( ! empty( $publish_date_after ) ) {
+			return $current_time > $publish_date_after;
+		} else {
+			return $current_time <= $publish_date_until;
+		}
+	}
+
+	/**
+	 * Test user rules against current user.
 	 *
 	 * @access public
 	 * @since 3.6
@@ -699,7 +749,7 @@ class AWB_Off_Canvas_Front_End extends AWB_Layout_Conditions {
 			}
 		}
 
-		// default behavior.
+		// Default behavior.
 		return true;
 	}
 
@@ -727,7 +777,8 @@ class AWB_Off_Canvas_Front_End extends AWB_Layout_Conditions {
 				return false;
 			}
 		}
-		// default behavior.
+
+		// Default behavior.
 		return true;
 	}
 

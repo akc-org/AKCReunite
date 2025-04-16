@@ -53,8 +53,66 @@ if ( fusion_is_element_enabled( 'fusion_search' ) ) {
 			public function modify_search_filter( $query ) {
 				if ( is_search() && $query->is_search ) {
 
-					if ( isset( $_GET ) && isset( $_GET['fs'] ) && isset( $_GET['post_type'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
-						$query->set( 'post_type', wp_unslash( $_GET['post_type'] ) ); // phpcs:ignore WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput
+					if ( isset( $_GET ) && isset( $_GET['fs'] ) ) {
+						if ( isset( $_GET['post_type'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
+							$query->set( 'post_type', wp_unslash( $_GET['post_type'] ) ); // phpcs:ignore WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput
+						}
+
+						$tax_query         = [];
+						$tax_query_include = [];
+						$tax_query_exclude = [];
+
+						if ( isset( $_GET['include_terms'] ) ) {
+							$terms = explode( ',', $_GET['include_terms'] );
+
+							foreach( $terms as $term ) {
+								$taxonomy_and_term = explode( '|', $term );
+								$tax_query_include[] = [
+									'taxonomy' => $taxonomy_and_term[0],
+									'terms'    => [ $taxonomy_and_term[1] ],
+									'field'    => is_numeric( $taxonomy_and_term[1] ) ? 'term_taxonomy_id' : 'slug'
+								];
+							}
+
+							if ( 1 < count( $tax_query_include ) ) {
+								$tax_query_include['relation'] = 'OR';
+							}
+
+						}
+
+						if ( isset( $_GET['exclude_terms'] ) ) {
+							$terms = explode( ',', $_GET['exclude_terms'] );
+
+							foreach( $terms as $term ) {
+								$taxonomy_and_term = explode( '|', $term );
+								$tax_query_exclude[] = [
+									'taxonomy' => $taxonomy_and_term[0],
+									'terms'    => [ $taxonomy_and_term[1] ],
+									'field'    => is_numeric( $taxonomy_and_term[1] ) ? 'term_taxonomy_id' : 'slug',
+									'operator' => 'NOT IN',
+								];
+							}
+
+							if ( 1 < count( $tax_query_exclude ) ) {
+								$tax_query_exclude['relation'] = 'AND';
+							}
+						}
+
+						if ( ! empty( $tax_query_include ) && ! empty( $tax_query_exclude ) ) {
+							$tax_query = [
+								'relation' => 'AND',
+								$tax_query_include,
+								$tax_query_exclude
+							];
+						} elseif ( ! empty( $tax_query_include ) ) {
+							$tax_query = $tax_query_include;
+						} else {
+							$tax_query = $tax_query_exclude;
+						}
+
+						if ( ! empty( $tax_query ) ) {
+							$query->set( 'tax_query', $tax_query );
+						}
 					}
 				}
 
@@ -102,6 +160,8 @@ if ( fusion_is_element_enabled( 'fusion_search' ) ) {
 					'class'                              => '',
 					'search_content'                     => '',
 					'placeholder'                        => 'Search...',
+					'exclude_terms'                      => '',
+					'include_terms'                      => '',
 					'design'                             => $fusion_settings->get( 'search_form_design' ),
 					'live_search'                        => $fusion_settings->get( 'live_search' ) ? 'yes' : 'no',
 					'live_min_character'                 => $fusion_settings->get( 'live_search_min_char_count' ),
@@ -109,6 +169,7 @@ if ( fusion_is_element_enabled( 'fusion_search' ) ) {
 					'live_search_display_featured_image' => $fusion_settings->get( 'live_search_display_featured_image' ) ? 'yes' : 'no',
 					'live_search_display_post_type'      => $fusion_settings->get( 'live_search_display_post_type' ) ? 'yes' : 'no',
 					'search_limit_to_post_titles'        => $fusion_settings->get( 'search_limit_to_post_titles' ) ? 'yes' : 'no',
+					'add_woo_product_skus'               => $fusion_settings->get( 'search_add_woo_product_skus' ) ? 'yes' : 'no',
 					'live_results_bg_color'              => $fusion_settings->get( 'form_bg_color' ),
 					'live_results_link_color'            => $fusion_settings->get( 'link_color' ),
 					'live_results_meta_color'            => $fusion_settings->get( 'link_color' ),
@@ -195,25 +256,37 @@ if ( fusion_is_element_enabled( 'fusion_search' ) ) {
 
 				if ( $search_content ) {
 					if ( 1 === count( $search_content ) && 'product' === $search_content[0] ) {
-						$extra_fields .= '<input type="hidden" name="post_type" value="' . $search_content[0] . '" />';
+						$extra_fields .= '<input type="hidden" name="post_type" value="' . esc_attr( $search_content[0] ) . '" />';
 					} else {
 						foreach ( $search_content as $value ) {
-							$extra_fields .= '<input type="hidden" name="post_type[]" value="' . $value . '" />';
+							$extra_fields .= '<input type="hidden" name="post_type[]" value="' . esc_attr( $value ) . '" />';
 						}
 					}
 				}
 
-				$extra_fields .= '<input type="hidden" name="search_limit_to_post_titles" value="' . ( 'yes' === $this->args['search_limit_to_post_titles'] ? '1' : '0' ) . '" />';
-				if ( 'yes' === $this->args['live_search'] ) {
-					$extra_fields .= '<input type="hidden" name="live_min_character" value="' . ( $this->args['live_min_character'] ? $this->args['live_min_character'] : '4' ) . '" />';
-					$extra_fields .= '<input type="hidden" name="live_posts_per_page" value="' . ( $this->args['live_posts_per_page'] ? $this->args['live_posts_per_page'] : '10' ) . '" />';
-					$extra_fields .= '<input type="hidden" name="live_search_display_featured_image" value="' . ( 'yes' === $this->args['live_search_display_featured_image'] ? '1' : '0' ) . '" />';
-					$extra_fields .= '<input type="hidden" name="live_search_display_post_type" value="' . ( 'yes' === $this->args['live_search_display_post_type'] ? '1' : '0' ) . '" />';
+				// Limit to specific terms.
+				if ( ! empty(  $this->args['include_terms'] ) ) {
+					$extra_fields .= '<input type="hidden" name="include_terms" value="' . esc_attr( $this->args['include_terms'] ) . '" />';
 				}
 
-				// Live results scrollbar.
-				if ( 'yes' === $this->args['live_search'] && 'hidden' !== $this->args['live_results_scrollbar'] ) {
-					$extra_fields .= '<input type="hidden" name="live_results_scrollbar" value="' . $this->args['live_results_scrollbar'] . '" />';
+				// Exclude specific terms.
+				if ( ! empty(  $this->args['exclude_terms'] ) ) {
+					$extra_fields .= '<input type="hidden" name="exclude_terms" value="' . esc_attr( $this->args['exclude_terms'] ) . '" />';
+				}
+
+				$extra_fields .= '<input type="hidden" name="search_limit_to_post_titles" value="' . ( 'yes' === $this->args['search_limit_to_post_titles'] ? '1' : '0' ) . '" />';
+				$extra_fields .= '<input type="hidden" name="add_woo_product_skus" value="' . ( 'yes' === $this->args['add_woo_product_skus'] ? '1' : '0' ) . '" />';
+				
+				if ( 'yes' === $this->args['live_search'] ) {
+					$extra_fields .= '<input type="hidden" name="live_min_character" value="' . ( $this->args['live_min_character'] ? esc_attr( $this->args['live_min_character'] ) : '4' ) . '" />';
+					$extra_fields .= '<input type="hidden" name="live_posts_per_page" value="' . ( $this->args['live_posts_per_page'] ? esc_attr( $this->args['live_posts_per_page'] ) : '10' ) . '" />';
+					$extra_fields .= '<input type="hidden" name="live_search_display_featured_image" value="' . ( 'yes' === $this->args['live_search_display_featured_image'] ? '1' : '0' ) . '" />';
+					$extra_fields .= '<input type="hidden" name="live_search_display_post_type" value="' . ( 'yes' === $this->args['live_search_display_post_type'] ? '1' : '0' ) . '" />';
+
+					// Live results scrollbar.
+					if (  'hidden' !== $this->args['live_results_scrollbar'] ) {
+						$extra_fields .= '<input type="hidden" name="live_results_scrollbar" value="' . esc_attr( $this->args['live_results_scrollbar'] ) . '" />';
+					}
 				}
 
 				// Activate the search filter.
@@ -371,6 +444,26 @@ function fusion_element_search() {
 						'choices'     => $search_content,
 					],
 					[
+						'type'        => 'ajax_select',
+						'heading'     => esc_attr__( 'Include Terms', 'fusion-builder' ),
+						'description' => esc_attr__( 'Select one or more terms to which the search results should be limited to or leave blank for all.', 'fusion-builder' ),
+						'param_name'  => 'include_terms',
+						'default'     => '',
+						'value'       => [],
+						'ajax'        => 'fusion_search_query',
+						'ajax_params' => [ 'all_terms' => true ],
+					],
+					[
+						'type'        => 'ajax_select',
+						'heading'     => esc_attr__( 'Exclude Terms', 'fusion-builder' ),
+						'description' => esc_attr__( 'Select one or more terms to exclude from search results or leave blank to exclude none.', 'fusion-builder' ),
+						'param_name'  => 'exclude_terms',
+						'default'     => '',
+						'value'       => [],
+						'ajax'        => 'fusion_search_query',
+						'ajax_params' => [ 'all_terms' => true ],
+					],
+					[
 						'type'        => 'radio_button_set',
 						'heading'     => esc_attr__( 'Enable Live Search', 'fusion-builder' ),
 						'description' => esc_attr__( 'Turn on to enable live search results on menu search field and other fitting search forms.', 'fusion-builder' ),
@@ -468,6 +561,18 @@ function fusion_element_search() {
 							'no'  => esc_attr__( 'No', 'fusion-builder' ),
 						],
 					],
+					[
+						'type'        => 'radio_button_set',
+						'heading'     => esc_html__( 'Search for Woo Product SKUs', 'fusion-builder' ),
+						'description' => esc_html__( 'Turn on to also search for WooCommerce product SKUs. This will only work, if products have been added to the search results content.', 'fusion-builder' ),
+						'param_name'  => 'add_woo_product_skus',
+						'default'     => '',
+						'value'       => [
+							''    => esc_attr__( 'Default', 'fusion-builder' ),
+							'yes' => esc_attr__( 'Yes', 'fusion-builder' ),
+							'no'  => esc_attr__( 'No', 'fusion-builder' ),
+						],
+					],							
 					[
 						'type'        => 'textfield',
 						'heading'     => esc_attr__( 'Placeholder', 'fusion-builder' ),

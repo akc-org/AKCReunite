@@ -43,6 +43,7 @@ if ( fusion_is_element_enabled( 'fusion_form_select' ) ) {
 					'empty_notice'     => '',
 					'placeholder'      => '',
 					'input_field_icon' => '',
+					'multiselect'      => '',
 					'options'          => '',
 					'tab_index'        => '',
 					'class'            => '',
@@ -63,6 +64,7 @@ if ( fusion_is_element_enabled( 'fusion_form_select' ) ) {
 			public function render_input_field( $content ) {
 				$options = '';
 				$html    = '';
+				$name    = 'yes' === $this->args['multiselect'] ? $this->args['name'] . '[]' : $this->args['name'];
 
 				if ( empty( $this->args['options'] ) ) {
 					return $html;
@@ -76,7 +78,13 @@ if ( fusion_is_element_enabled( 'fusion_form_select' ) ) {
 					$element_data['label'] .= $this->get_field_tooltip( $this->args );
 				}
 
-				if ( isset( $this->args['placeholder'] ) && '' !== $this->args['placeholder'] ) {
+				if ( 'yes' === $this->args['multiselect'] ) {
+					$height                = count( $this->args['options'] );
+					$height                = 5 < $height ? '6.5' : $height + 1.5;
+					$element_data['style'] = ' style="height:' . $height . 'em;"';
+				}
+
+				if ( isset( $this->args['placeholder'] ) && '' !== $this->args['placeholder'] && 'yes' !== $this->args['multiselect'] ) {
 					$options .= '<option value="" disabled selected>' . $this->args['placeholder'] . '</option>';
 				}
 
@@ -90,12 +98,14 @@ if ( fusion_is_element_enabled( 'fusion_form_select' ) ) {
 
 				$element_html  = '<div class="fusion-select-wrapper">';
 				$element_html .= '<select ';
+
+				$element_html .= 'yes' === $this->args['multiselect'] ? 'multiple ' : '';
 				$element_html .= '' !== $element_data['empty_notice'] ? 'data-empty-notice="' . $element_data['empty_notice'] . '" ' : '';
-				$element_html .= 'tabindex="' . $this->args['tab_index'] . '" id="' . $this->args['name'] . '" name="' . $this->args['name'] . '"' . $element_data['class'] . $element_data['required'] . $element_data['style'] . $element_data['holds_private_data'] . '>';
+				$element_html .= 'tabindex="' . $this->args['tab_index'] . '" id="' . $this->args['name'] . '" name="' . $name . '"' . $element_data['class'] . $element_data['required'] . $element_data['style'] . $element_data['holds_private_data'] . '>';
 				$element_html .= $options;
 				$element_html .= '</select>';
 
-				$element_html .= '<div class="select-arrow"><svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M1.5 1.75L6 6.25L10.5 1.75" stroke="#6D6D6D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/> </svg></div>';
+				$element_html .= 'yes' === $this->args['multiselect'] ? '' : '<div class="select-arrow"><svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M1.5 1.75L6 6.25L10.5 1.75" stroke="#6D6D6D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/> </svg></div>';
 				$element_html .= '</div>';
 
 				if ( isset( $this->args['input_field_icon'] ) && '' !== $this->args['input_field_icon'] ) {
@@ -166,6 +176,17 @@ function fusion_form_select() {
 					],
 					[
 						'type'        => 'radio_button_set',
+						'heading'     => esc_attr__( 'Multiselect', 'fusion-builder' ),
+						'description' => esc_attr__( 'Choose whether you want a multi select or not.', 'fusion-builder' ),
+						'param_name'  => 'multiselect',
+						'default'     => 'no',
+						'value'       => [
+							'yes' => esc_attr__( 'Yes', 'fusion-builder' ),
+							'no'  => esc_attr__( 'No', 'fusion-builder' ),
+						],
+					],
+					[
+						'type'        => 'radio_button_set',
 						'heading'     => esc_attr__( 'Required Field', 'fusion-builder' ),
 						'description' => esc_attr__( 'Make a selection to ensure that this field is completed before allowing the user to submit the form.', 'fusion-builder' ),
 						'param_name'  => 'required',
@@ -195,6 +216,13 @@ function fusion_form_select() {
 						'param_name'  => 'placeholder',
 						'value'       => '',
 						'description' => esc_attr__( 'The placeholder text to display as the initial selection.', 'fusion-builder' ),
+						'dependency'  => [
+							[
+								'element'  => 'multiselect',
+								'value'    => 'no',
+								'operator' => '==',
+							],
+						],
 					],
 					[
 						'type'        => 'textfield',

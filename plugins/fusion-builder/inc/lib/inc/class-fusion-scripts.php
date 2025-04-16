@@ -117,7 +117,7 @@ class Fusion_Scripts {
 				self::$js_folder_url . '/library/swiper.js',
 				self::$js_folder_path . '/library/swiper.js',
 				[],
-				'11.1.0',
+				'11.2.5',
 				true,
 			],
 
@@ -243,14 +243,6 @@ class Fusion_Scripts {
 				self::$js_folder_path . '/library/jquery.mousewheel.js',
 				[ 'jquery' ],
 				'3.0.6',
-				true,
-			],
-			[
-				'jquery-placeholder',
-				self::$js_folder_url . '/library/jquery.placeholder.js',
-				self::$js_folder_path . '/library/jquery.placeholder.js',
-				[ 'jquery' ],
-				'2.0.7',
 				true,
 			],
 			[
@@ -467,7 +459,7 @@ class Fusion_Scripts {
 			'fusion-general-global',
 			self::$js_folder_url . '/general/fusion-general-global.js',
 			self::$js_folder_path . '/general/fusion-general-global.js',
-			[ 'jquery', 'jquery-placeholder' ],
+			[ 'jquery' ],
 			$fusion_library_latest_version,
 			true
 		);
@@ -581,6 +573,7 @@ class Fusion_Scripts {
 				'lightbox_title'           => fusion_get_option( 'lightbox_title' ),
 				'lightbox_arrows'          => fusion_get_option( 'lightbox_arrows' ),
 				'lightbox_slideshow_speed' => fusion_get_option( 'lightbox_slideshow_speed' ),
+				'lightbox_loop'            => fusion_get_option( 'lightbox_loop' ),
 				'lightbox_autoplay'        => fusion_get_option( 'lightbox_autoplay' ),
 				'lightbox_opacity'         => fusion_get_option( 'lightbox_opacity' ),
 				'lightbox_desc'            => fusion_get_option( 'lightbox_desc' ),

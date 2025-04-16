@@ -128,6 +128,23 @@ class Fusion_Builder_Conditional_Render_Helper {
 						],
 					],
 					[
+						'id'          => 'session_var',
+						'title'       => esc_html__( 'SESSION Variable', 'fusion-builder' ),
+						'type'        => 'text',
+						'additionals' => [
+							'type'        => 'text',
+							'title'       => esc_html__( 'SESSION', 'fusion-builder' ),
+							'placeholder' => esc_html__( 'Variable Name', 'fusion-builder' ),
+						],
+						'comparisons' => [
+							'equal'        => esc_attr__( 'Equal To', 'fusion-builder' ),
+							'not-equal'    => esc_attr__( 'Not Equal To', 'fusion-builder' ),
+							'greater-than' => esc_attr__( 'Greater Than', 'fusion-builder' ),
+							'less-than'    => esc_attr__( 'Less Than', 'fusion-builder' ),
+							'contains'     => esc_attr__( 'Contains', 'fusion-builder' ),
+						],
+					],
+					[
 						'id'          => 'user_agent',
 						'title'       => esc_html__( 'User Agent', 'fusion-builder' ),
 						'type'        => 'text',
@@ -246,7 +263,7 @@ class Fusion_Builder_Conditional_Render_Helper {
 					],
 					[
 						'id'          => 'is_term',
-						'title'       => esc_html__( 'Is Term', 'fusion-builder' ),
+						'title'       => esc_html__( 'Term ID', 'fusion-builder' ),
 						'type'        => 'text',
 						'placeholder' => esc_attr__( 'Term ID', 'fusion-builder' ),
 						'comparisons' => [
@@ -450,6 +467,24 @@ class Fusion_Builder_Conditional_Render_Helper {
 				],
 			],
 			[
+				'id'          => 'purchased_product',
+				'title'       => esc_html__( 'Product Purchase Status', 'fusion-builder' ),
+				'type'        => 'select',
+				'options'     => [
+					'purchased'     => esc_html__( 'Purchased', 'fusion-builder' ),
+					'not_purchased' => esc_html__( 'Not Purchased', 'fusion-builder' ),
+				],
+				'additionals' => [
+					'type'        => 'text',
+					'title'       => esc_html__( 'Product ID', 'fusion-builder' ),
+					'placeholder' => esc_html__( 'ID or empty for current prodcut', 'fusion-builder' ),
+				],
+				'comparisons' => [
+					'equal'     => esc_attr__( 'Equal To', 'fusion-builder' ),
+					'not-equal' => esc_attr__( 'Not Equal To', 'fusion-builder' ),
+				],
+			],
+			[
 				'id'          => 'product_type',
 				'title'       => esc_html__( 'Product Type', 'fusion-builder' ),
 				'type'        => 'select',
@@ -533,7 +568,7 @@ class Fusion_Builder_Conditional_Render_Helper {
 				'id'          => 'order_received_status',
 				'title'       => esc_html__( 'Order Received Status', 'fusion-builder' ),
 				'type'        => 'select',
-				'placeholder' => esc_html__( 'If the order received page(after user checks out), is successful(payment successful) or not(payment denied by bank for example).', 'fusion-builder' ),
+				'placeholder' => esc_html__( 'If the order received page (after user checks out), is successful (payment successful) or not (payment denied by bank for example).', 'fusion-builder' ),
 				'options'     => $wc_statuses,
 				'comparisons' => [
 					'equal'     => esc_attr__( 'Equal To', 'fusion-builder' ),
@@ -544,7 +579,7 @@ class Fusion_Builder_Conditional_Render_Helper {
 				'id'          => 'order_received_total_value',
 				'title'       => esc_html__( 'Order Received Total Value', 'fusion-builder' ),
 				'type'        => 'text',
-				'placeholder' => esc_html__( 'The total value of the order. Works only in order received page(after user checks out).', 'fusion-builder' ),
+				'placeholder' => esc_html__( 'The total value of the order. Works only on order received page (after user checks out).', 'fusion-builder' ),
 				'comparisons' => [
 					'equal'        => esc_attr__( 'Equal To', 'fusion-builder' ),
 					'not-equal'    => esc_attr__( 'Not Equal To', 'fusion-builder' ),
@@ -557,7 +592,7 @@ class Fusion_Builder_Conditional_Render_Helper {
 				'id'          => 'order_received_downloads',
 				'title'       => esc_html__( 'Order Received Download Count', 'fusion-builder' ),
 				'type'        => 'text',
-				'placeholder' => esc_html__( 'How many items that can be download the order received page(after user checks out) has.', 'fusion-builder' ),
+				'placeholder' => esc_html__( 'How many items can be downloaded on the order received page (after user checks out).', 'fusion-builder' ),
 				'comparisons' => [
 					'equal'        => esc_attr__( 'Equal To', 'fusion-builder' ),
 					'not-equal'    => esc_attr__( 'Not Equal To', 'fusion-builder' ),
@@ -839,6 +874,15 @@ class Fusion_Builder_Conditional_Render_Helper {
 
 				return $product->is_in_stock() ? 'in' : 'out';
 
+			case 'purchased_product':
+				$product = isset( $additionals ) && ! empty( $additionals ) ? wc_get_product( $additionals ) : wc_get_product( get_the_ID() );
+
+				if ( false === $product || ! is_user_logged_in() ) {
+					return 0;
+				}
+
+				return wc_customer_bought_product( '', get_current_user_id(), $product->get_id() ) ? 'purchased' : 'not_purchased';
+
 			case 'product_type':
 				$product = wc_get_product( get_the_ID() );
 
@@ -969,6 +1013,16 @@ class Fusion_Builder_Conditional_Render_Helper {
 				}
 
 				return sanitize_text_field( wp_unslash( $_GET[ $additionals ] ) ); // phpcs:ignore WordPress.Security.NonceVerification
+
+			case 'session_var':
+				if ( ! isset( $_SESSION[ $additionals ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
+					return null;
+				}
+				if ( is_array( $_SESSION[ $additionals ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
+					return array_map( 'sanitize_text_field', $_SESSION[ $additionals ] ); // phpcs:ignore WordPress.Security
+				}
+
+				return sanitize_text_field( wp_unslash( $_SESSION[ $additionals ] ) ); // phpcs:ignore WordPress.Security.NonceVerification				
 			case 'custom_field':
 				$post_meta = get_post_meta( get_the_ID(), $additionals, true );
 				return ! empty( $post_meta ) ? $post_meta : null;

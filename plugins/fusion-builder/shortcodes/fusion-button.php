@@ -53,6 +53,7 @@ if ( fusion_is_element_enabled( 'fusion_button' ) ) {
 			public static function get_element_defaults() {
 				$fusion_settings = awb_get_fusion_settings();
 				return [
+					'aria_role_button'                   => '0',
 					'button_el_type'                     => 'link',
 					'hide_on_mobile'                     => fusion_builder_default_visibility( 'string' ),
 					'sticky_display'                     => '',
@@ -680,6 +681,10 @@ if ( fusion_is_element_enabled( 'fusion_button' ) ) {
 				if ( isset( $this->args['title'] ) && '' !== $this->args['title'] ) {
 					$attr['title']      = $this->args['title'];
 					$attr['aria-label'] = isset( $attr['aria-label'] ) ? $attr['aria-label'] : $attr['title'];
+				}
+
+				if ( '1' === $this->args['aria_role_button'] ) {
+					$attr['role'] = 'button';
 				}
 
 				if ( isset( $this->args['link'] ) && '' !== $this->args['link'] ) {
@@ -1486,6 +1491,17 @@ function fusion_element_button() {
 					],
 					[
 						'type'        => 'radio_button_set',
+						'heading'     => esc_attr__( 'Enable ARIA Role Button', 'fusion-builder' ),
+						'description' => esc_attr__( 'Turn on for accessibility reasons, if your button does not use standard link behaviour, but triggers an action like opening an Off-Canvas or a Modal.', 'fusion-builder' ),
+						'param_name'  => 'aria_role_button',
+						'default'     => '0',
+						'value'       => [
+							'1' => esc_attr__( 'On', 'fusion-builder' ),
+							'0' => esc_attr__( 'Off', 'fusion-builder' ),
+						],
+					],
+					[
+						'type'        => 'radio_button_set',
 						'heading'     => esc_attr__( 'Alignment', 'fusion-builder' ),
 						'description' => esc_attr__( "Select the button's alignment.", 'fusion-builder' ),
 						'param_name'  => 'alignment',
@@ -1667,7 +1683,7 @@ function fusion_element_button() {
 						'description' => esc_attr__( 'Controls the gradient angle. In degrees.', 'fusion-builder' ),
 						'param_name'  => 'linear_angle',
 						'default'     => $fusion_settings->get( 'button_gradient_angle' ),
-						'value'       => '180',
+						'value'       => '',
 						'min'         => '',
 						'max'         => '360',
 						'group'       => esc_attr__( 'Design', 'fusion-builder' ),

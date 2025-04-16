@@ -1,6 +1,7 @@
 .fusion-form-form-wrapper {
   --awb-tooltip-text-color: #fff;
   --awb-tooltip-background-color: #333;
+  --awb-required-field-symbol-deco: dotted underline;
   --awb-field-margin-top: 1em;
   --awb-field-margin-bottom: 1em;
   --awb-form-input-height: var(--form_input_height);
@@ -300,6 +301,10 @@
 }
 .fusion-builder-live .fusion-form-form-wrapper button[type="submit"] {
   pointer-events: none;
+}
+.fusion-form .fusion-form-element-required {
+  -webkit-text-decoration: var(--awb-required-field-symbol-deco);
+          text-decoration: var(--awb-required-field-symbol-deco);
 }
 .fusion-form .form-submission-notices .fusion-form-response {
   display: none;

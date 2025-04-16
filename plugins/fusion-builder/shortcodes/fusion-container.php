@@ -335,17 +335,17 @@ if ( ! class_exists( 'FusionSC_Container' ) ) {
 				'sticky_transition_offset'              => 0,
 				'scroll_offset'                         => 0,
 
-				//Background Slider.
-				'background_slider_images'				=> '',
-				'background_slider_skip_lazy_loading' 	=> 'no',
-				'background_slider_pause_on_hover'   	=> 'no',
-				'background_slider_loop'				=> 'yes',
+				// Background Slider.
+				'background_slider_images'              => '',
+				'background_slider_skip_lazy_loading'   => 'no',
+				'background_slider_pause_on_hover'      => 'no',
+				'background_slider_loop'                => 'yes',
 				'background_slider_slideshow_speed'     => '5000',
-				'background_slider_animation'			=> 'fade',
-				'background_slider_animation_speed'		=> '800',
-				'background_slider_direction'		    => 'up',
-				'background_slider_position'		    => '50% 50%',
-				'background_slider_blend_mode'		    => '',
+				'background_slider_animation'           => 'fade',
+				'background_slider_animation_speed'     => '800',
+				'background_slider_direction'           => 'up',
+				'background_slider_position'            => '50% 50%',
+				'background_slider_blend_mode'          => '',
 
 				// Video Background.
 				'video_mp4'                             => '',
@@ -2434,7 +2434,6 @@ if ( ! class_exists( 'FusionSC_Container' ) ) {
 			);
 
 			Fusion_Dynamic_JS::enqueue_script( 'awb-background-slider' );
-
 		}
 
 		/**
@@ -2805,6 +2804,7 @@ function fusion_builder_add_section() {
 						'type'        => 'radio_button_set',
 						'heading'     => esc_attr__( 'Content Wrap', 'fusion-builder' ),
 						'description' => __( 'Controls whether flex items are forced onto one line or can wrap onto multiple lines.', 'fusion-builder' ),
+						'group'       => esc_attr__( 'General', 'fusion-builder' ),
 						'param_name'  => 'flex_wrap',
 						'default'     => 'wrap',
 						'value'       => [
@@ -2831,6 +2831,7 @@ function fusion_builder_add_section() {
 						'type'        => 'textfield',
 						'heading'     => esc_attr__( 'Column Spacing', 'fusion-builder' ),
 						'description' => esc_attr__( 'Controls the spacing between columns of the container.', 'fusion-builder' ),
+						'group'       => esc_attr__( 'General', 'fusion-builder' ),
 						'param_name'  => 'flex_column_spacing',
 						'value'       => '',
 						'dependency'  => [
@@ -2933,6 +2934,7 @@ function fusion_builder_add_section() {
 						'value'       => fusion_builder_visibility_options( 'full' ),
 						'default'     => fusion_builder_default_visibility( 'array' ),
 						'description' => esc_attr__( 'Choose to show or hide the section on small, medium or large screens. You can choose more than one at a time.', 'fusion-builder' ),
+						'group'       => esc_attr__( 'General', 'fusion-builder' ),
 						'or'          => true,
 						'dependency'  => [
 							[
@@ -2951,6 +2953,7 @@ function fusion_builder_add_section() {
 						'type'        => 'radio_button_set',
 						'heading'     => esc_attr__( 'Container Publishing Status', 'fusion-builder' ),
 						'description' => __( 'Controls the publishing status of the container.  If draft is selected the container will only be visible to logged in users with the capability to publish posts.  If publish until or publish after are selected the container will be in draft mode when not published.', 'fusion-builder' ),
+						'group'       => esc_attr__( 'General', 'fusion-builder' ),
 						'param_name'  => 'status',
 						'default'     => 'published',
 						'value'       => [
@@ -3007,7 +3010,7 @@ function fusion_builder_add_section() {
 							],
 						],
 					],
-					'fusion_margin_placeholder'     => [
+					'fusion_margin_placeholder'            => [
 						'param_name'  => 'spacing',
 						'description' => esc_attr__( 'Spacing above and below the section. Enter values including any valid CSS unit, ex: 4%.', 'fusion-builder' ),
 						'responsive'  => [
@@ -3175,7 +3178,7 @@ function fusion_builder_add_section() {
 						],
 						'group'            => esc_attr__( 'Design', 'fusion-builder' ),
 					],
-					'fusion_box_shadow_placeholder' => [
+					'fusion_box_shadow_placeholder'        => [
 						'callback' => [
 							'function' => 'fusion_update_box_shadow_vars',
 							'args'     => [
@@ -3219,7 +3222,7 @@ function fusion_builder_add_section() {
 							'single'   => esc_attr__( 'Color', 'fusion-builder' ),
 							'gradient' => esc_attr__( 'Gradient', 'fusion-builder' ),
 							'image'    => esc_attr__( 'Image', 'fusion-builder' ),
-							'slider'    => esc_attr__( 'Slider', 'fusion-builder' ),
+							'slider'   => esc_attr__( 'Slider', 'fusion-builder' ),
 							'video'    => esc_attr__( 'Video', 'fusion-builder' ),
 							'pattern'  => esc_attr__( 'Pattern', 'fusion-builder' ),
 							'mask'     => esc_attr__( 'Mask', 'fusion-builder' ),
@@ -3228,7 +3231,7 @@ function fusion_builder_add_section() {
 							'single'   => '<span class="fusiona-fill-drip-solid" style="font-size:18px;"></span>',
 							'gradient' => '<span class="fusiona-gradient-fill" style="font-size:18px;"></span>',
 							'image'    => '<span class="fusiona-image" style="font-size:18px;"></span>',
-							'slider'    => '<span class="fusiona-images" style="font-size:18px;"></span>',
+							'slider'   => '<span class="fusiona-images" style="font-size:18px;"></span>',
 							'video'    => '<span class="fusiona-video" style="font-size:18px;"></span>',
 							'pattern'  => '<span class="fusiona-background-pattern" style="font-size:18px;"></span>',
 							'mask'     => '<span class="fusiona-background-mask" style="font-size:18px;"></span>',
@@ -3251,10 +3254,10 @@ function fusion_builder_add_section() {
 							'additional_states' => [ 'medium', 'small' ],
 						],
 					],
-					'fusion_gradient_placeholder'   => [
+					'fusion_gradient_placeholder'          => [
 						'selector' => '.fusion-fullwidth',
 						'defaults' => 'TO',
-					],					
+					],
 					[
 						'type'         => 'upload',
 						'heading'      => esc_attr__( 'Background Image', 'fusion-builder' ),
@@ -3681,7 +3684,7 @@ function fusion_builder_add_section() {
 							],
 						],
 					],
-					'fusion_background_slider_placeholder'    => [],
+					'fusion_background_slider_placeholder' => [],
 					[
 						'type'         => 'uploadfile',
 						'heading'      => esc_attr__( 'Video MP4 Upload', 'fusion-builder' ),
@@ -3881,8 +3884,8 @@ function fusion_builder_add_section() {
 							],
 						],
 					],
-					'fusion_pattern_placeholder'    => [],
-					'fusion_mask_placeholder'       => [],
+					'fusion_pattern_placeholder'           => [],
+					'fusion_mask_placeholder'              => [],
 					'fusion_conditional_render_placeholder' => [],
 					[
 						'type'        => 'fusion_logics',
@@ -4067,10 +4070,10 @@ function fusion_builder_add_section() {
 							],
 						],
 					],
-					'fusion_animation_placeholder'  => [
+					'fusion_animation_placeholder'         => [
 						'preview_selector' => '.fusion-fullwidth',
 					],
-					'fusion_filter_placeholder'     => [
+					'fusion_filter_placeholder'            => [
 						'selector_base' => 'fusion-builder-row-live-',
 					],
 				],

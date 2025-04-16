@@ -90,12 +90,15 @@ final class Fusion_Dynamic_JS {
 
 		if ( ( defined( 'FUSION_DISABLE_COMPILERS' ) && FUSION_DISABLE_COMPILERS ) ||
 			'0' === fusion_library()->get_option( 'js_compiler' ) ||
+			( defined( 'AVADA_DEV_MODE' ) && AVADA_DEV_MODE && defined( 'FUSION_BUILDER_DEV_MODE' ) && FUSION_BUILDER_DEV_MODE && defined( 'FUSION_LIBRARY_DEV_MODE' ) && FUSION_LIBRARY_DEV_MODE ) ||
 			( defined( 'WP_SCRIPT_DEBUG' ) && WP_SCRIPT_DEBUG ) ||
 			post_password_required() ||
 			( isset( $_GET['builder_id'] ) && get_transient( 'fusion_app_emulated-' . sanitize_text_field( wp_unslash( $_GET['builder_id'] ) ) . '-' . $option ) ) ) { // phpcs:ignore WordPress.Security.NonceVerification
+
 			new Fusion_Dynamic_JS_Separate( $this );
 			return;
 		}
+
 		$this->file = new Fusion_Dynamic_JS_File( $this );
 
 	}

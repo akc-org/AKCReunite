@@ -167,7 +167,11 @@ if ( fusion_is_element_enabled( 'fusion_tb_woo_tabs' ) ) {
 						wp_die();
 					}
 
-					do_action( 'fusion_pause_live_editor_filter' );
+					$pause_filtering = false;
+					if ( ! Fusion_Builder_Front()->is_filtering_paused() ) {
+						do_action( 'fusion_pause_live_editor_filter' );
+						$pause_filtering = true;
+					}
 
 					$this->emulate_product();
 
@@ -188,7 +192,9 @@ if ( fusion_is_element_enabled( 'fusion_tb_woo_tabs' ) ) {
 					$return_data['woo_tabs'] = $this->get_woo_tabs_content( $defaults, $post_id );
 					$this->restore_product();
 
-					do_action( 'fusion_resume_live_editor_filter' );
+					if ( $pause_filtering ) {
+						do_action( 'fusion_resume_live_editor_filter' );
+					}
 
 					// Restore global $post.
 					$post = null;
@@ -211,8 +217,10 @@ if ( fusion_is_element_enabled( 'fusion_tb_woo_tabs' ) ) {
 				$this->defaults = self::get_element_defaults();
 				$this->args     = FusionBuilder::set_shortcode_defaults( $this->defaults, $args, 'fusion_tb_woo_tabs' );
 
-				if ( function_exists( 'fusion_is_preview_frame' ) && fusion_is_preview_frame() ) {
+				$pause_filtering = false;
+				if ( ! Fusion_Builder_Front()->is_filtering_paused() ) {
 					do_action( 'fusion_pause_live_editor_filter' );
+					$pause_filtering = true;
 				}
 
 				$this->emulate_product();
@@ -225,7 +233,7 @@ if ( fusion_is_element_enabled( 'fusion_tb_woo_tabs' ) ) {
 
 				$this->restore_product();
 
-				if ( function_exists( 'fusion_is_preview_frame' ) && fusion_is_preview_frame() ) {
+				if ( $pause_filtering ) {
 					do_action( 'fusion_resume_live_editor_filter' );
 				}
 

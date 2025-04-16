@@ -22,10 +22,7 @@ $sticky_sidebar  = false !== strpos( $sidebar_classes, 'fusion-sticky-sidebar' )
 	<?php endif; ?>
 		<?php if ( ! AWB_Widget_Framework()->has_sidebar() || 'left' === AWB_Widget_Framework()->sidebars['position'] || ( 'right' === AWB_Widget_Framework()->sidebars['position'] && ! AWB_Widget_Framework()->has_double_sidebars() ) ) : ?>
 			<?php echo avada_display_sidenav( Avada()->fusion_library->get_page_id() ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
-			<?php if ( class_exists( 'Tribe__Events__Main' ) && is_singular( 'tribe_events' ) && 'sidebar' === fusion_library()->get_option( 'ec_meta_layout' ) ) : ?>
-				<?php do_action( 'tribe_events_single_event_before_the_meta' ); ?>
-				<?php tribe_get_template_part( 'modules/meta' ); ?>
-			<?php endif; ?>
+			<?php do_action( 'awb_tec_single_events_meta' ); ?>
 		<?php endif; ?>
 
 		<?php if ( isset( AWB_Widget_Framework()->sidebars['sidebar_1'] ) && AWB_Widget_Framework()->sidebars['sidebar_1'] ) : ?>

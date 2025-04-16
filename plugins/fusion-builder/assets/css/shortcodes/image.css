@@ -29,6 +29,7 @@
   --awb-caption-text-size: inherit;
   --awb-caption-text-font-family: var(--body_typography-font-family);
   --awb-caption-text-font-weight: var(--body_typography-font-weight);
+  --awb-caption-text-font-style: var(--body_typography-font-style);
   --awb-caption-text-line-height: var(--body_typography-line-height);
   --awb-caption-text-letter-spacing: var(--body_typography-letter-spacing);
   --awb-caption-text-transform: inherit;
@@ -39,19 +40,20 @@
   line-height: 1;
 }
 .awb-image-frame.awb-bottomshadow {
+  display: inline-block;
   position: relative;
 }
 .awb-image-frame.awb-bottomshadow svg {
   position: absolute;
   top: 99.5%;
   left: 0;
+  transition: transform 0.35s;
 }
 .awb-image-frame.awb-bottomshadow svg g g path {
   fill: var(--awb-bottom-shadow-color);
 }
 .awb-image-frame.awb-bottomshadow.imageframe-liftup:hover svg {
   transform: scale(1.03) translateY(15%);
-  transition: transform 0.35s;
 }
 .fusion-imageframe {
   display: inline-block;
@@ -136,6 +138,7 @@
   font-size: var(--awb-caption-text-size);
   font-family: var(--awb-caption-text-font-family);
   font-weight: var(--awb-caption-text-font-weight);
+  font-style: var(--awb-caption-text-font-style);
   line-height: var(--awb-caption-text-line-height);
   letter-spacing: var(--awb-caption-text-letter-spacing);
   text-transform: var(--awb-caption-text-transform);
@@ -410,8 +413,7 @@
   display: inline-block;
   margin: 0 0 0.25em;
   padding: 0.4em 1em;
-  background: rgba(255, 255, 255, 0.9);
-  color: #2f3238;
+  color: var(--awb-caption-text-color, #2f3238);
   text-transform: none;
   font-weight: 500;
   transition: opacity 0.35s, transform 0.35s;

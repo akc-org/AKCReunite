@@ -82,6 +82,10 @@ var FusionPageBuilder = FusionPageBuilder || {};
 					attr[ 'class' ] += ' dark-controls';
 				}
 
+				if ( 'on' ===  values.playback_speed ) {
+					attr[ 'class' ] += ' awb-playback-speed';
+				}
+
 				if ( '' !== values[ 'class' ] ) {
 					attr[ 'class' ] += ' ' + values[ 'class' ];
 				}

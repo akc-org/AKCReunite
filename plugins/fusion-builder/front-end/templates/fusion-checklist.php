@@ -23,7 +23,7 @@
 		let itemContent = FusionPageBuilderApp.renderContent( output, cid, false );
 
 		if ( usingDynamicParent ) {
-			itemContent = '<?php esc_html_e( 'This checklist use dynamic data.  For a preview please check the front-end.', 'fusion-builder' ); ?>';
+			itemContent = '<?php esc_html_e( 'This checklist uses dynamic data. For a preview please check the front-end.', 'fusion-builder' ); ?>';
 		}
 #>
 <div {{{ _.fusionGetAttributes( checklistShortcodeItemContent ) }}}>{{{ itemContent }}}</div>

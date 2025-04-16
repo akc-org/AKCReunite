@@ -114,6 +114,7 @@
 }
 .fusion-sharing-box .fusion-social-network-icon-tagline {
   display: inline;
+  transition: inherit;
 }
 .fusion-sharing-box.has-icon-taglines span a {
   display: flex;

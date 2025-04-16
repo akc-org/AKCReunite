@@ -42,7 +42,13 @@ var FusionPageBuilder = FusionPageBuilder || {};
 					elementData.label += this.getFieldTooltip( values );
 				}
 
-				if ( 'undefined' !== typeof values.placeholder && '' !== values.placeholder ) {
+				if ( 'yes' === values.multiselect ) {
+					let height = values.options.length;
+					height = 5 < height ? '6.5' : height + 1.5;
+					elementData.style = ' style="height:' + height + 'em;"';
+				}
+
+				if ( 'undefined' !== typeof values.placeholder && '' !== values.placeholder && 'yes' !== values.multiselect ) {
 					options += '<option value="" selected disabled>' + values.placeholder + '</option>';
 				}
 
@@ -55,10 +61,12 @@ var FusionPageBuilder = FusionPageBuilder || {};
 				} );
 
 				elementHtml  = '<div class="fusion-select-wrapper">';
-				elementHtml += '<select class="fusion-form-input" name="' + values.name + '"' + elementData[ 'class' ] + elementData.required + elementData.style + elementData.holds_private_data + '>';
+				elementHtml += '<select ';
+				elementHtml += 'yes' === values.multiselect ? 'multiple ' : '';
+				elementHtml += 'class="fusion-form-input" name="' + values.name + '"' + elementData[ 'class' ] + elementData.required + elementData.style + elementData.holds_private_data + '>';
 				elementHtml += options;
 				elementHtml += '</select>';
-				elementHtml += '<div class="select-arrow"><svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M1.5 1.75L6 6.25L10.5 1.75" stroke="#6D6D6D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/> </svg>';
+				elementHtml += 'yes' === values.multiselect ? '' : '<div class="select-arrow"><svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M1.5 1.75L6 6.25L10.5 1.75" stroke="#6D6D6D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/> </svg>';
 				elementHtml += '</div>';
 
 				elementHtml = this.generateIconHtml( values, elementHtml );

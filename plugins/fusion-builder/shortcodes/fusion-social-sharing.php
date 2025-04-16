@@ -93,10 +93,13 @@ if ( fusion_is_element_enabled( 'fusion_sharing' ) ) {
 							? $fusion_settings->get( 'social_sharing' ) : [
 								'facebook',
 								'twitter',
+								'bluesky',
 								'reddit',
 								'linkedin',
+								'mastodon',
 								'whatsapp',
 								'telegram',
+								'threads',
 								'tumblr',
 								'pinterest',
 								'vk',
@@ -205,10 +208,22 @@ if ( fusion_is_element_enabled( 'fusion_sharing' ) ) {
 						'param'    => 'social_networks',
 						'callback' => 'createSocialNetworks',
 					],
+					'sharing_mastodon'                  => [
+						'param'    => 'social_networks',
+						'callback' => 'createSocialNetworks',
+					],					
 					'sharing_twitter'                   => [
 						'param'    => 'social_networks',
 						'callback' => 'createSocialNetworks',
 					],
+					'sharing_bluesky'                   => [
+						'param'    => 'social_networks',
+						'callback' => 'createSocialNetworks',
+					],
+					'sharing_threads'                   => [
+						'param'    => 'social_networks',
+						'callback' => 'createSocialNetworks',
+					],								
 					'sharing_facebook'                  => [
 						'param'    => 'social_networks',
 						'callback' => 'createSocialNetworks',
@@ -340,7 +355,7 @@ if ( fusion_is_element_enabled( 'fusion_sharing' ) ) {
 					$icons
 				);
 
-				$this->counter ++;
+				$this->counter++;
 				$this->on_render();
 
 				return apply_filters( 'fusion_element_sharingbox_content', $html, $args );
@@ -646,10 +661,16 @@ if ( fusion_is_element_enabled( 'fusion_sharing' ) ) {
 						}
 						break;
 					case 'twitter':
-						$social_link = 'https://twitter.com/share?text=' . rawurlencode( html_entity_decode( $title, ENT_COMPAT, 'UTF-8' ) ) . '&url=' . rawurlencode( $link );
+						$social_link = 'https://x.com/intent/post?text=' . rawurlencode( html_entity_decode( $title, ENT_COMPAT, 'UTF-8' ) ) . '&url=' . rawurlencode( $link );
+						break;
+					case 'bluesky':
+						$social_link = 'https://bsky.app/intent/compose?text=' . rawurlencode( html_entity_decode( $title, ENT_COMPAT, 'UTF-8' ) ) . '%20' . rawurlencode( $link ) . '%20' . rawurlencode( $description );
 						break;
 					case 'linkedin':
 						$social_link = 'https://www.linkedin.com/shareArticle?mini=true&url=' . rawurlencode( $link ) . '&title=' . rawurlencode( $title ) . '&summary=' . rawurlencode( $description );
+						break;
+					case 'mastodon':
+						$social_link = 'https://mastodonshare.com/?url=' . rawurlencode( $link ) . '&amp;text=' . rawurlencode( $title ) . '%20' . rawurlencode( $description );
 						break;
 					case 'reddit':
 						$social_link = 'https://reddit.com/submit?url=' . rawurlencode( $link ) . '&amp;title=' . rawurlencode( $title );
@@ -660,6 +681,9 @@ if ( fusion_is_element_enabled( 'fusion_sharing' ) ) {
 					case 'telegram':
 						$social_link = 'https://t.me/share/url?url=' . rawurlencode( $link ) . '&text=' . rawurlencode( $title ) . '';
 						break;
+					case 'threads':
+						$social_link = 'https://www.threads.net/intent/post?url=' . rawurlencode( $link ) . '&amp;text=' . rawurlencode( $title ) . '%20' . rawurlencode( $description );
+						break;						
 					case 'tumblr':
 						$social_link = 'https://www.tumblr.com/share/link?url=' . rawurlencode( $link ) . '&amp;name=' . rawurlencode( $title ) . '&amp;description=' . rawurlencode( $description );
 						break;
@@ -754,10 +778,13 @@ if ( fusion_is_element_enabled( 'fusion_sharing' ) ) {
 								'choices'                => [
 									'facebook'  => esc_html__( 'Facebook', 'fusion-builder' ),
 									'twitter'   => esc_html__( 'X', 'fusion-builder' ),
+									'bluesky'   => esc_html__( 'Bluesky', 'fusion-builder' ),
 									'reddit'    => esc_html__( 'Reddit', 'fusion-builder' ),
 									'linkedin'  => esc_html__( 'LinkedIn', 'fusion-builder' ),
+									'mastodon'  => esc_html__( 'Mastodon', 'fusion-builder' ),
 									'whatsapp'  => esc_html__( 'WhatsApp', 'fusion-builder' ),
 									'telegram'  => esc_html__( 'Telegram', 'fusion-builder' ),
+									'threads'   => esc_html__( 'Threads', 'fusion-builder' ),
 									'tumblr'    => esc_html__( 'Tumblr', 'fusion-builder' ),
 									'pinterest' => esc_html__( 'Pinterest', 'fusion-builder' ),
 									'vk'        => esc_html__( 'VK', 'fusion-builder' ),
@@ -1099,10 +1126,13 @@ function fusion_element_sharing_box() {
 						'choices'     => [
 							'facebook'  => esc_html__( 'Facebook', 'fusion-builder' ),
 							'twitter'   => esc_html__( 'X', 'fusion-builder' ),
+							'bluesky'   => esc_html__( 'Bluesky', 'fusion-builder' ),
 							'reddit'    => esc_html__( 'Reddit', 'fusion-builder' ),
+							'mastodon'  => esc_html__( 'Mastodon', 'fusion-builder' ),
 							'linkedin'  => esc_html__( 'LinkedIn', 'fusion-builder' ),
 							'whatsapp'  => esc_html__( 'WhatsApp', 'fusion-builder' ),
 							'telegram'  => esc_html__( 'Telegram', 'fusion-builder' ),
+							'threads'   => esc_html__( 'Threads', 'fusion-builder' ),
 							'tumblr'    => esc_html__( 'Tumblr', 'fusion-builder' ),
 							'pinterest' => esc_html__( 'Pinterest', 'fusion-builder' ),
 							'vk'        => esc_html__( 'VK', 'fusion-builder' ),
@@ -1493,18 +1523,20 @@ function fusion_element_sharing_box() {
 						'value'       => [
 							''       => esc_attr__( 'Default', 'fusion-builder' ),
 							'top'    => esc_attr__( 'Top', 'fusion-builder' ),
+							'right'  => esc_attr__( 'Right', 'fusion-builder' ),
 							'bottom' => esc_attr__( 'Bottom', 'fusion-builder' ),
 							'left'   => esc_attr__( 'Left', 'fusion-builder' ),
-							'Right'  => esc_attr__( 'Right', 'fusion-builder' ),
+							'none'   => esc_html__( 'None', 'fusion-builder' ),
 						],
 						'default'     => '',
 					],
 					[
-						'type'        => 'upload',
-						'heading'     => esc_attr__( 'Pinterest Sharing Image', 'fusion-builder' ),
-						'description' => esc_attr__( 'Choose an image to share on pinterest.', 'fusion-builder' ),
-						'param_name'  => 'pinterest_image',
-						'value'       => '',
+						'type'         => 'upload',
+						'heading'      => esc_attr__( 'Pinterest Sharing Image', 'fusion-builder' ),
+						'description'  => esc_attr__( 'Choose an image to share on pinterest.', 'fusion-builder' ),
+						'param_name'   => 'pinterest_image',
+						'value'        => '',
+						'dynamic_data' => true,
 					],
 					[
 						'type'        => 'textfield',
@@ -1584,22 +1616,12 @@ function fusion_element_sharing_box() {
 						'value'       => '',
 						'default'     => $fusion_settings->get( 'link_color' ),
 						'group'       => esc_attr__( 'Design', 'fusion-builder' ),
-						'dependency'  => [
-							[
-								'element'  => 'icon_taglines',
-								'value'    => '',
-								'operator' => '!=',
+						'states'      => [
+							'hover' => [
+								'label'   => __( 'Hover', 'fusion-builder' ),
+								'default' => $fusion_settings->get( 'link_hover_color' ),
 							],
 						],
-					],
-					[
-						'type'        => 'colorpickeralpha',
-						'heading'     => esc_attr__( 'Social Icon Tagline Hover Color', 'fusion-builder' ),
-						'description' => esc_attr__( 'Controls the link hover color of the social sharing tagline.', 'fusion-builder' ),
-						'param_name'  => 'icon_tagline_color_hover',
-						'value'       => '',
-						'default'     => $fusion_settings->get( 'link_hover_color' ),
-						'group'       => esc_attr__( 'Design', 'fusion-builder' ),
 						'dependency'  => [
 							[
 								'element'  => 'icon_taglines',

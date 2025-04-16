@@ -665,7 +665,7 @@ if ( fusion_is_element_enabled( 'fusion_title' ) ) {
 					$attr['style'] .= $this->args['style_tag'];
 				}
 
-				if ( $this->args['responsive_typography'] ) {
+				if ( $this->args['responsive_typography'] && false === strpos( $this->args['font_size'], 'clamp(' ) ) {
 					$data           = awb_get_responsive_type_data( $this->args['size'], $this->args['font_size'], $this->args['line_height'] );
 					$attr['class'] .= ' ' . $data['class'];
 					$attr['style'] .= $data['font_size'];

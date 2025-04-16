@@ -56,8 +56,7 @@
 				}
 
 				// Remove HTML tags but keep quotation marks etc.
-				elementName = jQuery( '<div/>' ).html( elementName ).text();
-				elementName = jQuery( '<div/>' ).html( elementName ).text();
+				elementName = elementName.replace( /(<([^>]+)>)/ig, '' );
 
 				let isDynamic = '';
 				if ( child.attributes.params.dynamic_parent ) {

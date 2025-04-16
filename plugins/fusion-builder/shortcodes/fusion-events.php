@@ -717,7 +717,7 @@ if ( fusion_is_element_enabled( 'fusion_events' ) && class_exists( 'Tribe__Event
 							],
 							'excerpt_length_events'     => [
 								'label'       => esc_attr__( 'Excerpt Length', 'fusion-builder' ),
-								'description' => esc_attr__( 'Controls the number of words in the excerpts for events elements.', 'fusion-builder' ),
+								'description' => sprintf( __( 'Controls the number of %s in the excerpts for events elements.', 'fusion-builder' ), Fusion_Settings::get_instance()->get_default_description( 'excerpt_base', false, 'no_desc' ) ),
 								'id'          => 'excerpt_length_events',
 								'default'     => '55',
 								'type'        => 'slider',
@@ -991,7 +991,7 @@ function fusion_element_events() {
 						[
 							'type'        => 'range',
 							'heading'     => esc_attr__( 'Excerpt Length', 'fusion-builder' ),
-							'description' => esc_attr__( 'Insert the number of words/characters you want to show in the excerpt.', 'fusion-builder' ),
+							'description' => sprintf( __( 'Controls the number of %s in the excerpts.', 'fusion-builder' ), Fusion_Settings::get_instance()->get_default_description( 'excerpt_base', false, 'no_desc' ) ),
 							'param_name'  => 'excerpt_length',
 							'value'       => '',
 							'min'         => '0',

@@ -77,15 +77,27 @@ jQuery( document ).ready( function() {
 
 	// Reset options for a role.
 	jQuery( '.awb-role-manager-reset-role' ).on( 'click', function( e ) {
+		e.preventDefault();
+
 		const parent          = jQuery( this ).closest( '.awb-role-manager-item' ),
 			buttonSets        = parent.find( '.fusion-form-radio-button-set' ),
 			disableButtonSets = parent.find( '.awb-role-manager-access-item:not(.awb-dashboard-access):not(.awb-form-submissions)' ).find( '.fusion-form-radio-button-set ' );
 
-		e.preventDefault();
+		if ( buttonSets.first().children( 'input' ).data( 'default' ).length ) {
+			buttonSets.each( function() {
+				const input = jQuery( this ).children( 'input' ),
+					  value = input.data( 'default' ),
+					  button = jQuery( this ).children( '[data-value="' + value + '"]' );
+					  console.log( input, value, button );
+					  input.prop( 'checked', true ).val( value );
+					  button.trigger( 'click' );
+			} );
 
-		buttonSets.children( 'input' ).prop( 'checked', false ).val( '' );
-		buttonSets.children( '.ui-button' ).removeClass( 'ui-state-active' );
-		disableButtonSets.addClass( 'awb-disabled' );
+		} else {
+			buttonSets.children( 'input' ).prop( 'checked', false ).val( '' );
+			buttonSets.children( '.ui-button' ).removeClass( 'ui-state-active' );
+			disableButtonSets.addClass( 'awb-disabled' );
+		}
 
 	} );
 

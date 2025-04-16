@@ -131,6 +131,13 @@
 .fontawesome-icon.icon-hover-animation-slide:before {
   display: block;
 }
+.fb-icon-element.dashicons,
+.fusion-li-icon.dashicons,
+.fontawesome-icon.dashicons {
+  font-size: var(--awb-font-size, inherit);
+  width: auto;
+  height: auto;
+}
 .fusion-fa-align-left {
   display: inline;
   float: left;

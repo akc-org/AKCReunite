@@ -1550,8 +1550,8 @@ if ( fusion_is_element_enabled( 'fusion_tb_woo_cart' ) ) {
 					add_action( 'wp', [ $this, 'catch_woocommerce_paypal_payments_single_product' ], 20 );
 				}
 
-				if ( class_exists( 'Woocommerce_Catalog_Enquiry' ) && ! is_admin() && ! fusion_doing_ajax() ) {
-					add_action( 'wp', [ $this, 'change_woocommerce_catalog_enquiry_action' ] );
+				if ( ( class_exists( 'WC_Zipmoney_Payment_Gateway_Widget' ) || class_exists( 'Woocommerce_Catalog_Enquiry' ) ) && ! is_admin() && ! fusion_doing_ajax() ) {
+					add_action( 'wp', [ $this, 'adjust_woocommerce_single_product_summary_actions' ] );
 				}
 
 				if ( class_exists( 'YITH_YWGC_Frontend' ) ) {
@@ -1593,20 +1593,20 @@ if ( fusion_is_element_enabled( 'fusion_tb_woo_cart' ) ) {
 
 
 			/**
-			 * Add Woocommerce Catalog Enquiry plugin hooks to our awb_after_woo_add_to_cart_content action.
+			 * Adjust plugin functions hooking into woocommerce_single_product_summary to our awb_before_woo_add_to_cart_content action.
 			 *
 			 * @access public
 			 * @since 3.2
 			 * @return void
 			 */
-			public function change_woocommerce_catalog_enquiry_action() {
+			public function adjust_woocommerce_single_product_summary_actions() {
 				// phpcs:disable WordPress.NamingConventions
 				global $wp_filter;
 
 				if ( class_exists( 'Woocommerce_Catalog_Enquiry_Pro' ) ) {
 					global $Woocommerce_Catalog_Enquiry_Pro;
 					$Woocommerce_Catalog_Enquiry_Pro->frontend->catalog_woocommerce_template_single();
-				} else {
+				} elseif ( class_exists( 'Woocommerce_Catalog_Enquiry' ) ) {
 					global $Woocommerce_Catalog_Enquiry;
 					$Woocommerce_Catalog_Enquiry->frontend->catalog_woocommerce_template_single();
 				}
@@ -1614,7 +1614,13 @@ if ( fusion_is_element_enabled( 'fusion_tb_woo_cart' ) ) {
 				if ( isset( $wp_filter['woocommerce_single_product_summary'] ) ) {
 					foreach ( $wp_filter['woocommerce_single_product_summary'] as $index => $actions ) {
 						foreach ( $actions as $name => $action ) {
+
+							// Change WooCommerce Catalog Enquiry plugin action.
 							if ( false !== strpos( $name, 'add_form_for_enquiry' ) || false !== strpos( $name, 'add_form_for_enquiry_without_popup' ) ) {
+								add_action( 'awb_before_woo_add_to_cart_content', $action['function'] );
+							}
+
+							if ( false !== strpos( $name, 'render_widget_product' ) ) {
 								add_action( 'awb_before_woo_add_to_cart_content', $action['function'] );
 							}
 						}

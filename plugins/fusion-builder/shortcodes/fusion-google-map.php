@@ -460,7 +460,6 @@ if ( fusion_is_element_enabled( 'fusion_map' ) ) {
 								marker_icon: '<?php echo $icon; // phpcs:ignore WordPress.Security.EscapeOutput ?>',
 								overlay_color: '<?php echo $overlay_color; // phpcs:ignore WordPress.Security.EscapeOutput ?>',
 								overlay_color_hsl: <?php echo wp_json_encode( $overlay_color_hsl ); ?>,
-								pan_control: <?php echo ( 'yes' === $this->args['zoom_pancontrol'] ) ? 'true' : 'false'; ?>,
 								show_address: <?php echo ( 'yes' === $this->args['popup'] ) ? 'true' : 'false'; ?>,
 								scale_control: <?php echo ( 'yes' === $this->args['scale'] ) ? 'true' : 'false'; ?>,
 								scrollwheel: <?php echo ( 'yes' === $this->args['scrollwheel'] ) ? 'true' : 'false'; ?>,
@@ -780,12 +779,13 @@ function fusion_element_google_map() {
 						],
 					],
 					[
-						'type'        => 'textarea',
-						'heading'     => esc_attr__( 'Address', 'fusion-builder' ),
-						'description' => esc_attr__( 'Add the address of the location you wish to display. Single address example: 775 New York Ave, Brooklyn, Kings, New York 11203. If the location is off, please try to use long/lat coordinates with latlng=. ex: latlng=12.381068,-1.492711. For multiple addresses, separate addresses by using the | symbol. ex: Address 1|Address 2|Address 3.', 'fusion-builder' ),
-						'param_name'  => 'address',
-						'value'       => '',
-						'dependency'  => [
+						'type'         => 'textarea',
+						'heading'      => esc_attr__( 'Address', 'fusion-builder' ),
+						'description ' => esc_attr__( 'Add the address of the location you wish to display. Single address example: 775 New York Ave, Brooklyn, Kings, New York 11203. If the location is off, please try to use long/lat coordinates with latlng=. ex: latlng=12.381068,-1.492711. For multiple addresses, separate addresses by using the | symbol. ex: Address 1|Address 2|Address 3.', 'fusion-builder' ),
+						'param_name'   => 'address',
+						'value'        => '',
+						'dynamic_data' => true,
+						'dependency'   => [
 							[
 								'element'  => 'api_type',
 								'value'    => 'embed',
@@ -882,8 +882,8 @@ function fusion_element_google_map() {
 					],
 					[
 						'type'        => 'radio_button_set',
-						'heading'     => esc_attr__( 'Show Pan Control on Map', 'fusion-builder' ),
-						'description' => esc_attr__( 'Display pan control button.', 'fusion-builder' ),
+						'heading'     => esc_attr__( 'Show Zoom Control on Map', 'fusion-builder' ),
+						'description' => esc_attr__( 'Display the zoom control buttons.', 'fusion-builder' ),
 						'param_name'  => 'zoom_pancontrol',
 						'value'       => [
 							'yes' => esc_attr__( 'Yes', 'fusion-builder' ),

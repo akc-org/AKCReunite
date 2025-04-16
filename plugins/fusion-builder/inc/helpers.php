@@ -170,6 +170,7 @@ function fusion_builder_available_animations() {
 		'rubberBand'   => esc_attr__( 'Rubberband', 'fusion-builder' ),
 		'shake'        => esc_attr__( 'Shake', 'fusion-builder' ),
 		'slide'        => esc_attr__( 'Slide', 'fusion-builder' ),
+		'slideShort'   => esc_attr__( 'Slide Short', 'fusion-builder' ),
 		'zoom'         => esc_attr__( 'Zoom', 'fusion-builder' ),
 		'flipinx'      => esc_attr__( 'Flip Vertically', 'fusion-builder' ),
 		'flipiny'      => esc_attr__( 'Flip Horizontally', 'fusion-builder' ),
@@ -1160,6 +1161,15 @@ function fusion_builder_get_social_networks( $defaults ) {
 	if ( $defaults['twitter'] ) {
 		$social_links_array['twitter'] = $defaults['twitter'];
 	}
+	if ( $defaults['bluesky'] ) {
+		$social_links_array['bluesky'] = $defaults['bluesky'];
+	}
+	if ( $defaults['threads'] ) {
+		$social_links_array['threads'] = $defaults['threads'];
+	}
+	if ( $defaults['mastodon'] ) {
+		$social_links_array['mastodon'] = $defaults['mastodon'];
+	}
 	if ( $defaults['instagram'] ) {
 		$social_links_array['instagram'] = $defaults['instagram'];
 	}
@@ -1249,6 +1259,9 @@ function fusion_builder_get_social_networks( $defaults ) {
 	}
 	if ( $defaults['spotify'] ) {
 		$social_links_array['spotify'] = $defaults['spotify'];
+	}
+	if ( $defaults['github'] ) {
+		$social_links_array['github'] = $defaults['github'];
 	}
 	if ( $defaults['email'] ) {
 		$social_links_array['mail'] = $defaults['email'];
@@ -2219,6 +2232,7 @@ function fusion_element_options_loop( $params, $class = '' ) {
 		var hasDynamic,
 			supportsDynamic,
 			hasResponsive,
+			heading,
 			parentContent;
 
 		option_value = 'undefined' !== typeof atts.added ? param.value : atts.params[param.param_name];
@@ -2242,6 +2256,7 @@ function fusion_element_options_loop( $params, $class = '' ) {
 		}
 
 		option_value    = _.unescape( option_value );
+		heading 		= FusionPageBuilderApp.maybeDecode( param.heading );
 		parentContent   = 'string' === typeof atts.multi && 'multi_element_parent' === atts.multi && 'element_content' === param.param_name;
 		hidden          = 'undefined' !== typeof param.hidden ? ' hidden' : '';
 		supportsDynamic = 'undefined' !== param.dynamic_data && true === param.dynamic_data ? true : false;
@@ -2275,7 +2290,7 @@ function fusion_element_options_loop( $params, $class = '' ) {
 			<# if ( ! jQuery( 'body' ).hasClass( 'fusion-builder-live' ) ) { #>
 				<div class="option-details">
 					<# if ( 'undefined' !== typeof param.heading ) { #>
-						<h3><span>{{ param.heading }}</span>
+						<h3><span>{{ heading }}</span>
 							<# if ( supportsDynamic ) { #>
 								<a class="option-dynamic-content fusiona-dynamic-data" title="<?php esc_attr_e( 'Dynamic Content', 'fusion-builder' ); ?>"></a>
 							<# } #>

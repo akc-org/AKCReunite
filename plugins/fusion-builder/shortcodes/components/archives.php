@@ -313,7 +313,7 @@ if ( fusion_is_element_enabled( 'fusion_blog' ) ) {
 						[
 							'type'        => 'range',
 							'heading'     => esc_attr__( 'Excerpt Length', 'fusion-builder' ),
-							'description' => esc_attr__( 'Insert the number of words/characters you want to show in the excerpt.', 'fusion-builder' ),
+							'description' => sprintf( __( 'Controls the number of %s in the excerpts.', 'fusion-builder' ), Fusion_Settings::get_instance()->get_default_description( 'excerpt_base', false, 'no_desc' ) ),
 							'param_name'  => 'excerpt_length',
 							'value'       => '100',
 							'min'         => '0',
@@ -334,7 +334,7 @@ if ( fusion_is_element_enabled( 'fusion_blog' ) ) {
 						],
 						[
 							'type'        => 'radio_button_set',
-							'heading'     => esc_attr__( 'Strip HTML from Posts Content', 'fusion-builder' ),
+							'heading'     => esc_attr__( 'Strip HTML From Post Content', 'fusion-builder' ),
 							'description' => esc_attr__( 'Choose to strip HTML from the post content.', 'fusion-builder' ),
 							'param_name'  => 'strip_html',
 							'default'     => 'yes',

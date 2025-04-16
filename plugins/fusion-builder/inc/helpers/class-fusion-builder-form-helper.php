@@ -173,13 +173,6 @@ class Fusion_Builder_Form_Helper {
 	 * @return array
 	 */
 	public static function fusion_form_get_form_meta( $id ) {
-
-		$sitename = isset( $_SERVER['SERVER_NAME'] ) ? strtolower( sanitize_text_field( wp_unslash( $_SERVER['SERVER_NAME'] ) ) ) : '';
-
-		if ( 'www.' === substr( $sitename, 0, 4 ) ) {
-			$sitename = substr( $sitename, 4 );
-		}
-
 		$form_meta = wp_parse_args(
 			(array) fusion_data()->post_meta( $id )->get_all_meta(),
 			[
@@ -214,7 +207,7 @@ class Fusion_Builder_Form_Helper {
 				'privacy_expiration_action'   => 'anonymize',
 				'email'                       => get_option( 'admin_email' ),
 				'email_from'                  => 'WordPress',
-				'email_from_id'               => 'wordpress@' . $sitename,
+				'email_from_id'               => 'wordpress@' . preg_replace( '#^www\.#', '', wp_parse_url( network_home_url(), PHP_URL_HOST ) ),
 
 				/* translators: The title. */
 				'email_subject'               => sprintf( esc_html__( '%s - Form Submission Notification', 'fusion-builder' ), get_the_title( $id ) ),

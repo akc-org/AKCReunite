@@ -61,7 +61,7 @@ class AWB_Widget_Style {
 	 */
 	public function __construct() {
 
-		$this->init_options();
+		add_action( 'after_setup_theme', [ $this, 'init_options' ] );
 
 		// Add styles and scripts.
 		add_action( 'admin_enqueue_scripts', [ $this, 'add_scripts_styles' ] );
@@ -155,10 +155,10 @@ class AWB_Widget_Style {
 	 * Init all options that we're going to add.
 	 *
 	 * @since 5.3.0
-	 * @access private
+	 * @access public
 	 * @return void
 	 */
-	private function init_options() {
+	public function init_options() {
 
 		$this->widget_options = [
 			'fusion_display_title'  => [

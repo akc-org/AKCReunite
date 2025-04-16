@@ -47,7 +47,7 @@ var FusionPageBuilder = FusionPageBuilder || {};
 		checkKey: function( event ) {
 
 			// If disabled.
-			if ( ( 'undefined' !== typeof FusionApp && 'undefined' !== typeof FusionApp.preferencesData && 'off' === FusionApp.preferencesData.keyboard_shortcuts ) ) {
+			if ( ( 'undefined' !== typeof FusionApp && 'undefined' !== typeof FusionApp.preferencesData && 'undefined' !== typeof FusionApp.preferencesData.keyboard_shortcuts && 'off' === FusionApp.preferencesData.keyboard_shortcuts ) ) {
 				return;
 			}
 
@@ -93,28 +93,16 @@ var FusionPageBuilder = FusionPageBuilder || {};
 						jQuery( '.fusion-builder-preview-desktop' ).trigger( 'click' );
 						break;
 
-						// Key 2 for mobile view portrait.
+						// Key 2 for mobile view.
 					case 50:
 						event.preventDefault();
 						jQuery( '.fusion-builder-preview-mobile.portrait' ).trigger( 'click' );
 						break;
 
-						// Key 3 for mobile view landscape.
+						// Key 4 for tablet view.
 					case 51:
 						event.preventDefault();
-						jQuery( '.fusion-builder-preview-mobile.landscape' ).trigger( 'click' );
-						break;
-
-						// Key 4 for tablet view portrait.
-					case 52:
-						event.preventDefault();
 						jQuery( '.fusion-builder-preview-tablet.portrait' ).trigger( 'click' );
-						break;
-
-						// Key 5 for tablet view landscape.
-					case 53:
-						event.preventDefault();
-						jQuery( '.fusion-builder-preview-tablet.landscape' ).trigger( 'click' );
 						break;
 
 						// Key D to clear layout.
@@ -166,7 +154,7 @@ var FusionPageBuilder = FusionPageBuilder || {};
 						// Key S to save, click rather than save directly so that animations occur.
 					case 83:
 						event.preventDefault();
-						if ( 0 === jQuery( 'body' ).find( '.ui-dialog' ).length && ! FusionApp.sidebarView.panelIsOpen() ) {
+						if ( 0 === jQuery( 'body' ).find( '.ui-dialog' ).length ) {
 							jQuery( '.fusion-builder-save-template' ).trigger( 'click' );
 						}
 						break;

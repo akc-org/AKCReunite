@@ -716,7 +716,7 @@ class AWB_Widget_Framework {
 		} elseif ( $this->has_double_sidebars() ) {
 			add_action( 'avada_after_content', [ $this, 'append_sidebar_double' ] );
 			$load_sidebars = true;
-		} elseif ( ! $this->has_sidebar() && ( is_page_template( 'side-navigation.php' ) || ( is_singular( 'tribe_events' ) && 'sidebar' === fusion_library()->get_option( 'ec_meta_layout' ) ) ) ) {
+		} elseif ( ! $this->has_sidebar() && ( is_page_template( 'side-navigation.php' ) || ( class_exists( 'Avada_EventsCalendar' ) && Avada_EventsCalendar::has_legacy_meta_sidebar() ) ) ) {
 			add_action( 'avada_after_content', [ $this, 'append_sidebar_single' ] );
 			$load_sidebars = true;
 		}

@@ -339,7 +339,7 @@ FASElement.prototype.renderOptions = function() {
 	}
 
 	_.each( this.options, function( option ) {
-		var theID =  self.prefix + '-' + option.id;
+		var theID =  self.prefix + '-' + String( option.id ).replace( '|', '__' );
 		var checked = option.checked ? 'checked' : '';
 		var arrayOption = ( self.notArrayFormat ? '' : '[]' );
 		var $option = jQuery( '<input type="checkbox" id="' + theID + '" name="' + self.fieldId + arrayOption + '" value="' + option.id + '" data-label="' + option.text + '" class="fusion-select-option" ' + checked + '><label for="' + theID + '" class="fusion-select-label">' + option.text + '</label>' );

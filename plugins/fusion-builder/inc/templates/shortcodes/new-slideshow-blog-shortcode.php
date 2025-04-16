@@ -129,7 +129,7 @@ $post_video = apply_filters( 'privacy_iframe_embed', fusion_get_page_option( 'vi
 					$attachment_image = wp_get_attachment_image_src( $attachment_id, $size );
 					?>
 
-					<?php if ( is_array( $attachment_data ) ) : ?>
+					<?php if ( is_array( $attachment_data ) && $attachment_image ) : ?>
 						<li>
 							<div class="fusion-image-wrapper">
 								<a href="<?php echo esc_url( $permalink ); ?>" aria-label="<?php the_title_attribute(); ?>">

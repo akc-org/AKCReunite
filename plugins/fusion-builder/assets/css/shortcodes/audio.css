@@ -28,6 +28,10 @@
 .fusion-audio.fusion-audio.dark-controls .mejs-button > button {
   background-image: url("FUSION_AUDIO_SVG_URL");
 }
+.fusion-audio.fusion-audio.dark-controls .awb-playback-rate .playback-rate-button {
+  background: none;
+  color: #000;
+}
 .fusion-audio.fusion-audio.dark-controls .mejs-controls > * {
   color: #000;
 }
@@ -66,4 +70,35 @@
   box-shadow: var(--awb-box-shadow);
   border: calc(var(--awb-border-size) * 1px) solid var(--awb-border-color);
   height: calc(40px + 2 * var(--awb-border-size) * 1px) !important;
+}
+.fusion-audio.fusion-audio .awb-playback-rate-flyout {
+  display: none;
+  background-color: var(--awb-background-color);
+  z-index: 1000000;
+  position: absolute;
+  bottom: 40px;
+  border: calc(var(--awb-border-size) * 1px) solid var(--awb-border-color);
+  border-bottom: 0;
+}
+.fusion-audio.fusion-audio .awb-button {
+  width: 30px;
+}
+.fusion-audio.fusion-audio .playback-rate-button {
+  box-sizing: content-box;
+  margin: 0;
+  padding: 10px 5px;
+  background: none;
+  color: #fff;
+  font-size: 10px;
+  transition: opacity 0.2s;
+  text-align: center;
+}
+.fusion-audio.fusion-audio .playback-rate-button:hover {
+  opacity: 0.6;
+}
+.fusion-audio.fusion-audio .awb-playback-rate-active {
+  font-size: 11px;
+  padding: 16px 6px 14px 6px;
+  line-height: 10px;
+  height: auto;
 }

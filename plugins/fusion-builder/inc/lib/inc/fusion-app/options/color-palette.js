@@ -33,11 +33,14 @@ FusionPageBuilder.options.fusionColorPalette = {
 
 		initializePickers();
 
+		// Copy color code.
+		$paletteContainer.on( 'click', '.fusiona-code', copyColorCode );
+
 		// Toggle open and close color.
 		$paletteContainer.on( 'click', '.preview, .fusiona-pen', handleToggleColor );
 
 		// Listen for removal of color.
-		$paletteContainer.on( 'click', '.fusiona-trash-o', handleTrashIconClick );
+		$paletteContainer.on( 'click', '.fusiona-trash-o', handleTrashIconClick );	
 
 		// Listen for the add color button.
 		$paletteContainer.on( 'click', '.awb-color-palette-add-btn', handleAddColorBtnClick );
@@ -71,6 +74,24 @@ FusionPageBuilder.options.fusionColorPalette = {
 			}
 
 			addOrUpdateOptionColor( slug, { color: value } );
+		}
+
+		function copyColorCode() {
+			const colorVar = 'var(--awb-' + jQuery( this ).closest( '.fusion-color-palette-item' ).data( 'slug' ) + ')';
+
+			if ( 'clipboard' in navigator ) {
+				navigator.clipboard.writeText( colorVar );
+			} else {
+				const textArea = document.createElement( 'textarea' );
+				textArea.value = colorVar;
+				textArea.style.opacity = 0;
+				document.body.appendChild( textArea );
+				textArea.focus();
+				textArea.select();
+
+				const success = document.execCommand( 'copy' );
+				document.body.removeChild( textArea );
+			}			
 		}
 
 		// Show or hide the controls to change a color.

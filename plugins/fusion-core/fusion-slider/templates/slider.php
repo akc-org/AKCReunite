@@ -210,17 +210,16 @@
 				$heading_font_size   = '60px';
 				$heading_line_height = '80px';
 				if ( isset( $metadata['heading_font_size'] ) && $metadata['heading_font_size'] ) {
-					$heading_font_size   = str_replace( 'px', '', $metadata['heading_font_size'] ) . 'px';
-					$heading_line_height = (float) $heading_font_size * 1.2 . 'px';
+					$heading_font_size   = false === strpos( $metadata['heading_font_size'], 'clamp(' ) ? str_replace( 'px', '', $metadata['heading_font_size'] ) . 'px' : $metadata['heading_font_size'];
+					$heading_line_height = false === strpos( $metadata['heading_font_size'], 'clamp(' ) ? (float) $heading_font_size * 1.2 . 'px' : '1.2';
 				}
 
 				$caption_font_size   = '24px';
 				$caption_line_height = '38px';
 				if ( isset( $metadata['caption_font_size'] ) && $metadata['caption_font_size'] ) {
-					$caption_font_size   = str_replace( 'px', '', $metadata['caption_font_size'] ) . 'px';
-					$caption_line_height = (float) $caption_font_size * 1.2 . 'px';
+					$caption_font_size   = false === strpos( $metadata['caption_font_size'], 'clamp(' ) ? str_replace( 'px', '', $metadata['caption_font_size'] ) . 'px' : $metadata['caption_font_size'];
+					$caption_line_height = false === strpos( $metadata['caption_font_size'], 'clamp(' ) ? (float) $caption_font_size * 1.2 . 'px' : '1.2';
 				}
-
 
 				$heading_title_sc_wrapper_class = '';
 				$caption_title_sc_wrapper_class = '';

@@ -35,12 +35,24 @@ if ( class_exists( 'GFForms' ) ) {
 	 *
 	 * @since 3.11.8
 	 * @return void
-	 */	
+	 */
 	function awb_add_gravity_forms_assets_to_live_editor() {
-		if ( fusion_is_element_enabled( 'gravityform' )  ) {
+		if ( fusion_is_element_enabled( 'gravityform' ) ) {
 			add_filter( 'gform_force_hooks_js_output', '__return_true' );
-			add_filter( 'gform_post_render_script', function( $script ) { return 'setTimeout( function() {' . str_replace( 'if (event.defaultPrevented) {', 'if (event && event.defaultPrevented) {', $script ) . '}, 250 );'; } );
-			add_action( 'wp_enqueue_scripts', function() { $forms = GFAPI::get_forms(); foreach ( $forms as $form ) { gravity_form_enqueue_scripts( $form['id'], true ); } } );
+			add_filter(
+				'gform_post_render_script',
+				function ( $script ) {
+					return 'setTimeout( function() {' . str_replace( 'if (event.defaultPrevented) {', 'if (event && event.defaultPrevented) {', $script ) . '}, 250 );';
+				}
+			);
+			add_action(
+				'wp_enqueue_scripts',
+				function () {
+					$forms = GFAPI::get_forms();
+					foreach ( $forms as $form ) {
+						gravity_form_enqueue_scripts( $form['id'], true );
+					} }
+			);
 		}
 	}
 	add_action( 'fusion_load_module', 'awb_add_gravity_forms_assets_to_live_editor' );

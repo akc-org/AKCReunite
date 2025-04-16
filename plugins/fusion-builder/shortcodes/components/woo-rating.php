@@ -187,6 +187,11 @@ if ( fusion_is_element_enabled( 'fusion_tb_woo_rating' ) ) {
 					$content = $content .= '<div class="woocommerce-product-rating"><a href="#reviews" class="woocommerce-review-link fusion-no-rating" rel="nofollow">' . __( 'Be the first to leave a review.', 'fusion-builder' ) . '</a></div>';
 				}
 
+				// When rendering Post Cards, add in link to the correct product.
+				if ( FusionBuilder()->post_card_data['is_rendering'] && is_object( $product ) && isset( $product->id ) ) {
+					$content = str_replace( '<a href="#reviews" class="woocommerce-review-link"', '<a href="' . get_permalink( $product->id ) . '#reviews" class="woocommerce-review-link"', $content );
+				}
+
 				return apply_filters( 'fusion_woo_component_content', $content, $this->shortcode_handle, $this->args );
 			}
 

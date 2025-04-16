@@ -133,7 +133,7 @@ class Fusion_App {
 	 * @since 2.0
 	 */
 	private function __construct() {
-		$can_edit = current_user_can( apply_filters( 'awb_role_manager_access_capability', 'manage_options', null, 'live_builder_edit' ) ) || current_user_can( apply_filters( 'awb_role_manager_access_capability', 'publish_pages', null, 'live_builder_edit' ) ) || current_user_can( apply_filters( 'awb_role_manager_access_capability', 'publish_posts', null, 'live_builder_edit' ) );
+		$can_edit = current_user_can( apply_filters( 'awb_role_manager_access_capability', 'manage_options', null, 'live_builder_edit' ) ) || current_user_can( apply_filters( 'awb_role_manager_access_capability', 'publish_', null, 'live_builder_edit' ) );
 
 		$this->set_ajax_status();
 
@@ -450,7 +450,7 @@ class Fusion_App {
 	}
 
 	/**
-	 * More no cache headers to pass on.
+	 * Set no cache headers for the builder frames.
 	 *
 	 * @access public
 	 * @since 2.0
@@ -458,10 +458,8 @@ class Fusion_App {
 	 * @return array
 	 */
 	public function cache_headers( $headers ) {
-		if ( isset( $_SERVER['REQUEST_URI'] ) && ( false !== strpos( $_SERVER['REQUEST_URI'], 'fb-edit' ) || false !== strpos( $_SERVER['REQUEST_URI'], 'builder=true' ) ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
-			$headers['Pragma']        = 'no-cache';
-			$headers['Cache-Control'] = 'no-cache, must-revalidate';
-		}
+		$headers = wp_get_nocache_headers();
+
 		return $headers;
 	}
 
@@ -2335,7 +2333,12 @@ class Fusion_App {
 			return;
 		}
 
-		$user    = null;
+		$user = null;
+
+		if ( ! function_exists( 'wp_check_post_lock' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/post.php';
+		}
+
 		$user_id = wp_check_post_lock( $post->ID );
 
 		if ( $user_id ) {

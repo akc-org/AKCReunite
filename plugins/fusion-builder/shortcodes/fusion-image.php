@@ -432,7 +432,7 @@ if ( fusion_is_element_enabled( 'fusion_imageframe' ) ) {
 
 				if ( $this->args['animation_type'] ) {
 					$attr = Fusion_Builder_Animation_Helper::add_animation_attributes( $this->args, $attr );
-				}				
+				}
 
 				return $attr;
 			}
@@ -530,10 +530,15 @@ if ( fusion_is_element_enabled( 'fusion_imageframe' ) ) {
 				$is_logo_images = false;
 
 				if ( is_array( $this->image_data ) ) {
-					if ( is_array( json_decode( $this->image_data['url'], true ) ) ) {
-						$content        = $this->get_logo_images( $this->image_data['url'] );
-						$is_logo_images = true;
+					if ( ! empty( $this->image_data['url'] ) ) {
+						$image_array = json_decode( $this->image_data['url'], true );
+					} else {
+						$image_array = json_decode( $content, true );
+					}
 
+					if ( is_array( $image_array ) ) {
+						$content        = $this->get_logo_images( $image_array );
+						$is_logo_images = true;
 					} else {
 						$atts    = FusionBuilder::attributes( 'image-shortcode-tag-element', $content );
 						$atts    = false === strpos( $atts, 'alt=' ) ? $atts . ' alt' : $atts;
@@ -995,24 +1000,23 @@ if ( fusion_is_element_enabled( 'fusion_imageframe' ) ) {
 			 *
 			 * @access public
 			 * @since 3.0
-			 * @param  string $images    JSON string of images.
-			 * @return string             HTML output.
+			 * @param  array $images Array of images.
+			 * @return string        HTML output.
 			 */
 			public function get_logo_images( $images ) {
-				$data       = json_decode( $images, true );
 				$content    = '';
-				$normal_url = isset( $data['default']['normal']['url'] ) && '' !== $data['default']['normal']['url'];
-				$sticky_url = isset( $data['sticky']['normal']['url'] ) && '' !== $data['sticky']['normal']['url'];
-				$mobile_url = isset( $data['mobile']['normal']['url'] ) && '' !== $data['mobile']['normal']['url'];
+				$normal_url = isset( $images['default']['normal']['url'] ) && '' !== $images['default']['normal']['url'];
+				$sticky_url = isset( $images['sticky']['normal']['url'] ) && '' !== $images['sticky']['normal']['url'];
+				$mobile_url = isset( $images['mobile']['normal']['url'] ) && '' !== $images['mobile']['normal']['url'];
 
 				if ( $normal_url ) {
-					$content .= $this->get_logo_image( $data['default'], 'fusion-standard-logo' );
+					$content .= $this->get_logo_image( $images['default'], 'fusion-standard-logo' );
 				}
 				if ( $sticky_url ) {
-					$content .= $this->get_logo_image( $data['sticky'], 'fusion-sticky-logo' );
+					$content .= $this->get_logo_image( $images['sticky'], 'fusion-sticky-logo' );
 				}
 				if ( $mobile_url ) {
-					$content .= $this->get_logo_image( $data['mobile'], 'fusion-mobile-logo' );
+					$content .= $this->get_logo_image( $images['mobile'], 'fusion-mobile-logo' );
 				}
 
 				return $content;
@@ -1525,7 +1529,7 @@ function fusion_element_image() {
 					],
 					[
 						'type'        => 'textfield',
-						'heading'     => esc_attr__( 'Gallery ID', 'fusion-builder' ),
+						'heading'     => esc_attr__( 'Gallery Lightbox ID', 'fusion-builder' ),
 						'description' => esc_attr__( 'Set a name for the lightbox gallery this image should belong to.', 'fusion-builder' ),
 						'param_name'  => 'gallery_id',
 						'value'       => '',

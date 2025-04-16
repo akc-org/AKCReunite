@@ -125,6 +125,10 @@ var FusionPageBuilder = FusionPageBuilder || {};
 				jQuery( '#fb-preview' )[ 0 ].contentWindow.jQuery( 'body' ).find( '.fusion-form-form-wrapper' ).removeClass( 'has-icon-alignment' );
 			}
 
+			if ( 'undefined' !== typeof this.formData.required_field_symbol_decoration &&  'no' === this.formData.required_field_symbol_decoration ) {
+				customVars.required_field_symbol_deco = 'none';
+			}
+
 			cssVarsOptions.margin_top    = { 'callback': _.fusionGetValueWithUnit };
 			cssVarsOptions.margin_right  = { 'callback': _.fusionGetValueWithUnit };
 			cssVarsOptions.margin_bottom = { 'callback': _.fusionGetValueWithUnit };

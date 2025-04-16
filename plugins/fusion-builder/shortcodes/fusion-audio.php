@@ -64,6 +64,7 @@ if ( fusion_is_element_enabled( 'fusion_audio' ) && ! class_exists( 'FusionSC_Au
 				'class'                      => '',
 				'id'                         => '',
 				'src'                        => '',
+				'playback_speed'             => 'off',
 				'loop'                       => 'off',
 				'autoplay'                   => 'off',
 				'preload'                    => 'none',
@@ -151,6 +152,24 @@ if ( fusion_is_element_enabled( 'fusion_audio' ) && ! class_exists( 'FusionSC_Au
 		}
 
 		/**
+		 * Sets the necessary scripts.
+		 *
+		 * @access public
+		 * @since 1.1
+		 * @return void
+		 */
+		public function on_first_render() {
+			Fusion_Dynamic_JS::enqueue_script(
+				'awb-audio',
+				FusionBuilder::$js_folder_url . '/general/awb-audio.js',
+				FusionBuilder::$js_folder_path . '/general/awb-audio.js',
+				[ 'jquery' ],
+				FUSION_BUILDER_VERSION,
+				true
+			);
+		}
+
+		/**
 		 * Builds the attributes array.
 		 *
 		 * @access public
@@ -165,6 +184,10 @@ if ( fusion_is_element_enabled( 'fusion_audio' ) && ! class_exists( 'FusionSC_Au
 
 			if ( 'dark' === $this->args['controls_color_scheme'] ) {
 				$attr['class'] .= ' dark-controls';
+			}
+
+			if ( 'on' === $this->args['playback_speed'] ) {
+				$attr['class'] .= ' awb-playback-speed';
 			}
 
 			$attr = fusion_builder_visibility_atts( $this->args['hide_on_mobile'], $attr );
@@ -453,6 +476,17 @@ function fusion_element_audio() {
 						'value'        => '',
 						'data_type'    => 'audio',
 						'dynamic_data' => true,
+					],
+					[
+						'type'        => 'radio_button_set',
+						'heading'     => esc_attr__( 'Playback Speed Controls', 'fusion-builder' ),
+						'description' => esc_attr__( 'Turn on to display playback speed controls.', 'fusion-builder' ),
+						'param_name'  => 'playback_speed',
+						'default'     => 'off',
+						'value'       => [
+							'on'  => esc_html__( 'On', 'fusion-builder' ),
+							'off' => esc_html__( 'Off', 'fusion-builder' ),
+						],
 					],
 					[
 						'type'        => 'radio_button_set',

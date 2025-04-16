@@ -310,7 +310,7 @@ if ( fusion_is_element_enabled( 'fusion_recent_posts' ) ) {
 				}
 
 				if ( '' !== $defaults['post_status'] ) {
-					$args['post_status'] = explode( ',', $defaults['post_status'] );
+					$args['post_status'] = ( $live_request || is_preview() ) && ! current_user_can( 'edit_other_posts' ) ? 'publish' : explode( ',', $defaults['post_status'] );
 				} elseif ( $live_request ) {
 					$args['post_status'] = 'publish';
 				}
@@ -1459,7 +1459,7 @@ function fusion_element_recent_posts() {
 					[
 						'type'        => 'range',
 						'heading'     => esc_attr__( 'Excerpt Length', 'fusion-builder' ),
-						'description' => esc_attr__( 'Insert the number of words/characters you want to show in the excerpt.', 'fusion-builder' ),
+						'description' => sprintf( __( 'Controls the number of %s in the excerpts.', 'fusion-builder' ), Fusion_Settings::get_instance()->get_default_description( 'excerpt_base', false, 'no_desc' ) ),
 						'param_name'  => 'excerpt_length',
 						'value'       => '35',
 						'min'         => '0',

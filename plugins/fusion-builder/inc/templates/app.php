@@ -20,6 +20,7 @@
 
 		<div class="fusion-page-builder-controls">
 			<a href="#" class="fusion-builder-layout-buttons fusion-builder-layout-buttons-toggle-containers" title="{{ fusionBuilderText.toggle_all_sections }}"><span class="dashicons-before dashicons-arrow-down"></span></a>
+			<a href="#" class="fusion-builder-layout-buttons fusion-builder-layout-code-fields" title="{{ fusionBuilderText.code_fields }}"><span class="fusiona-file-code-o"></span></a>
 			<a href="#" class="fusion-builder-layout-buttons fusion-builder-layout-custom-css <?php echo esc_attr( $has_custom_css ); ?>" title="{{ fusionBuilderText.custom_css }}"><span class="fusiona-code"></span></a>
 			<?php if ( current_user_can( apply_filters( 'awb_role_manager_access_capability', 'edit_posts', 'avada_library', 'backed_builder_edit' ) ) ) : ?>
 				<a href="#" class="fusion-builder-layout-buttons fusion-builder-template-buttons-save" title="{{ fusionBuilderText.save_page_layout }}"><span class="fusiona-drive"></span></a>
@@ -33,6 +34,31 @@
 			</a>
 		</div>
 
+		<?php
+		if ( class_exists( 'Avada' ) ) {
+			$sections = [];
+			require_once wp_normalize_path( Avada::$template_dir_path . '/includes/metaboxes/tabs/tab_code_fields.php' );
+			if ( function_exists( 'avada_page_options_tab_code_fields' ) ) {
+				$sections = call_user_func( 'avada_page_options_tab_code_fields', [] );
+			}
+
+			if ( isset( $sections['code_fields']['fields'] ) ) {
+				?>
+				<div class="awb-po-code-fields">
+					<div class="awb-po-code-fields-wrapper">
+
+							<?php foreach ( $sections['code_fields']['fields'] as $name => $field ) { ?>
+								<div class="awb-po-code-field awb-<?php echo esc_attr( str_replace( '_', '-', $name ) ); ?>">
+									<label for="<?php echo esc_attr( Fusion_Data_PostMeta::ROOT . '[' . $field['id'] . ']' ); ?>"><?php echo esc_html( $field['label'] ); ?></label>
+									<textarea class="awb-code" placeholder="<?php echo esc_attr( $field['description'] ); ?>" id="<?php echo esc_attr( $field['id'] ); ?>" name="<?php echo esc_attr( Fusion_Data_PostMeta::ROOT . '[' . $field['id'] . ']' ); ?>" ><?php echo esc_html( fusion_data()->post_meta( $post->ID )->get( $name ) ); // phpcs:ignore WordPress.Security.EscapeOutput ?></textarea>
+								</div>
+							<?php } ?>
+
+					</div>
+				</div>
+			<?php } ?>
+		<?php } ?>
+
 		<div class="fusion-custom-css">
 			<?php
 			$echo_custom_css = '';
@@ -40,6 +66,7 @@
 				$echo_custom_css = $saved_custom_css;
 			}
 			?>
+			<label for="_fusion_builder_custom_css">{{ fusionBuilderText.custom_css }}</label>
 			<textarea name="_fusion_builder_custom_css" id="fusion-custom-css-field" placeholder="{{ fusionBuilderText.add_css_code_here }}"><?php echo wp_strip_all_tags( $echo_custom_css ); // phpcs:ignore WordPress.Security.EscapeOutput ?></textarea>
 		</div>
 

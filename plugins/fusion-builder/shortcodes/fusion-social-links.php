@@ -94,6 +94,7 @@ if ( fusion_is_element_enabled( 'fusion_social_links' ) ) {
 					'dropbox'                => '',
 					'soundcloud'             => '',
 					'snapchat'               => '',
+					'spotify'                => '',
 					'vk'                     => '',
 					'wechat'                 => '',
 					'whatsapp'               => '',
@@ -101,7 +102,10 @@ if ( fusion_is_element_enabled( 'fusion_social_links' ) ) {
 					'teams'                  => '',
 					'xing'                   => '',
 					'yelp'                   => '',
-					'spotify'                => '',
+					'github'                 => '',
+					'mastodon'               => '',
+					'bluesky'                => '',
+					'threads'                => '',
 					'email'                  => '',
 					'phone'                  => '',
 
@@ -278,7 +282,7 @@ if ( fusion_is_element_enabled( 'fusion_social_links' ) ) {
 					$html = '<div class="align' . $this->args['alignment'] . '">' . $html . '</div>';
 				}
 
-				$this->counter ++;
+				$this->counter++;
 				$this->on_render();
 
 				return apply_filters( 'fusion_element_social_links_content', $html, $args );
@@ -831,6 +835,14 @@ function fusion_element_social_links() {
 			],
 			[
 				'type'         => 'textfield',
+				'heading'      => esc_attr__( 'Bluesky Link', 'fusion-builder' ),
+				'description'  => esc_attr__( 'Insert your custom Bluesky link.', 'fusion-builder' ),
+				'param_name'   => 'bluesky',
+				'value'        => '',
+				'dynamic_data' => true,
+			],		
+			[
+				'type'         => 'textfield',
 				'heading'      => esc_attr__( 'Deviantart Link', 'fusion-builder' ),
 				'description'  => esc_attr__( 'Insert your custom Deviantart link.', 'fusion-builder' ),
 				'param_name'   => 'deviantart',
@@ -895,6 +907,14 @@ function fusion_element_social_links() {
 			],
 			[
 				'type'         => 'textfield',
+				'heading'      => esc_attr__( 'GitHub Link', 'fusion-builder' ),
+				'description'  => esc_attr__( 'Insert your custom GitHub link.', 'fusion-builder' ),
+				'param_name'   => 'github',
+				'value'        => '',
+				'dynamic_data' => true,
+			],			
+			[
+				'type'         => 'textfield',
 				'heading'      => esc_attr__( 'Instagram Link', 'fusion-builder' ),
 				'description'  => esc_attr__( 'Insert your custom Instagram link.', 'fusion-builder' ),
 				'param_name'   => 'instagram',
@@ -909,6 +929,14 @@ function fusion_element_social_links() {
 				'value'        => '',
 				'dynamic_data' => true,
 			],
+			[
+				'type'         => 'textfield',
+				'heading'      => esc_attr__( 'Mastodon Link', 'fusion-builder' ),
+				'description'  => esc_attr__( 'Insert your custom Mastodon link.', 'fusion-builder' ),
+				'param_name'   => 'mastodon',
+				'value'        => '',
+				'dynamic_data' => true,
+			],			
 			[
 				'type'         => 'textfield',
 				'heading'      => esc_attr__( 'Myspace Link', 'fusion-builder' ),
@@ -983,14 +1011,6 @@ function fusion_element_social_links() {
 			],
 			[
 				'type'         => 'textfield',
-				'heading'      => esc_attr__( 'Teams Link', 'fusion-builder' ),
-				'description'  => esc_attr__( 'Insert your custom Microsoft Teams link.', 'fusion-builder' ),
-				'param_name'   => 'teams',
-				'value'        => '',
-				'dynamic_data' => true,
-			],
-			[
-				'type'         => 'textfield',
 				'heading'      => esc_attr__( 'Telegram Link', 'fusion-builder' ),
 				'description'  => esc_attr__( 'Insert your custom Telegram link.', 'fusion-builder' ),
 				'param_name'   => 'telegram',
@@ -999,12 +1019,28 @@ function fusion_element_social_links() {
 			],
 			[
 				'type'         => 'textfield',
-				'heading'      => esc_attr__( 'Tiktok Link', 'fusion-builder' ),
+				'heading'      => esc_attr__( 'Teams Link', 'fusion-builder' ),
+				'description'  => esc_attr__( 'Insert your custom Microsoft Teams link.', 'fusion-builder' ),
+				'param_name'   => 'teams',
+				'value'        => '',
+				'dynamic_data' => true,
+			],			
+			[
+				'type'         => 'textfield',
+				'heading'      => esc_attr__( 'TikTok Link', 'fusion-builder' ),
 				'description'  => esc_attr__( 'Insert your custom Tiktok link.', 'fusion-builder' ),
 				'param_name'   => 'tiktok',
 				'value'        => '',
 				'dynamic_data' => true,
 			],
+			[
+				'type'         => 'textfield',
+				'heading'      => esc_attr__( 'Thredas Link', 'fusion-builder' ),
+				'description'  => esc_attr__( 'Insert your custom Threads link.', 'fusion-builder' ),
+				'param_name'   => 'threads',
+				'value'        => '',
+				'dynamic_data' => true,
+			],				
 			[
 				'type'         => 'textfield',
 				'heading'      => esc_attr__( 'Tumblr Link', 'fusion-builder' ),
@@ -1019,14 +1055,6 @@ function fusion_element_social_links() {
 				'description'  => esc_attr__( 'Insert your custom Twitch link.', 'fusion-builder' ),
 				'param_name'   => 'twitch',
 				'value'        => '',
-				'dynamic_data' => true,
-			],
-			[
-				'type'         => 'textfield',
-				'heading'      => esc_attr__( 'X Link', 'fusion-builder' ),
-				'description'  => esc_attr__( 'Insert your custom X link.', 'fusion-builder' ),
-				'param_name'   => 'twitter',
-				'value'        => '#',
 				'dynamic_data' => true,
 			],
 			[
@@ -1063,6 +1091,14 @@ function fusion_element_social_links() {
 			],
 			[
 				'type'         => 'textfield',
+				'heading'      => esc_attr__( 'X Link', 'fusion-builder' ),
+				'description'  => esc_attr__( 'Insert your custom X link.', 'fusion-builder' ),
+				'param_name'   => 'twitter',
+				'value'        => '#',
+				'dynamic_data' => true,
+			],			
+			[
+				'type'         => 'textfield',
 				'heading'      => esc_attr__( 'Xing Link', 'fusion-builder' ),
 				'description'  => esc_attr__( 'Insert your custom Xing link.', 'fusion-builder' ),
 				'param_name'   => 'xing',
@@ -1087,8 +1123,8 @@ function fusion_element_social_links() {
 			],
 			[
 				'type'         => 'textfield',
-				'heading'      => esc_attr__( 'Youtube Link', 'fusion-builder' ),
-				'description'  => esc_attr__( 'Insert your custom Youtube link.', 'fusion-builder' ),
+				'heading'      => esc_attr__( 'YouTube Link', 'fusion-builder' ),
+				'description'  => esc_attr__( 'Insert your custom YouTube link.', 'fusion-builder' ),
 				'param_name'   => 'youtube',
 				'value'        => '',
 				'dynamic_data' => true,

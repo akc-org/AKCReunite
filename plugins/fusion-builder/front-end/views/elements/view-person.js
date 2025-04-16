@@ -432,8 +432,9 @@ var FusionPageBuilder = FusionPageBuilder || {};
 					styles += '-webkit-box-shadow: ' + blur + ' ' + blur + ' ' + blurRadius + ' ' + this.stylecolor + ';box-shadow: ' + blur + ' ' + blur + ' ' + blurRadius + ' ' + this.stylecolor + ';';
 				}
 
-				if ( '' !== values.pic_borderradius ) {
-					styles += '-webkit-border-radius:' + values.pic_borderradius + ';-moz-border-radius:' + values.pic_borderradius + ';border-radius:' + values.pic_borderradius + '; overflow:hidden;';
+				if ( '' !== values.pic_borderradius && '0px' !== values.pic_borderradius ) {
+					personShortcodeImageContainer[ 'class' ] += ' person-rounded-overflow';
+					styles += '-webkit-border-radius:' + values.pic_borderradius + ';-moz-border-radius:' + values.pic_borderradius + ';border-radius:' + values.pic_borderradius + ';';
 				}
 				if ( '' !== values.pic_bordersize ) {
 					styles += 'border:' + values.pic_bordersize + ' solid ' + values.pic_bordercolor + ';';

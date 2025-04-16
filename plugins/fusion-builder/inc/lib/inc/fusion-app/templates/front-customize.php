@@ -46,6 +46,13 @@ $overlay_mode = isset( $preferences['sidebar_overlay'] ) && 'on' === $preference
 ?>
 <title><?php esc_html_e( 'Avada Builder', 'fusion-builder' ); // phpcs:ignore WPThemeReview.CoreFunctionality ?></title>
 
+<?php 
+$favicon = fusion_library()->get_option( 'fav_icon', 'url' );
+if ( $favicon ) :
+	?>
+	<link rel="shortcut icon" href="<?php echo esc_url( $favicon ); ?>" type="image/x-icon" />
+<?php endif; ?>
+
 <script type="text/javascript">
 // TODO: localize the following vars ?
 var ajaxurl                  = <?php echo wp_json_encode( admin_url( 'admin-ajax.php', 'relative' ) ); ?>;

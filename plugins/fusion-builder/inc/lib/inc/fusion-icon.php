@@ -145,6 +145,11 @@ if ( ! function_exists( 'fusion_font_awesome_name_handler' ) ) {
 				return $icon;
 			}
 
+			// Dashicon is used.
+			if ( 'dashicons-' === substr( $icon, 0, 10 ) ) {
+				return ' dashicons ' . $icon;
+			}           
+
 			// FA icon, but we need to handle BC.
 			$fa_icon = $icon;
 			if ( 'icon-' === substr( $icon, 0, 5 ) || 'fa-' !== substr( $icon, 0, 3 ) ) {

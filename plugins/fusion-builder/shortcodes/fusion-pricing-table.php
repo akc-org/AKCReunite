@@ -930,7 +930,7 @@ function fusion_element_pricing_table_column() {
 					],
 					[
 						'type'        => 'sortable_text',
-						'heading'     => esc_attr__( 'Featured Rows', 'fusion-builder' ),
+						'heading'     => esc_attr__( 'Feature Rows', 'fusion-builder' ),
 						'description' => esc_attr__( 'Organize and add content to the pricing table.', 'fusion-builder' ),
 						'param_name'  => 'feature_rows',
 						'placeholder' => 'Feature',

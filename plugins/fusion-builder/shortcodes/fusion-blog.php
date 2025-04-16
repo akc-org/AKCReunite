@@ -424,7 +424,7 @@ if ( fusion_is_element_enabled( 'fusion_blog' ) ) {
 						unset( $defaults['post_status'] );
 					}
 				} else {
-					$defaults['post_status'] = explode( ',', $defaults['post_status'] );
+					$defaults['post_status'] = ( $live_request || is_preview() ) && ! current_user_can( 'edit_other_posts' ) ? 'publish' : explode( ',', $defaults['post_status'] );
 				}
 
 				$fusion_query = fusion_cached_query( apply_filters( 'fusion_blog_shortcode_query_args', $defaults ) );
@@ -736,6 +736,12 @@ if ( fusion_is_element_enabled( 'fusion_blog' ) ) {
 					$first_timeline_loop = false;
 				}
 
+				$pause_filtering = false;
+				if ( ! Fusion_Builder_Front()->is_filtering_paused() ) {
+					do_action( 'fusion_pause_live_editor_filter' );
+					$pause_filtering = true;
+				}
+
 				// Do the loop.
 				if ( $fusion_query->have_posts() ) {
 
@@ -861,6 +867,11 @@ if ( fusion_is_element_enabled( 'fusion_blog' ) ) {
 				$html .= '</div>';
 
 				wp_reset_postdata();
+
+				if ( $pause_filtering ) {
+					do_action( 'fusion_resume_live_editor_filter' );
+				}
+
 				if ( $reset_to_null ) {
 					$post = null;
 				}
@@ -1936,7 +1947,7 @@ if ( fusion_is_element_enabled( 'fusion_blog' ) ) {
 							],
 							'blog_excerpt_length'      => [
 								'label'       => esc_attr__( 'Excerpt Length', 'fusion-builder' ),
-								'description' => esc_attr__( 'Controls the number of words in the excerpts for blog elements.', 'fusion-builder' ),
+								'description' => sprintf( __( 'Controls the number of %s in the excerpts for blog elements.', 'fusion-builder' ), Fusion_Settings::get_instance()->get_default_description( 'excerpt_base', false, 'no_desc' ) ),
 								'id'          => 'blog_excerpt_length',
 								'default'     => '10',
 								'type'        => 'slider',
@@ -2717,7 +2728,7 @@ function fusion_element_blog() {
 					[
 						'type'        => 'range',
 						'heading'     => esc_attr__( 'Excerpt Length', 'fusion-builder' ),
-						'description' => esc_attr__( 'Insert the number of words/characters you want to show in the excerpt.', 'fusion-builder' ),
+						'description' => sprintf( __( 'Controls the number of %s in the excerpts.', 'fusion-builder' ), Fusion_Settings::get_instance()->get_default_description( 'excerpt_base', false, 'no_desc' ) ),
 						'param_name'  => 'excerpt_length',
 						'value'       => '',
 						'min'         => '0',
@@ -2739,7 +2750,7 @@ function fusion_element_blog() {
 					],
 					[
 						'type'        => 'radio_button_set',
-						'heading'     => esc_attr__( 'Strip HTML from Posts Content', 'fusion-builder' ),
+						'heading'     => esc_attr__( 'Strip HTML From Post Content', 'fusion-builder' ),
 						'description' => esc_attr__( 'Choose to strip HTML from the post content.', 'fusion-builder' ),
 						'param_name'  => 'strip_html',
 						'default'     => 'yes',

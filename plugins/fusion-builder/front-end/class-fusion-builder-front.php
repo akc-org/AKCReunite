@@ -63,15 +63,6 @@ if ( ! class_exists( 'Fusion_Builder_Front' ) ) {
 		private $filtering_paused = false;
 
 		/**
-		 * Whether we are within correct the_content call.
-		 *
-		 * @access private
-		 * @since 4.0
-		 * @var bool
-		 */
-		private $real_event_content = false;
-
-		/**
 		 * Actively capturing shortcode data.
 		 *
 		 * @access public
@@ -134,7 +125,6 @@ if ( ! class_exists( 'Fusion_Builder_Front' ) ) {
 
 					add_filter( 'revslider_include_libraries', [ $this, 'include_rev_scripts' ], 999 );
 
-					add_action( 'tribe_events_single_event_before_the_content', [ $this, 'set_real_event_content' ], 999 );
 					add_action( 'fusion_pause_live_editor_filter', [ $this, 'pause_content_filter' ], 999 );
 					add_action( 'fusion_resume_live_editor_filter', [ $this, 'resume_content_filter' ], 999 );
 					add_filter( 'awb_capturing_active', [ $this, 'is_capturing_active' ] );
@@ -307,7 +297,7 @@ if ( ! class_exists( 'Fusion_Builder_Front' ) ) {
 		 */
 		public function front_end_content( $content ) {
 
-			if ( ( is_singular( 'tribe_events' ) && ! $this->real_event_content ) || $this->filtering_paused ) {
+			if ( $this->filtering_paused ) {
 				return do_shortcode( $content );
 			}
 
@@ -316,9 +306,7 @@ if ( ! class_exists( 'Fusion_Builder_Front' ) ) {
 			$this->next_page_elements_count = ( $this->next_page_elements_count ) ? $this->next_page_elements_count + 1 : 0;
 
 			// Ajax check to make sure contents retrieved via ajax is regular content.
-			if ( ( $this->editable_posttype() && $this->real_event_content ) || ( ! fusion_doing_ajax() && is_main_query() && ( is_singular() || ( class_exists( 'WooCommerce' ) && is_shop() ) ) && $this->editable_posttype() ) ) {
-				$this->real_event_content = false;
-
+			if ( ( ! fusion_doing_ajax() && is_main_query() && ( is_singular() || ( class_exists( 'WooCommerce' ) && is_shop() ) ) && $this->editable_posttype() ) ) {
 				if ( false === $this->content_filtered ) {
 					$this->capturing_active = true;
 				}
@@ -337,16 +325,6 @@ if ( ! class_exists( 'Fusion_Builder_Front' ) ) {
 		}
 
 		/**
-		 * We are within real content for single event.
-		 *
-		 * @since 6.0.0
-		 * @return void
-		 */
-		public function set_real_event_content() {
-			$this->real_event_content = true;
-		}
-
-		/**
 		 * Whether capturing is active or not.
 		 *
 		 * @since 3.9
@@ -354,6 +332,16 @@ if ( ! class_exists( 'Fusion_Builder_Front' ) ) {
 		 */
 		public function is_capturing_active() {
 			return true === $this->capturing_active;
+		}
+
+		/**
+		 * Get the filtering of content flag.
+		 *
+		 * @since 3.22.11
+		 * @return bool
+		 */
+		public function is_filtering_paused() {
+			return $this->filtering_paused;
 		}
 
 		/**
@@ -1147,8 +1135,10 @@ if ( ! class_exists( 'Fusion_Builder_Front' ) ) {
 				$post_shortcodes           = wp_unslash( $_POST['shortcodes'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
 				if ( ! empty( $post_shortcodes ) ) {
 					foreach ( $post_shortcodes as $shortcode ) {
-						$shortcode                               = wp_unslash( $shortcode );
+						$shortcode = wp_unslash( $shortcode );
+						do_action( 'awb_before_ajax_shortcode_render', $shortcode );
 						$return_data['shortcodes'][ $shortcode ] = do_shortcode( $shortcode );
+						do_action( 'awb_after_ajax_shortcode_render', $shortcode );
 					}
 				}
 			}
@@ -1157,7 +1147,9 @@ if ( ! class_exists( 'Fusion_Builder_Front' ) ) {
 			if ( isset( $_POST['content'] ) ) {
 				$content = wp_unslash( $_POST['content'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
 			}
+			do_action( 'awb_before_ajax_shortcode_render', $content );
 			$return_data['content'] = do_shortcode( $content );
+			do_action( 'awb_after_ajax_shortcode_render', $content );
 
 			echo wp_json_encode( $return_data );
 			wp_die();
@@ -1406,6 +1398,10 @@ function load_builder_front_class() {
 	Fusion_Builder_Front::get_instance();
 }
 
+function Fusion_Builder_Front() {
+	return Fusion_Builder_Front::get_instance();
+}
+
 /**
  * Loop for front-options.
  *
@@ -1430,6 +1426,7 @@ function fusion_element_front_options_loop( $params ) {
 			hasResponsive,
 			hasHover,
 			supportsGlobal,
+			heading,
 			responsiveIcons = {
 				'large': 'desktop',
 				'medium': 'tablet',
@@ -1456,6 +1453,7 @@ function fusion_element_front_options_loop( $params ) {
 		}
 
 		option_value = _.unescape(option_value);
+		heading = FusionPageBuilderApp.maybeDecode( param.heading );
 
 		hidden = 'undefined' !== typeof param.hidden ? ' hidden' : '';
 
@@ -1514,7 +1512,7 @@ function fusion_element_front_options_loop( $params ) {
 				<div class="option-details-inner">
 					<# if ( 'undefined' !== typeof param.heading ) { #>
 						<h3>
-							{{ param.heading }}
+							{{ heading }}
 						</h3>
 						<ul class="fusion-panel-options">
 							<# if ( 'subgroup' === param.type ) {

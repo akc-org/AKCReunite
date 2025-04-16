@@ -709,6 +709,12 @@ if ( function_exists( 'fusion_is_element_enabled' ) && fusion_is_element_enabled
 
 				$lazy_load = ( 'avada' === $fusion_settings->get( 'lazy_load' ) && ! is_feed() ) ? true : false;
 
+				$pause_filtering = false;
+				if ( function_exists( 'Fusion_Builder_Front' ) && ! Fusion_Builder_Front()->is_filtering_paused() ) {
+					do_action( 'fusion_pause_live_editor_filter' );
+					$pause_filtering = true;
+				}
+
 				// Loop through returned posts.
 				// Setup the inner HTML for each elements.
 				while ( $portfolio_query->have_posts() ) {
@@ -1026,6 +1032,10 @@ if ( function_exists( 'fusion_is_element_enabled' ) && fusion_is_element_enabled
 				}
 
 				wp_reset_postdata();
+
+				if ( $pause_filtering ) {
+					do_action( 'fusion_resume_live_editor_filter' );
+				}
 
 				// Wrap all the portfolio posts with the appropriate HTML markup.
 				// Carousel layout.
@@ -2601,7 +2611,7 @@ function fusion_element_portfolio() {
 					[
 						'type'        => 'range',
 						'heading'     => esc_attr__( 'Excerpt Length', 'fusion-core' ),
-						'description' => esc_attr__( 'Insert the number of words/characters you want to show in the excerpt.', 'fusion-core' ),
+						'description' => sprintf( __( 'Controls the number of %s in the excerpts.', 'fusion-core' ), Fusion_Settings::get_instance()->get_default_description( 'excerpt_base', false, 'no_desc' ) ),
 						'param_name'  => 'excerpt_length',
 						'value'       => '',
 						'min'         => '0',

@@ -46,7 +46,6 @@ if ( fusion_is_element_enabled( 'fusion_tb_woo_checkout_billing' ) ) {
 
 				// Ajax mechanism for live editor.
 				add_action( 'wp_ajax_get_fusion_tb_woo_checkout_billing', [ $this, 'ajax_render' ] );
-				
 			}
 
 
@@ -169,7 +168,7 @@ if ( fusion_is_element_enabled( 'fusion_tb_woo_checkout_billing' ) ) {
 				ob_start();
 				do_action( 'woocommerce_checkout_billing' );
 				do_action( 'awb_woocommerce_checkout_after_customer_details' );
-				
+
 				$content = preg_replace( '#<h3>(.*?)</h3>#', '', ob_get_clean(), 1 );
 
 				if ( class_exists( 'Avada' ) && ! is_null( $avada_woocommerce ) ) {
@@ -185,14 +184,14 @@ if ( fusion_is_element_enabled( 'fusion_tb_woo_checkout_billing' ) ) {
 			 * @access private
 			 * @since 3.11.8
 			 * @return void
-			 */			
+			 */
 			private function add_order_attribution() {
 				global $wp_filter;
 
 				if ( isset( $wp_filter['woocommerce_checkout_after_customer_details'] ) ) {
 					foreach ( $wp_filter['woocommerce_checkout_after_customer_details'] as $index => $actions ) {
 						foreach ( $actions as $name => $action ) {
-							if ( false !== strpos( $name, 'source_form_elements' ) ) {
+							if ( false !== strpos( $name, 'stamp_html_element' ) ) {
 								add_action( 'awb_woocommerce_checkout_after_customer_details', $action['function'] );
 							}
 						}

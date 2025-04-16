@@ -99,7 +99,7 @@ if ( fusion_is_element_enabled( 'fusion_lightbox' ) ) {
 				} elseif ( 'link' === $this->args['type'] ) {
 					$attr['href'] = $this->args['link_url'];
 				} else {
-					$attr['href'] = $this->args['video_url'];
+					$attr['href'] = false !== strpos( $this->args['video_url'], 'youtube.com/shorts' ) ? str_replace( 'youtube.com/shorts', 'youtube.com/embed', $this->args['video_url'] ) : $this->args['video_url'];
 				}
 
 				if ( '' !== $this->args['description'] ) {

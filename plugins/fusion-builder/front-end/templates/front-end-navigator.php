@@ -73,7 +73,7 @@
 							<div class="awb-builder-nav__item-icon"><i class="{{ icon }}" aria-hidden="true"></i></div>
 						<# } #>
 
-						<div class="awb-builder-nav__item-name">{{ navigationItems[i].name }}{{ getColumnDisplaySize( navigationItems[i] ) }}</div>
+						<div class="awb-builder-nav__item-name">{{{ navigationItems[i].name }}}{{ getColumnDisplaySize( navigationItems[i] ) }}</div>
 
 						<div class="awb-builder-nav__item-actions">
 							<# if ( isButtonAllowed( 'edit', itemType, navigationItems[i] ) ) { #>

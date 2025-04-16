@@ -175,20 +175,21 @@ class Fusion_Cache {
 	 */
 	protected function clear_third_party_caches() {
 
-		// WP Rocket
+		// WP Rocket.
 		if ( function_exists( 'rocket_clean_domain' ) ) {
 			rocket_clean_domain();
 		}
 		// W3 Total Cache cache.
-		if ( function_exists( 'w3tc_flush_posts' ) ) {
-			w3tc_flush_posts();
+		if ( has_action( 'w3tc_flush_posts' ) ) {
+			do_action( 'w3tc_flush_posts' );
 		}
+	
 		// WP Super Cache cache.
 		if ( function_exists( 'wp_cache_clean_cache' ) ) {
 			global $file_prefix;
 			wp_cache_clean_cache( $file_prefix );
 		}
-		// WP Fastest Cache
+		// WP Fastest Cache.
 		if ( function_exists( 'wpfc_clear_all_cache' ) ) {
 			wpfc_clear_all_cache( true );
 		}       
@@ -201,9 +202,10 @@ class Fusion_Cache {
 			\Hummingbird\WP_Hummingbird::flush_cache();
 		}       
 		// LiteSpeed cache.
-		if ( class_exists( 'LiteSpeed_Cache_API' ) && method_exists( 'LiteSpeed_Cache_API', 'purge_all' ) ) {
-			LiteSpeed_Cache_API::purge_all();
-		}       
+		if ( defined( 'LSCWP_V' ) ) {
+			do_action( 'litespeed_purge_all' );
+		}
+
 		// SG Optimizer (SiteGround) cache.
 		if ( function_exists( 'sg_cachepress_purge_cache' ) ) {
 			sg_cachepress_purge_cache();
@@ -222,7 +224,8 @@ class Fusion_Cache {
 		}
 		// Pagely cache.
 		if ( class_exists( 'PagelyCachePurge' ) && method_exists( 'PagelyCachePurge', 'purgeAll' ) ) {
-			PagelyCachePurge::purgeAll();
+			$purger = new PagelyCachePurge();
+			$purger->purgeAll();
 		}
 
 		if ( ! class_exists( 'Fusion_Settings' ) ) {

@@ -705,8 +705,7 @@ var FusionPageBuilder = FusionPageBuilder || {};
 					}
 
 					// Remove HTML tags but keep quotation marks etc.
-					dialogTitle = jQuery( '<div/>' ).html( dialogTitle ).text();
-					dialogTitle = jQuery( '<div/>' ).html( dialogTitle ).text();
+					dialogTitle = dialogTitle.replace( /(<([^>]+)>)/ig, '' );
 					dialogTitle = ( dialogTitle && 15 < dialogTitle.length ) ? dialogTitle.substring( 0, 15 ) + '...' : dialogTitle;
 
 					dialogTitle = _.fusionUcFirst( dialogTitle );

@@ -136,6 +136,30 @@ FusionPageBuilder.options.fusionIconPicker = {
 					}
 				} );
 
+				// Copy icon name to clipboard.
+				$container.find( '.icon_preview' ).on( 'contextmenu', function( event ) {
+					const iconName = jQuery( this ).children( 'i' ).attr( 'class' );
+
+					if ( 'clipboard' in navigator ) {
+						navigator.clipboard.writeText( iconName );
+					} else {
+						const textArea = document.createElement('textarea');
+						textArea.value = iconName;
+						textArea.style.opacity = 0;
+						document.body.appendChild( textArea );
+						textArea.focus();
+						textArea.select();
+		
+						const success = document.execCommand( 'copy' );
+						document.body.removeChild( textArea );
+					}
+		
+					jQuery( this ).fadeOut( 100 );
+					jQuery( this ).fadeIn( 100 );
+		
+					return false;
+				} );				
+
 				// Icon Search bar
 				$search.on( 'change paste keyup', function() {
 					var $searchInput = jQuery( this );

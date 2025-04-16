@@ -69,7 +69,7 @@ if ( fusion_is_element_enabled( 'fusion_menu' ) ) {
 				// Ajax mechanism for query related part.
 				add_action( 'wp_ajax_get_fusion_menu', [ $this, 'ajax_query' ] );
 
-				add_action( 'wp_footer', [ $this, 'print_inline_script' ] );
+				add_action( 'wp_footer', [ $this, 'print_inline_script' ], 1 );
 			}
 
 			/**
@@ -444,11 +444,11 @@ if ( fusion_is_element_enabled( 'fusion_menu' ) ) {
 				$active_arrow_border = false;
 				if ( ( false !== strpos( $this->args['arrows'], 'main' ) || false !== strpos( $this->args['arrows'], 'active' ) ) && ! Fusion_Color::new_color( $this->args['active_border_color'] )->is_color_transparent() ) {
 					$direction = 'bottom';
-					if ( 'column' === $this->args['direction'] ) {
+					if ( 'column' === $this->args['direction'] && 'center' !== $this->args['expand_direction'] ) {
 						$direction = $this->args['expand_direction'];
 					}
 
-					if ( $this->args[ 'active_border_' . $direction ] && ! in_array( $this->args[ 'active_border_' . $direction ], [ '', '0', '0px' ], true ) ) {
+					if ( isset( $this->args[ 'active_border_' . $direction ] ) && ! in_array( $this->args[ 'active_border_' . $direction ], [ '', '0', '0px' ], true ) ) {
 						$active_arrow_border = true;
 					}
 				}

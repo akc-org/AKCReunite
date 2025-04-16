@@ -350,8 +350,9 @@ if ( fusion_is_element_enabled( 'fusion_instagram' ) ) {
 
 						// If no children data get it from the API.
 						if ( ! $children_data || ! is_array( $children_data ) ) {
-							$children_url = get_rest_url() . 'awb/instagram/' . $id . '/children';
-							$response     = wp_remote_get( $children_url );
+							$children_url = get_rest_url( get_current_blog_id(), 'awb/instagram/' . $id . '/children' );
+
+							$response = wp_remote_get( $children_url );
 
 							if ( is_wp_error( $response ) ) { // phpcs:ignore
 								// TODO: better error handling.
@@ -466,10 +467,17 @@ if ( fusion_is_element_enabled( 'fusion_instagram' ) ) {
 
 				// Combine with defaults to ensure nothing is missing.
 				$args = FusionBuilder::set_shortcode_defaults( self::get_element_defaults(), (array) $args, 'fusion_instagram' );
+				$url  = get_rest_url( get_current_blog_id(), 'awb/instagram/media/' );
 
-				$url = get_rest_url() . "awb/instagram/media/?limit={$limit}&page={$page}";
+				$url = add_query_arg(
+					[
+						'limit' => $limit,
+						'page'  => $page,
+					],
+					$url
+				);
 				if ( $next ) {
-					$url = $url . "&next={$next}";
+					$url = add_query_arg( [ 'next' => $next ], $url );
 				}
 
 				$response = wp_remote_get( $url );
@@ -903,7 +911,7 @@ if ( fusion_is_element_enabled( 'fusion_instagram' ) ) {
 			 */
 			public function oauth_option_render() {
 				$wpnonce  = wp_create_nonce( 'awb-nonce-instagram' );
-				$auth_url = 'https://api.instagram.com/oauth/authorize?response_type=code&client_id=678411916571642&redirect_uri=https://updates.theme-fusion.com/instagram-api&scope=user_profile,user_media&state=' . rawurlencode( admin_url( 'admin.php?page=avada_wpnonce=' . $wpnonce ) );
+				$auth_url = 'https://www.instagram.com/oauth/authorize?enable_fb_login=0&force_authentication=1&client_id=566437275995657&redirect_uri=https://updates.theme-fusion.com/insta-api-v2&response_type=code&scope=instagram_business_basic&state=' . rawurlencode( admin_url( 'admin.php?page=avada_wpnonce=' . $wpnonce ) );
 
 				$type = 'connected';
 				if ( isset( $_GET['error'] ) && ! empty( $_GET['error'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput
@@ -1110,9 +1118,9 @@ if ( fusion_is_element_enabled( 'fusion_instagram' ) ) {
 				// Get IG JSON request.
 				if ( $token && is_array( $token ) && ! $cached_json ) {
 					if ( $next ) {
-						$url = "https://graph.instagram.com/v14.0/{$token['user_id']}/media/?limit={$limit}&access_token={$token['token']}&after={$next}&fields=caption,media_type,media_url,permalink,thumbnail_url,id&access_token={$token['token']}";
+						$url = "https://graph.instagram.com/v21.0/{$token['user_id']}/media/?limit={$limit}&access_token={$token['token']}&after={$next}&fields=caption,media_type,media_url,permalink,thumbnail_url,id&access_token={$token['token']}";
 					} else {
-						$url = "https://graph.instagram.com/v14.0/{$token['user_id']}/media/?limit={$limit}&fields=caption,media_type,media_url,permalink,thumbnail_url,id&access_token={$token['token']}";
+						$url = "https://graph.instagram.com/v21.0/{$token['user_id']}/media/?limit={$limit}&fields=caption,media_type,media_url,permalink,thumbnail_url,id&access_token={$token['token']}";
 					}
 
 					$response = wp_remote_get( $url );
@@ -1176,7 +1184,7 @@ if ( fusion_is_element_enabled( 'fusion_instagram' ) ) {
 
 				// Get IG JSON request.
 				if ( $token && is_array( $token ) && ! $cached_json ) {
-						$url      = "https://graph.instagram.com/v14.0/{$id}/children/?fields=media_type,media_url,permalink,thumbnail_url,id&access_token={$token['token']}";
+						$url      = "https://graph.instagram.com/v21.0/{$id}/children/?fields=media_type,media_url,permalink,thumbnail_url,id&access_token={$token['token']}";
 						$response = wp_remote_get( $url );
 
 					if ( is_wp_error( $response ) ) {

@@ -30,6 +30,10 @@ class Fusion_Data {
 				'label' => 'Blogger',
 				'color' => '#f57d00',
 			],
+			'bluesky'    => [
+				'label' => 'Bluesky',
+				'color' => '#0085FF',
+			],
 			'deviantart' => [
 				'label' => 'Deviantart',
 				'color' => '#4dc47d',
@@ -62,13 +66,21 @@ class Fusion_Data {
 				'label' => 'Forrst',
 				'color' => '#5b9a68',
 			],
+			'github'     => [
+				'label' => 'GitHub',
+				'color' => '#24292e',
+			],
 			'instagram'  => [
 				'label' => 'Instagram',
-				'color' => '#3f729b',
+				'color' => '#c13584',
 			],
 			'linkedin'   => [
 				'label' => 'LinkedIn',
 				'color' => '#0077b5',
+			],
+			'mastodon'   => [
+				'label' => 'Mastodon',
+				'color' => '#6364FF',
 			],
 			'myspace'    => [
 				'label' => 'Myspace',
@@ -94,6 +106,10 @@ class Fusion_Data {
 				'label' => 'Skype',
 				'color' => '#00aff0',
 			],
+			'snapchat'   => [
+				'label' => 'Snapchat',
+				'color' => '#F7F300',
+			],
 			'soundcloud' => [
 				'label' => 'Soundcloud',
 				'color' => '#ff8800',
@@ -109,6 +125,10 @@ class Fusion_Data {
 			'telegram'   => [
 				'label' => 'Telegram',
 				'color' => '#0088cc',
+			],
+			'threads'    => [
+				'label' => 'Threads',
+				'color' => '#000000',
 			],
 			'tiktok'     => [
 				'label' => 'Tiktok',

@@ -13,7 +13,7 @@
   --awb-border-size-left: var(--form_border_width-left);
   --awb-border-color: var(--form_border_color);
   --awb-text-size: var(--form_text_size);
-  --awb-border-radius: calc(1px * var(--form_border_radius));
+  --awb-border-radius: var(--form_border_radius);
   --awb-live-results-bg-color: var(--form_bg_color);
   --awb-live-results-link-color: var(--link_color);
   --awb-live-results-meta-color: var(--link_color);
@@ -68,6 +68,7 @@
   background-color: var(--awb-live-results-bg-color);
   border-color: var(--awb-live-results-border-color);
   border-width: var(--awb-results-border-top) var(--awb-results-border-right) var(--awb-results-border-bottom) var(--awb-results-border-left);
+  border-radius: var(--awb-border-radius);
 }
 .fusion-search-element .fusion-live-search .fusion-search-results.live-results-scrollbar-custom {
   overflow-y: auto;

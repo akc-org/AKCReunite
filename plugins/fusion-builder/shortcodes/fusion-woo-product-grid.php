@@ -532,7 +532,7 @@ if ( fusion_is_element_enabled( 'fusion_woo_product_grid' ) && class_exists( 'Wo
 				if ( class_exists( 'Avada' ) && null !== $avada_woocommerce && 'no' === $this->args['show_thumbnail'] ) {
 					$priority = 'clean' === Avada()->settings->get( 'woocommerce_product_box_design' ) ? 10 : 7;
 					add_action( 'woocommerce_before_shop_loop_item_title', 'woocommerce_show_product_loop_sale_flash', $priority );
-					add_action( 'woocommerce_before_shop_loop_item_title', [ $this, 'show_product_loop_outofstock_flash' ], 7 );
+					add_action( 'woocommerce_before_shop_loop_item_title', [ $avada_woocommerce, 'show_product_loop_outofstock_flash' ], 7 );
 					add_action( 'woocommerce_before_shop_loop_item_title', [ $avada_woocommerce, 'thumbnail' ], 10 );
 				}
 

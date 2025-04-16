@@ -46,6 +46,8 @@ if ( fusion_is_element_enabled( 'fusion_tb_woo_price' ) ) {
 
 				// Ajax mechanism for live editor.
 				add_action( 'wp_ajax_get_fusion_tb_woo_price', [ $this, 'ajax_render' ] );
+
+				$this->add_third_party_hooks();
 			}
 
 
@@ -220,6 +222,10 @@ if ( fusion_is_element_enabled( 'fusion_tb_woo_price' ) ) {
 
 				$content = '';
 
+				ob_start();
+				do_action( 'awb_before_woo_price_content' );
+				$content .= ob_get_clean();
+
 				if ( function_exists( 'woocommerce_template_single_price' ) ) {
 					add_filter( 'woocommerce_product_price_class', [ $this, 'product_price_class' ], 20, 1 );
 					ob_start();
@@ -248,6 +254,10 @@ if ( fusion_is_element_enabled( 'fusion_tb_woo_price' ) ) {
 				if ( function_exists( 'wc_get_stock_html' ) && 'no' !== $this->args['show_stock'] ) {
 					$content .= wc_get_stock_html( $this->product );
 				}
+
+				ob_start();
+				do_action( 'awb_after_woo_price_content' );
+				$content .= ob_get_clean();
 
 				return apply_filters( 'fusion_woo_component_content', $content, $this->shortcode_handle, $this->args );
 			}
@@ -292,6 +302,29 @@ if ( fusion_is_element_enabled( 'fusion_tb_woo_price' ) ) {
 				}
 
 				return $class;
+			}
+
+			/**
+			 * Add third party hooks to our awb_before_woo_price_content and awb_after_woo_price_content actions.
+			 *
+			 * @access public
+			 * @since 3.11.14
+			 * @return void
+			 */
+			public function add_third_party_hooks() {
+
+				// WooCommerce Germanized legal info.
+				if ( class_exists( 'WooCommerce_Germanized' ) && function_exists( 'wc_gzd_get_single_product_shopmarks' ) ) {
+					foreach ( wc_gzd_get_single_product_shopmarks() as $shopmark ) {
+						if ( 'woocommerce_gzd_display_single_product_legal' === $shopmark->get_option_name() ) {
+							if ( $shopmark->get_default_filter() === $shopmark->get_filter() ) {
+								add_action( 'awb_after_woo_price_content', 'woocommerce_gzd_template_single_legal_info' );
+							}
+
+							break;
+						}
+					}
+				}
 			}
 
 			/**

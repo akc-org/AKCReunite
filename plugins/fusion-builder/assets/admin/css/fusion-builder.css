@@ -409,14 +409,14 @@
   display: none !important;
 }
 .fusion-builder-main-settings.fusion-medium .fusion-builder-option.has-responsive.fusion-medium {
-  display: inline-block;
+  display: inline-block !important;
 }
 .fusion-builder-main-settings.fusion-medium .fusion-builder-option.has-responsive.fusion-large,
 .fusion-builder-main-settings.fusion-medium .fusion-builder-option.has-responsive.fusion-small {
   display: none !important;
 }
 .fusion-builder-main-settings.fusion-small .fusion-builder-option.has-responsive.fusion-small {
-  display: inline-block;
+  display: inline-block !important;
 }
 .fusion-builder-main-settings.fusion-small .fusion-builder-option.has-responsive.fusion-large,
 .fusion-builder-main-settings.fusion-small .fusion-builder-option.has-responsive.fusion-medium {
@@ -1229,6 +1229,9 @@ body.wp-admin.fusion-builder-enabled .upload-image-remove,
 .fusion-builder-main-settings-advanced .fusion-builder-option-advanced-module-settings.has-dynamic-data .fusion-builder-sortable-options {
   margin-top: 70px;
   transition: margin 0.2s;
+}
+.fusion-builder-main-settings-advanced .fusion-builder-option-advanced-module-settings.has-dynamic-data-no-children .fusion-builder-sortable-options {
+  display: none;
 }
 .fusion-builder-main-settings-advanced .fusion-builder-option-advanced-module-settings .fusion-builder-option-advanced-module-settings-content {
   position: relative;
@@ -3438,6 +3441,7 @@ body.wp-admin.fusion-builder-enabled .upload-image-remove,
   position: relative;
   list-style-position: inside;
   padding-left: 1em;
+  padding-right: 40px;
   width: 30.333%;
   list-style-type: none;
   cursor: pointer;
@@ -3558,6 +3562,7 @@ body.wp-admin.fusion-builder-enabled .upload-image-remove,
   font-size: 16px;
   height: 16px;
   text-decoration: none;
+  box-sizing: content-box;
 }
 .fusion-builder-section-controls a .dashicons-arrow-up:before {
   width: inherit;
@@ -3895,6 +3900,7 @@ body.wp-admin.fusion-builder-enabled .upload-image-remove,
   display: block;
   float: left;
   text-align: center;
+  box-sizing: content-box;
 }
 .fusion-builder-column-controls a:hover {
   color: #333;
@@ -4326,6 +4332,9 @@ body.wp-admin.fusion-builder-enabled .upload-image-remove,
 }
 .fusion-iconpicker .fusion-icon-picker-nav-wrapper > a {
   padding: 0 7px;
+  color: #93999f;
+  text-decoration: none;
+  box-shadow: none;
 }
 .fusion-iconpicker .fusion-icon-picker-nav {
   flex-grow: 2;
@@ -4685,6 +4694,7 @@ h4.fusion_module_title span.fusion-global-tooltip {
   float: left;
   text-align: center;
   margin-left: -1px;
+  box-sizing: content-box;
 }
 .fusion-builder-module-controls a:hover {
   color: #333;
@@ -5135,6 +5145,31 @@ input[type=text].fusion-builder-section-name:hover {
 .fusion-builder-option.textarea .option-field {
   width: 50% !important;
 }
+.awb-po-code-fields {
+  display: none;
+  float: left;
+  width: 94%;
+  padding: 2% 3%;
+  background: #f6f6f6;
+}
+.awb-po-code-fields-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5%;
+}
+.awb-po-code-field {
+  width: 49.25%;
+  padding: 1% 0;
+}
+.post-type-awb_off_canvas .awb-po-code-field {
+  width: 100%;
+}
+.awb-po-code-field label,
+.fusion-custom-css label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 0.5em;
+}
 .fusion-custom-css {
   float: left;
   width: 94% !important;
@@ -5142,6 +5177,7 @@ input[type=text].fusion-builder-section-name:hover {
   background: #f6f6f6;
   display: none;
 }
+.awb-po-code-field textarea,
 #fusion-custom-css-field {
   width: 100%;
   min-height: 150px;
@@ -7132,9 +7168,12 @@ tr:hover .fusion-builder-table-delete-row {
 }
 .post-type-fusion_element #fusion_builder_controls .fusion-builder-layout-buttons-clear,
 .post-type-fusion_element #fusion_builder_controls .fusion-builder-layout-buttons-toggle-containers,
-.post-type-fusion_element #fusion_builder_controls .fusion-builder-layout-custom-css,
+.post-type-fusion_element #fusion_builder_controls .fusion-builder-layout-code-fields,
 .post-type-fusion_element #fusion_builder_controls .fusion-builder-library-dialog,
 .post-type-fusion_element #fusion_builder_controls .fusion-builder-template-buttons-save {
+  display: none;
+}
+.post-type-fusion_element:not(.fusion-element-post-type-mega_menus) #fusion_builder_controls .fusion-builder-layout-custom-css {
   display: none;
 }
 .post-type-fusion_element.fusion-element-post-type-post_cards #fusion_builder_controls .fusion-builder-library-dialog {
@@ -7664,6 +7703,9 @@ body.wp-admin.fusion-builder-enabled .uploadfile .fusion-upload-file .fusion-bui
   top: 50%;
   left: 0;
   transform: translateY(-50%);
+}
+.fusion-image-focus-point:not(.mode-position) .preview {
+  display: inline-flex;
 }
 @media all and (max-width: 1340px) {
   .awb-import-options .awb-import-options-group .awb-import-option label {

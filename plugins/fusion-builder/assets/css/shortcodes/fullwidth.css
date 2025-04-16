@@ -132,6 +132,7 @@
   min-width: 100%;
   background-color: var(--awb-background-color);
   background-image: var(--awb-background-image);
+  background-repeat: var(--awb-background-repeat);
   background-position: var(--awb-background-position);
   background-blend-mode: var(--awb-background-blend-mode);
   background-size: var(--awb-background-size);

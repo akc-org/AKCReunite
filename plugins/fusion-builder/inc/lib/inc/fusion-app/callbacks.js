@@ -42,10 +42,10 @@ var fusionSanitize = {
 	 *
 	 * @param {string} themeOption - Global Option ID.
 	 * @param {string} pageOption - Page option ID.
-	 * @param {number} postID - Post/Page ID.
+	 * @param {string} subSetting - A sub setting name for the main option.
 	 * @return {string} - Global Option or page option value.
 	 */
-	getOption: function( themeOption, pageOption ) {
+	getOption: function( themeOption, pageOption, subSetting ) {
 		var self     = this,
 			themeVal = '',
 			pageVal  = '';
@@ -59,6 +59,10 @@ var fusionSanitize = {
 					themeVal = self.getSettings()[ val.theme ];
 				}
 			} );
+		}
+
+		if ( subSetting && themeVal && 'undefined' !== themeVal[ subSetting ] ) {
+			themeVal = themeVal[ subSetting ];
 		}
 
 		// Get the page value.
@@ -80,6 +84,10 @@ var fusionSanitize = {
 				}
 			}
 		} );
+
+		if ( subSetting && pageVal && 'undefined' !== pageVal[ subSetting ] ) {
+			pageVal = pageVal[ subSetting ];
+		}
 
 		if ( themeOption && pageOption && 'default' !== pageVal && ! _.isEmpty( pageVal ) ) {
 			return pageVal;

@@ -133,6 +133,7 @@ if ( fusion_is_element_enabled( 'fusion_gallery' ) ) {
 					'hover_type'                           => ( '' !== $fusion_settings->get( 'gallery_hover_type' ) ) ? strtolower( $fusion_settings->get( 'gallery_hover_type' ) ) : 'none',
 					'lightbox_content'                     => ( '' !== $fusion_settings->get( 'gallery_lightbox_content' ) ) ? strtolower( $fusion_settings->get( 'gallery_lightbox_content' ) ) : '',
 					'lightbox'                             => $fusion_settings->get( 'status_lightbox' ),
+					'lightbox_id'                          => '',
 					'column_spacing'                       => ( '' !== $fusion_settings->get( 'gallery_column_spacing' ) ) ? strtolower( $fusion_settings->get( 'gallery_column_spacing' ) ) : '',
 					'picture_size'                         => ( '' !== $fusion_settings->get( 'gallery_picture_size' ) ) ? strtolower( $fusion_settings->get( 'gallery_picture_size' ) ) : '',
 					'layout'                               => ( '' !== $fusion_settings->get( 'gallery_layout' ) ) ? strtolower( $fusion_settings->get( 'gallery_layout' ) ) : 'grid',
@@ -277,10 +278,12 @@ if ( fusion_is_element_enabled( 'fusion_gallery' ) ) {
 				extract( $defaults );
 
 				$this->parent_args = $this->args = $defaults;
+				$this->parent_args['column_spacing'] = $fusion_library->sanitize->get_value_with_unit( $this->parent_args['column_spacing'] / 2 );
 
 				$this->num_of_columns = $this->parent_args['columns'];
 				$image_ids            = '';
 				$counter              = 0;
+				$acf_repeater_html    = '';
 
 				$this->parent_args['original_picture_size'] = $this->parent_args['picture_size'];
 				if ( 'fixed' === $this->parent_args['picture_size'] && 'masonry' !== $this->parent_args['layout'] ) {
@@ -292,19 +295,31 @@ if ( fusion_is_element_enabled( 'fusion_gallery' ) ) {
 					$this->parent_args['picture_size'] = 'full';
 				}
 
-				if ( $this->parent_args['image_ids'] ) {
-					$image_ids                  = explode( ',', $this->parent_args['image_ids'] );
-					$this->total_num_of_columns = count( $image_ids );
-					$this->child_args           = [];
-				} else {
-					preg_match_all( '/\[fusion_gallery_image (.*?)\]/s', $content, $matches );
+				if ( $this->parent_args['dynamic_params'] ) {
+					$dynamic_data = json_decode( fusion_decode_if_needed( $this->parent_args['dynamic_params'] ), true );
 
-					if ( is_array( $matches ) && ! empty( $matches ) ) {
-						$this->total_num_of_columns = count( $matches[0] );
+					if ( isset( $dynamic_data['parent_dynamic_content']['data'] ) ) {
+						if ( 'filebird_folder_parent' === $dynamic_data['parent_dynamic_content']['data'] ) {
+							$image_ids = Fusion_Dynamic_Data_Callbacks::get_filebird_folder_image_ids( $dynamic_data['parent_dynamic_content'] );
+						} elseif ( 'acf_repeater_parent' === $dynamic_data['parent_dynamic_content']['data'] ) {
+							$acf_repeater_html = self::get_acf_repeater( $dynamic_data['parent_dynamic_content'], $this->parent_args, $content );
+						}
 					}
 				}
 
-				$this->parent_args['column_spacing'] = $fusion_library->sanitize->get_value_with_unit( $this->parent_args['column_spacing'] / 2 );
+				if ( ! $image_ids && ! $acf_repeater_html ) {
+					if ( $this->parent_args['image_ids'] ) {
+						$image_ids                  = explode( ',', $this->parent_args['image_ids'] );
+						$this->total_num_of_columns = count( $image_ids );
+						$this->child_args           = [];
+					} else {
+						preg_match_all( '/\[fusion_gallery_image (.*?)\]/s', $content, $matches );
+
+						if ( is_array( $matches ) && ! empty( $matches ) ) {
+							$this->total_num_of_columns = count( $matches[0] );
+						}
+					}
+				}
 
 				$html  = '<div ' . FusionBuilder::attributes( 'gallery-wrapper' ) . '>';
 				$html .= '<div ' . FusionBuilder::attributes( 'gallery-shortcode' ) . '>';
@@ -314,23 +329,14 @@ if ( fusion_is_element_enabled( 'fusion_gallery' ) ) {
 					$html                           .= '<div ' . FusionBuilder::attributes( 'gallery-shortcode-images' ) . '></div>';
 				}
 
-				$acf_repeater_html = '';
-
-				if ( $this->parent_args['dynamic_params'] ) {
-					$dynamic_data = json_decode( fusion_decode_if_needed( $this->parent_args['dynamic_params'] ), true );
-
-					if ( isset( $dynamic_data['parent_dynamic_content'] ) ) {
-						$acf_repeater_html = self::get_acf_repeater( $dynamic_data['parent_dynamic_content'], $this->parent_args, $content );
-					}
-				}
-
 				if ( $acf_repeater_html ) {
 					$html .= $acf_repeater_html;
 				} else {
 					if ( $image_ids ) {
+
 						$image_ids = $this->sort_gallery_items( $image_ids );
 						foreach ( $image_ids as $image_id ) {
-							$this->child_args = 0 < $this->parent_args['limit'] && $counter >= $this->parent_args['limit'] ? [ 'hidden' => 'yes' ] : [];
+							$this->child_args = 0 < $this->parent_args['limit'] && $counter >= $this->parent_args['limit'] ? [ 'hidden' => 'yes' ] : self::get_element_defaults( 'child' );
 							$html            .= $this->get_image_markup( $image_id, '', false );
 
 							$counter++;
@@ -453,7 +459,6 @@ if ( fusion_is_element_enabled( 'fusion_gallery' ) ) {
 			 * @return string The HTML output of the image.
 			 */
 			public function get_image_markup( $image_id, $image = '', $parent_args = false, $child_args = false ) {
-
 				global $fusion_library;
 
 				$ajax_request = false;
@@ -753,7 +758,7 @@ if ( fusion_is_element_enabled( 'fusion_gallery' ) ) {
 					$attr['class']                  .= ' fusion-grid-sizer';
 				}
 
-				if ( ! is_null( $this->child_args ) && 'yes' === $this->child_args['hidden'] ) {
+				if ( isset( $this->child_args['hidden'] ) && 'yes' === $this->child_args['hidden'] ) {
 					$attr['class'] .= ' awb-gallery-item-hidden';
 				}
 
@@ -802,8 +807,9 @@ if ( fusion_is_element_enabled( 'fusion_gallery' ) ) {
 							$attr['data-caption'] = $this->image_data['caption'];
 						}
 					}
+					$lightbox_id      = $this->parent_args['lightbox_id'] ? $this->parent_args['lightbox_id'] : 'gallery_image_' . $this->gallery_counter;
 					$attr['rel']      = 'noreferrer';
-					$attr['data-rel'] = 'iLightbox[gallery_image_' . $this->gallery_counter . ']';
+					$attr['data-rel'] = 'iLightbox[' . esc_attr( $lightbox_id ) . ']';
 					$attr['class']    = 'fusion-lightbox';
 				}
 
@@ -1376,6 +1382,11 @@ if ( fusion_is_element_enabled( 'fusion_gallery' ) ) {
 								'type'        => 'dimension',
 								'choices'     => [ 'px', '%' ],
 								'transport'   => 'postMessage',
+								'css_vars'    => [
+									[
+										'name'          => '--gallery_border_radius',
+									],
+								],
 							],
 						],
 					],
@@ -1444,7 +1455,7 @@ function fusion_element_gallery() {
 						'heading'         => esc_attr__( 'Dynamic Content', 'fusion-builder' ),
 						'param_name'      => 'parent_dynamic_content',
 						'dynamic_data'    => true,
-						'dynamic_options' => [ 'acf_repeater_parent' ],
+						'dynamic_options' => [ 'acf_repeater_parent', 'filebird_folder_parent' ],
 						'group'           => esc_attr__( 'children', 'fusion-builder' ),
 					],
 					[
@@ -1802,6 +1813,20 @@ function fusion_element_gallery() {
 							'captions'          => esc_attr__( 'Captions', 'fusion-builder' ),
 							'title_and_caption' => esc_attr__( 'Titles and Captions', 'fusion-builder' ),
 						],
+						'dependency'  => [
+							[
+								'element'  => 'lightbox',
+								'value'    => 'no',
+								'operator' => '!=',
+							],
+						],
+					],
+					[
+						'type'        => 'textfield',
+						'heading'     => esc_attr__( 'Lightbox ID', 'fusion-builder' ),
+						'description' => esc_attr__( 'Set an ID for the lightbox of the gallery items. This can be used in Image elements to add images to the same lightbox gallery.', 'fusion-builder' ),
+						'param_name'  => 'lightbox_id',
+						'value'       => '',
 						'dependency'  => [
 							[
 								'element'  => 'lightbox',

@@ -31,12 +31,15 @@ $icon_map = apply_filters(
 		if ( 'undefined' !== typeof atts.multi && 'multi_element_parent' === atts.multi && ( 'undefined' === typeof atts.child_ui || atts.child_ui ) ) {
 			group_options['children'] = {};
 		}
-		group_options['general'] = {};
+
 		var editingChild     = 'multi_element_child' === atts.multi,
 			generatedElement = 'generated_element' === atts.type ? true : false
 			sidebarEditing   = 'dialog' !== FusionApp.preferencesData.editing_mode && ! generatedElement ? true : false,
 			inlineElement    = 'undefined' !== typeof atts.inlineElement ? true : false,
+			generalGroupTag  = '<?php esc_attr_e( 'General', 'fusion-builder' ); ?>'.toLowerCase().replace(/ /g, '-'),
 			menuLabel        = '';
+			
+		group_options[ generalGroupTag ] = {};
 	#>
 
 	<# _.each( fusionAllElements[atts.element_type].params, function( param ) {
@@ -57,7 +60,7 @@ $icon_map = apply_filters(
 				group_options[ group_tag ][ param.param_name ] = param;
 			}
 		} else {
-			group_options['general'][ param.param_name ] = param;
+			group_options[ generalGroupTag ][ param.param_name ] = param;
 		}
 
 	} ); #>

@@ -491,10 +491,29 @@ abstract class Fusion_Element {
 
 		$field = isset( $dynamic_data['field'] ) ? $dynamic_data['field'] : '';
 
-		$is_builder  = ( function_exists( 'fusion_is_preview_frame' ) && fusion_is_preview_frame() ) || ( function_exists( 'fusion_is_builder_frame' ) && fusion_is_builder_frame() );
-		$target_post = ( $is_builder || isset( $_GET['awb-studio-content'] ) ) && function_exists( 'Fusion_Template_Builder' ) ? Fusion_Template_Builder()->get_dynamic_content_selection() : false; // phpcs:ignore WordPress.Security
-		$post_id     = $target_post ? $target_post->ID : get_the_ID();
-		$post_id     = isset( $_POST['post_id'] ) ? $_POST['post_id'] : $post_id; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput, WordPress.Security.NonceVerification.Missing
+		$is_builder = ( function_exists( 'fusion_is_preview_frame' ) && fusion_is_preview_frame() ) || ( function_exists( 'fusion_is_builder_frame' ) && fusion_is_builder_frame() );
+
+		// Prefixed options page fields.
+		if ( 'awb_acfop_' === substr( $field, 0, 10 ) ) {
+			$post_id = 'option';
+			if ( 1 === preg_match( '/awb_acfop_.+__/', $field, $check ) ) {
+				$post_id = trim( str_replace( 'awb_acfop_', '', $check[0] ), '__' );
+			}
+
+			$field = str_replace( 'awb_acfop_', '', $field );
+		} else {
+			$target_post = ( $is_builder || isset( $_GET['awb-studio-content'] ) ) && function_exists( 'Fusion_Template_Builder' ) ? Fusion_Template_Builder()->get_dynamic_content_selection() : false; // phpcs:ignore WordPress.Security
+			$post_id     = $target_post ? $target_post->ID : Fusion_Dynamic_Data_Callbacks::get_post_id();
+		}
+		$post_id = isset( $_POST['post_id'] ) ? $_POST['post_id'] : $post_id; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput, WordPress.Security.NonceVerification.Missing
+
+		if ( false !== strpos( $post_id, '-archive' ) ) {
+			if ( is_author() ) {
+				$post_id = 'user_' . str_replace( '-archive', '', $post_id );
+			} else {
+				$post_id = get_term_by( 'term_taxonomy_id', str_replace( '-archive', '', $post_id ) );
+			}
+		}
 
 		ob_start();
 		if ( have_rows( $field, $post_id ) ) {
@@ -520,7 +539,7 @@ abstract class Fusion_Element {
 
 					foreach ( $el_dynamic_data as $key => $value ) {
 						if ( isset( $value['data'] ) && 'acf_repeater_sub' === $value['data'] ) {
-							$content       = Fusion_Dynamic_Data_Callbacks::acf_get_repeater_sub_field( [ 'sub_field' => $value['sub_field'] ] );
+							$content       = Fusion_Dynamic_Data_Callbacks::acf_get_repeater_sub_field( [ 'sub_field' => str_replace( 'awb_acfop_', '', $value['sub_field'] ) ] );
 							$before_string = isset( $value['before'] ) ? (string) $value['before'] : '';
 							$after_string  = isset( $value['after'] ) ? (string) $value['after'] : '';
 

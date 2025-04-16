@@ -722,6 +722,12 @@ var FusionPageBuilder = FusionPageBuilder || {};
 				} );
 
 				jQuery( 'body' ).addClass( 'fusion-builder-module-settings-' + viewPorts[ viewport ] );
+
+				jQuery( '#fb-preview' )[ 0 ].contentWindow.jQuery( 'body' ).removeClass( function ( index, className ) {
+					return ( className.match( /(^|\s)awb-le-viewport-S+/g ) || [] ).join( ' ' );
+				} );
+			
+				jQuery( '#fb-preview' )[ 0 ].contentWindow.jQuery( 'body' ).addClass( 'awb-le-viewport-' + viewPorts[ viewport ] );
 			}
 
 		} );

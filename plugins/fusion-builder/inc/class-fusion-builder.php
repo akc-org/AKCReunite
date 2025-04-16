@@ -391,6 +391,10 @@ class FusionBuilder {
 
 		// Sanitize post content.
 		add_filter( 'content_save_pre', [ $this, 'filter_post_content' ], 10 );
+		add_filter( 'excerpt_save_pre', [ $this, 'filter_post_content' ], 10 );
+		add_filter( 'pre_kses', [ $this, 'filter_post_content_pre_kses' ], 10, 3 );
+		add_filter( 'the_content', [ $this, 'filter_post_content_on_render' ], 10 );
+		add_filter( 'widget_text', [ $this, 'filter_post_content_on_render' ], 9 );
 
 		// Add checkout wrapper.
 		if ( $is_builder ) {
@@ -438,25 +442,99 @@ class FusionBuilder {
 	}
 
 	/**
+	 * Sanitizes content for allowed HTML tags for post content on render.
+	 *
+	 * @access public
+	 * @since 7.11.10
+	 * @param string $post_content Post content to filter, expected to be escaped with slashes.
+	 * @return string Filtered post content with allowed HTML tags and attributes intact.
+	 */
+	public function filter_post_content_on_render( $content ) {
+		$override = Fusion_Template_Builder()->get_override( Fusion_Template_Builder()->get_current_override_name() );
+
+		if ( $override && 0 === strcmp( trim( $override->post_content ), trim( $content ) ) ) {
+			$author_id = $override->post_author;
+		} else {
+			$author_id = get_the_author_meta( 'ID' );
+		}
+
+		if ( ! user_can( $author_id, 'unfiltered_html' ) ) {
+			return $this->filter_post_content( $content, false, true );
+		}
+
+		return $content;
+	}
+
+	/**
 	 * Sanitizes content for allowed HTML tags for post content.
 	 *
+	 * @access public
+	 * @since 7.11.10
+	 * @param array $content Elementor element array, decoded from JSON.
+	 * @return array Filtered Elementor element array.
+	 */
+	public function parse_elementor_content( $content ) {
+		$content = json_encode( $content );
+		$content = preg_replace_callback( '/"editor":"[^}]+"}/', [ $this, 'filter_elementor_content' ], $content );
+		$content = json_decode( $content, true );
+
+		return $content;
+	}
+
+	/**
+	 * Callback for filtering Elementor content.
+	 *
+	 * @access public
+	 * @since 7.11.10
+	 * @param array $post_content Matched Elementor content from the "editor" indices.
+	 * @return strin Filtered Elementor content.
+	 */
+	public function filter_elementor_content( $post_content ) {
+		return '"editor":"' . $this->filter_post_content( str_replace( [ '"editor":"', '"}' ], '', $post_content[0] ), true, true ) . '"}';
+	}
+
+	/**
+	 * Sanitizes content to be run through KSES.
 	 * This function expects slashed data.
+	 *
+	 * @access public
+	 * @since 7.11.10
+	 * @param string         $content           Content to filter through KSES.
+	 * @param array[]|string $allowed_html      An array of allowed HTML elements and attributes,
+	 *                                          or a context name such as 'post'. See wp_kses_allowed_html()
+	 *                                          for the list of accepted context names.
+	 * @param string[]       $allowed_protocols Array of allowed URL protocols.
+	 * @return string Filtered post content with allowed HTML tags and attributes intact.
+	 */
+	public function filter_post_content_pre_kses( $content, $allowed_html, $allowed_protocols ) {
+		if ( is_string( $allowed_html ) && 'post' === $allowed_html ) {
+			return $this->filter_post_content( $content, false );
+		}
+
+		return $content;
+	}
+
+	/**
+	 * Sanitizes content for allowed HTML tags for post content.
 	 *
 	 * @access public
 	 * @since 7.11.7
 	 * @param string $post_content Post content to filter, expected to be escaped with slashes.
+	 * @param bool   $handle_slashes Decides if we need to strip slashes or not.
+	 * @param bool   $force_check Decides if we need to run the filtering in any case.
 	 * @return string Filtered post content with allowed HTML tags and attributes intact.
 	 */
-	public function filter_post_content( $post_content ) {
-		if ( current_user_can( 'unfiltered_html' ) ) {
+	public function filter_post_content( $post_content, $handle_slashes = true, $force_check = false ) {
+		if ( current_user_can( 'unfiltered_html' ) && ! $force_check ) {
 			return $post_content;
 		}
 
-		$post_content = stripslashes( $post_content );
-		$post_content = preg_replace_callback( '/( link="[^"]+"| href="[^"]+"| url="[^"]+"| link_attributes="[^"]+")/', [ $this, 'process_urls_and_links' ], $post_content );
+		$post_content = $handle_slashes ? stripslashes( $post_content ) : $post_content;
+		$post_content = preg_replace_callback( '/( link="[^"]+"| link_url="[^"]+"| href="[^"]+"| url="[^"]+"| full_image="[^"]+"| video_url="[^"]+"| link_attributes="[^"]+")/', [ $this, 'process_urls_and_links' ], $post_content );
 		$post_content = preg_replace_callback( '/\[fusion_code\](.+)\[\/fusion_code\]/U', [ $this, 'process_code_block' ], $post_content );
+		$post_content = $handle_slashes ? addslashes( $post_content ) : $post_content;
 
-		return addslashes( $post_content );
+		return $post_content;
 	}
 
 	/**
@@ -464,7 +542,7 @@ class FusionBuilder {
 	 *
 	 * @access public
 	 * @since 7.11.7
-	 * @param string $link_param The URL or link param to be sanitized starting with link=", url=",  href=", or link_attributes=".
+	 * @param string $link_param The URL or link param to be sanitized starting with link=", link_url=", url=",  href=", full_image="', video_url=" or link_attributes=".
 	 * @return string Sanitized URL or link param.
 	 */
 	public function process_urls_and_links( $link_param ) {
@@ -472,11 +550,18 @@ class FusionBuilder {
 			return ' link_attributes=""';
 		}
 
-		$link_param_raw = str_replace( [ ' link="', ' url="', ' href="' ], '', $link_param[0] );
+		$link_param_raw = str_replace( [ ' link="', ' link_url="', ' url="', ' href="', ' full_image="', ' video_url="' ], '', $link_param[0] );
 		$link_param_raw = trim( $link_param_raw, '"' );
-		$new_link_param = sanitize_url( $link_param_raw );
+		$new_link_param = str_replace( 'javascript', '', $link_param_raw );
+		$new_link_param = sanitize_url( $new_link_param );
 
 		if ( $link_param_raw === str_replace( 'http://', '', $new_link_param ) ) {
+			return $link_param[0];
+		}
+
+		preg_match( '/{{{[\w+|\-|.]+}}}/', $link_param_raw, $new_link_param_test );
+
+		if ( ! empty( $new_link_param_test ) ) {
 			return $link_param[0];
 		}
 
@@ -2140,6 +2225,7 @@ class FusionBuilder {
 						'ajaxurl'                         => admin_url( 'admin-ajax.php' ),
 						'admin_url'                       => admin_url(),
 						'rest_url'                        => get_rest_url(),
+						'rest_nonce'                      => wp_create_nonce( 'wp_rest' ),
 						'fusion_load_nonce'               => wp_create_nonce( 'fusion_load_nonce' ),
 						'fontawesomeicons'                => fusion_get_icons_array(),
 						'fontawesomesubsets'              => fusion_library()->get_option( 'status_fontawesome' ),
@@ -2204,6 +2290,7 @@ class FusionBuilder {
 						'ajaxurl'                         => admin_url( 'admin-ajax.php' ),
 						'admin_url'                       => admin_url(),
 						'rest_url'                        => get_rest_url(),
+						'rest_nonce'                      => wp_create_nonce( 'wp_rest' ),
 						'fusion_load_nonce'               => wp_create_nonce( 'fusion_load_nonce' ),
 						'fontawesomeicons'                => fusion_get_icons_array(),
 						'fontawesomesubsets'              => fusion_library()->get_option( 'status_fontawesome' ),
@@ -4420,6 +4507,10 @@ class FusionBuilder {
 			'theme-option' => 'separator_style_type',
 			'type'         => 'select',
 		];
+		$element_option_map['weight']['fusion_separator']            = [
+			'theme-option' => 'separator_border_size',
+			'type'         => 'range',
+		];
 
 		// Search.
 		$element_option_map['design']['fusion_search']                             = [
@@ -4443,10 +4534,12 @@ class FusionBuilder {
 		$element_option_map['live_search_display_featured_image']['fusion_search'] = [
 			'theme-option' => 'live_search_display_featured_image',
 			'type'         => 'yesno',
+			'reset'        => true,
 		];
 		$element_option_map['live_search_display_post_type']['fusion_search']      = [
 			'theme-option' => 'live_search_display_post_type',
 			'type'         => 'yesno',
+			'reset'        => true,
 		];
 		$element_option_map['live_results_height']['fusion_search']                = [
 			'theme-option' => 'live_search_results_height',
@@ -4455,6 +4548,11 @@ class FusionBuilder {
 		];
 		$element_option_map['search_limit_to_post_titles']['fusion_search']        = [
 			'theme-option' => 'search_limit_to_post_titles',
+			'type'         => 'yesno',
+			'reset'        => true,
+		];
+		$element_option_map['add_woo_product_skus']['fusion_search']               = [
+			'theme-option' => 'search_add_woo_product_skus',
 			'type'         => 'yesno',
 			'reset'        => true,
 		];
@@ -4770,6 +4868,10 @@ class FusionBuilder {
 		$element_option_map['columns']['fusion_text']          = [
 			'theme-option' => 'text_columns',
 			'type'         => 'range',
+		];
+		$element_option_map['user_select']['fusion_text']      = [
+			'theme-option' => 'text_user_select',
+			'type'         => 'select',
 		];
 		$element_option_map['column_min_width']['fusion_text'] = [
 			'theme-option' => 'text_column_min_width',
@@ -7197,7 +7299,10 @@ class FusionBuilder {
 			[
 				'methods'             => 'POST',
 				'callback'            => [ $this, 'rendered_content_endpoint' ],
-				'permission_callback' => '__return_true',
+				'permission_callback' => function () {
+					return current_user_can( 'edit_others_posts' );
+				},
+
 			]
 		);
 	}

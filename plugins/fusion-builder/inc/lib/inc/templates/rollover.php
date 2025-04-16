@@ -69,6 +69,7 @@ if ( null != $link_icon_url ) { // phpcs:ignore WordPress.PHP.StrictComparisons.
 
 // Set the link target to blank if the option is set.
 $link_target = ( 'yes' === $link_icon_target || 'yes' === $post_links_target || ( 'avada_portfolio' === get_post_type() && $portfolio_link_icon_target ) ) ? ' target="_blank"' : '';
+$options     = '';
 ?>
 <div class="fusion-rollover">
 	<div class="fusion-rollover-content">
@@ -107,6 +108,7 @@ $link_target = ( 'yes' === $link_icon_target || 'yes' === $post_links_target || 
 				 */
 				?>
 				<?php if ( $video_url ) : ?>
+					<?php $options = $full_image[0] ? "thumbnail:'" . $full_image[0] . "'" : ''; ?>
 					<?php $full_image[0] = $video_url; ?>
 				<?php endif; ?>
 
@@ -133,7 +135,7 @@ $link_target = ( 'yes' === $link_icon_target || 'yes' === $post_links_target || 
 					$lightbox_content = ( 'individual' === fusion_library()->get_option( 'lightbox_behavior' ) ) ? avada_featured_images_lightbox( $post_id ) : '';
 					$data_rel         = ( 'individual' === fusion_library()->get_option( 'lightbox_behavior' ) ) ? 'iLightbox[gallery' . $post_id . ']' : 'iLightbox[gallery' . $gallery_id . ']';
 					?>
-					<a class="fusion-rollover-gallery" href="<?php echo esc_url_raw( $full_image[0] ); ?>" data-id="<?php echo esc_attr( $post_id ); ?>" data-rel="<?php echo esc_attr( $data_rel ); ?>" data-title="<?php echo esc_attr( get_post_field( 'post_title', get_post_thumbnail_id( $post_id ) ) ); ?>" data-caption="<?php echo esc_attr( get_post_field( 'post_excerpt', get_post_thumbnail_id( $post_id ) ) ); ?>">
+					<a class="fusion-rollover-gallery" href="<?php echo esc_url_raw( $full_image[0] ); ?>" data-options="<?php echo esc_attr( $options ); ?>" data-id="<?php echo esc_attr( $post_id ); ?>" data-rel="<?php echo esc_attr( $data_rel ); ?>" data-title="<?php echo esc_attr( get_post_field( 'post_title', get_post_thumbnail_id( $post_id ) ) ); ?>" data-caption="<?php echo esc_attr( get_post_field( 'post_excerpt', get_post_thumbnail_id( $post_id ) ) ); ?>">
 						<?php esc_html_e( 'Gallery', 'fusion-builder' ); ?>
 					</a>
 					<?php echo $lightbox_content; // phpcs:ignore WordPress.Security.EscapeOutput ?>
@@ -192,7 +194,7 @@ $link_target = ( 'yes' === $link_icon_target || 'yes' === $post_links_target || 
 		<?php endif; ?>
 
 		<?php if ( class_exists( 'WooCommerce' ) && WC()->cart && 'product' === get_post_type( $post_id ) ) : ?>
-			<?php $icon_class = ( $in_cart ) ? 'awb-icon-check-square-o' : 'awb-icon-spinner'; ?>
+			<?php $icon_class = ( $in_cart ) ? 'awb-icon-shopping-cart' : 'awb-icon-spinner'; ?>
 			<div class="cart-loading">
 				<a href="<?php echo esc_url_raw( wc_get_cart_url() ); ?>">
 					<i class="<?php echo esc_attr( $icon_class ); ?>" aria-hidden="true"></i>

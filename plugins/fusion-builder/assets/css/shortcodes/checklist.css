@@ -74,8 +74,6 @@ ul.fusion-checklist .fusion-li-item-content {
 ul.fusion-checklist.fusion-checklist-divider.fusion-404-checklist > li,
 .fusion-checklist.fusion-checklist-divider .fusion-li-item,
 ul.fusion-checklist.fusion-checklist-divider .fusion-li-item {
-  padding-top: calc(var(--checklist_item_padding-top, 0.35em) * 2);
-  padding-bottom: calc(var(--checklist_item_padding-bottom, 0.35em) * 2);
   border-bottom: 1px solid var(--awb-divider-color);
 }
 .fusion-checklist.type-numbered li,

@@ -289,7 +289,7 @@ if ( function_exists( 'fusion_is_element_enabled' ) && fusion_is_element_enabled
 						unset( $defaults['post_status'] );
 					}
 				} else {
-					$args['post_status'] = explode( ',', $defaults['post_status'] );
+					$args['post_status'] = ( $live_request || is_preview() ) && ! current_user_can( 'edit_other_posts' ) ? 'publish' : explode( ',', $defaults['post_status'] );
 				}
 
 				$faq_items = FusionCore_Plugin::fusion_core_cached_query( $args );
@@ -603,14 +603,18 @@ if ( function_exists( 'fusion_is_element_enabled' ) && fusion_is_element_enabled
 				$inactive_icon = ( '' !== $this->args['inactive_icon'] ) ? fusion_font_awesome_name_handler( $this->args['inactive_icon'] ) : 'awb-icon-plus';
 				$active_icon   = ( '' !== $this->args['active_icon'] ) ? fusion_font_awesome_name_handler( $this->args['active_icon'] ) : 'awb-icon-minus';
 
-				$this_post_id = get_the_ID();
+				$this_post_id = function_exists( 'fusion_library' ) ? fusion_library()->get_page_id() : get_the_ID();
 
-				do_action( 'fusion_pause_live_editor_filter' );
+				$pause_filtering = false;
+				if ( function_exists( 'Fusion_Builder_Front' ) && ! Fusion_Builder_Front()->is_filtering_paused() ) {
+					do_action( 'fusion_pause_live_editor_filter' );
+					$pause_filtering = true;
+				}
 
 				while ( $faq_items->have_posts() ) :
 					$faq_items->the_post();
 
-					// If used on a faq item itself, thzis is needed to prevent an infinite loop.
+					// If used on a faq item itself, this is needed to prevent an infinite loop.
 					if ( get_the_ID() === $this_post_id ) {
 						continue;
 					}
@@ -710,7 +714,9 @@ if ( function_exists( 'fusion_is_element_enabled' ) && fusion_is_element_enabled
 				endwhile; // Loop through faq_items.
 				wp_reset_postdata();
 
-				do_action( 'fusion_resume_live_editor_filter' );
+				if ( $pause_filtering ) {
+					do_action( 'fusion_resume_live_editor_filter' );
+				}
 
 				$html .= '</div>';
 				$html .= '</div>';

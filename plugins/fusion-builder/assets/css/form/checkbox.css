@@ -58,6 +58,7 @@
 .fusion-form-form-wrapper .fusion-form-field .fusion-form-checkbox input:focus + label:before {
   border-color: var(--awb-form-focus-border-color);
 }
-.fusion-form-consent-field p:last-of-type {
+.fusion-form .fusion-form-consent-field .label:last-of-type {
+  font-size: inherit;
   margin-bottom: 0;
 }

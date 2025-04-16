@@ -36,6 +36,13 @@ class Fusion_Breadcrumbs {
 	private $home_prefix;
 
 	/**
+	 * Label for the "Home" link.
+	 *
+	 * @var string
+	 */
+	private $home_label;
+
+	/**
 	 * Separator between single breadscrumbs.
 	 *
 	 * @var string
@@ -55,13 +62,6 @@ class Fusion_Breadcrumbs {
 	 * @var bool
 	 */
 	private $show_leaf; 
-
-	/**
-	 * Label for the "Home" link.
-	 *
-	 * @var string
-	 */
-	private $home_label;
 
 	/**
 	 * Prefix used for pages like date archive.
@@ -149,7 +149,7 @@ class Fusion_Breadcrumbs {
 			'show_post_type_archive' => $fusion_settings->get( 'breadcrumb_show_post_type_archive' ) ? $fusion_settings->get( 'breadcrumb_show_post_type_archive' ) : '',
 			'show_leaf'              => $fusion_settings->get( 'breadcrumb_show_leaf' ) ? $fusion_settings->get( 'breadcrumb_show_leaf' ) : '',
 			'show_terms'             => $fusion_settings->get( 'breadcrumb_show_categories' ) ? $fusion_settings->get( 'breadcrumb_show_categories' ) : '',
-			'home_label'             => esc_html__( 'Home', 'fusion-builder' ),
+			'home_label'             => $fusion_settings->get( 'breacrumb_home_label' ) ? $fusion_settings->get( 'breacrumb_home_label' ) : esc_html__( 'Home', 'fusion-builder' ),
 			'tag_archive_prefix'     => esc_html__( 'Tag:', 'fusion-builder' ),
 			'search_prefix'          => esc_html__( 'Search:', 'fusion-builder' ),
 			'error_prefix'           => esc_html__( '404 - Page not Found', 'fusion-builder' ),
@@ -259,7 +259,7 @@ class Fusion_Breadcrumbs {
 		$class = function_exists( 'yoast_breadcrumb' ) ? $class . ' awb-yoast-breadcrumbs' : $class;
 		$class = ( 'fusion-breadcrumbs' !== $class && function_exists( 'rank_math_get_breadcrumbs' ) ) ? $class . ' awb-rankmath-breadcrumbs' : $class;
 
-		$this->html_markup = '<nav class="' . $class . '" ara-label="' . esc_attr__( 'Breadcrumb', 'fusion-builder' ) . '">' . $this->html_markup . '</nav>';
+		$this->html_markup = '<nav class="' . $class . '" aria-label="' . esc_attr__( 'Breadcrumb', 'fusion-builder' ) . '">' . $this->html_markup . '</nav>';
 	}
 
 	/**
@@ -290,9 +290,8 @@ class Fusion_Breadcrumbs {
 		if ( is_home() && is_front_page() && $fusion_settings->get( 'blog_title' ) ) { // If the home page is the main blog page.
 			$this->breadcrumbs_parts['home'] = $this->get_single_breadcrumb_data( $fusion_settings->get( 'blog_title' ), '', false, true, true );
 		} else {
-			$separator = is_front_page() ? false : true;
-
-			$this->breadcrumbs_parts['home'] = $this->get_single_breadcrumb_data( $this->home_label, get_home_url(), $separator );
+			$separator                       = is_front_page() ? false : true;
+			$this->breadcrumbs_parts['home'] = $this->get_single_breadcrumb_data( $this->home_label, get_home_url(), $separator, true, false, 'awb-home' );
 
 			// Make sure the breadcrumb does not get doubled up.
 			if ( is_front_page() ) {
@@ -543,7 +542,7 @@ class Fusion_Breadcrumbs {
 			} else {
 
 				// If the leaf isn't displayed, the last separator has to be removed.
-				if ( $trail_counter === $trail_size_minus_one && ! $this->show_leaf && isset( $this->breadcrumbs_parts['leaf'] ) ) {
+				if ( $trail_counter === $trail_size_minus_one && ! $this->show_leaf && isset( $this->breadcrumbs_parts['leaf'] ) && ! is_search() && ! is_404() ) {
 					$data['separator'] = false;
 				}
 

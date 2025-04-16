@@ -239,9 +239,10 @@ if ( fusion_is_element_enabled( 'fusion_openstreetmap' ) ) {
 			 * @return array $sections Button settings.
 			 */
 			public function add_options() {
-				$api_key_link      = 'https://docs.mapbox.com/help/getting-started/access-tokens/';
-				$map_styles        = $this->get_map_styles();
-				$map_styles_option = [];
+				$api_key_link        = 'https://docs.mapbox.com/help/getting-started/access-tokens/';
+				$map_styles          = $this->get_map_styles();
+				$map_styles_option   = [];
+				$link_tile_providers = sprintf( '<a href="%s" target="_blank" rel="noopener noreferrer">%s</a>', 'https://wiki.openstreetmap.org/wiki/Raster_tile_providers', esc_html__( 'Raster Tile Providers ', 'fusion-builder' ) );
 
 				foreach ( $map_styles as $key => $style ) {
 					$map_styles_option[ $key ] = $style['label'];
@@ -257,7 +258,8 @@ if ( fusion_is_element_enabled( 'fusion_openstreetmap' ) ) {
 							'openstreetmap_map_style' => [
 								'type'        => 'select',
 								'label'       => esc_attr__( 'Map Style', 'fusion-builder' ),
-								'description' => esc_attr__( 'Select the map style. Using Mapbox Style will required API Access Token.', 'fusion-builder' ),
+								/* translators: %s - Link to raster tile providers of OSM. */
+								'description' => sprintf( esc_html__( 'Select the map style. For more information about licensing, please see the documentation %s. Using Mapbox Style will required API Access Token.', 'fusion-builder' ), $link_tile_providers ),
 								'id'          => 'openstreetmap_map_style',
 								'choices'     => $map_styles_option,
 								'default'     => 'osm-carto',
@@ -318,12 +320,17 @@ if ( fusion_is_element_enabled( 'fusion_openstreetmap' ) ) {
 					'topomap'                  => [
 						'label'     => esc_html__( 'Topography', 'fusion-builder' ),
 						'url'       => 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
-						'attribute' => __( 'Map tiles by <a href="http://opentopomap.org">Open Topomap</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> — Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors', 'fusion-builder' ),
+						'attribute' => __( 'Map tiles by <a href="http://opentopomap.org">Open Topomap</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under ODbL.', 'fusion-builder' ),
 					],
 					'carto-db'                 => [
-						'label'     => esc_html__( 'Carto DB', 'fusion-builder' ),
-						'url'       => 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
-						'attribute' => __( 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/attributions">CARTO</a>', 'fusion-builder' ),
+						'label'     => esc_html__( 'Carto Light', 'fusion-builder' ),
+						'url'       => 'https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png',
+						'attribute' => __( 'Map tiles by <a href="https://carto.com/attributions">CARTO</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under ODbL.', 'fusion-builder' ),
+					],
+					'carto-dark'               => [
+						'label'     => esc_html__( 'Carto Dark', 'fusion-builder' ),
+						'url'       => ' 	https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png',
+						'attribute' => __( 'Map tiles by <a href="https://carto.com/attributions">CARTO</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under ODbL.', 'fusion-builder' ),
 					],
 					'esri-world'               => [
 						'label'     => esc_html__( 'Esri World Street', 'fusion-builder' ),
@@ -610,12 +617,13 @@ if ( fusion_is_element_enabled( 'fusion_openstreetmap' ) ) {
 			 * @return string
 			 */
 			public function fetch_map_styles_option() {
-				$styles          = $this->get_map_styles();
-				$fusion_settings = awb_get_fusion_settings();
-				$options         = [
+				$styles              = $this->get_map_styles();
+				$fusion_settings     = awb_get_fusion_settings();
+				$options             = [
 					'' => esc_html__( 'Default', 'fusion-builder' ),
 				];
-				$link            = sprintf( '<a href="%s" target="_blank" rel="noopener noreferrer">%s</a>', $fusion_settings->get_setting_link( 'openstreetmap_mapbox_access_token' ), esc_html__( 'Global Options', 'fusion-builder' ) );
+				$link_tile_providers = sprintf( '<a href="%s" target="_blank" rel="noopener noreferrer">%s</a>', 'https://wiki.openstreetmap.org/wiki/Raster_tile_providers', esc_html__( 'Raster Tile Providers ', 'fusion-builder' ) );
+				$link_go             = sprintf( '<a href="%s" target="_blank" rel="noopener noreferrer">%s</a>', $fusion_settings->get_setting_link( 'openstreetmap_mapbox_access_token' ), esc_html__( 'Global Options', 'fusion-builder' ) );
 
 				if ( is_array( $styles ) ) {
 					foreach ( $styles as $key => $style ) {
@@ -626,8 +634,8 @@ if ( fusion_is_element_enabled( 'fusion_openstreetmap' ) ) {
 				return [
 					'type'        => 'select',
 					'heading'     => esc_html__( 'Map Style', 'fusion-builder' ),
-					/* translators: %s - Link to Global Options. */
-					'description' => sprintf( esc_html__( 'Select map style. Using Mapbox Style will required API Access Token in the %s.', 'fusion-builder' ), $link ),
+					/* translators: %1$s - Link to raster tile providers of OSM, %2$s - Link to Global Options. */
+					'description' => sprintf( esc_html__( 'Select map style. For more information about licensing, please see the documentation %1$s. Using Mapbox Style will required API Access Token in the %2$s.', 'fusion-builder' ), $link_tile_providers, $link_go ),
 					'param_name'  => 'map_style',
 					'default'     => '',
 					'value'       => $options,

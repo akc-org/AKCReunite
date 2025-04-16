@@ -51,6 +51,7 @@ if ( fusion_is_element_enabled( 'fusion_form_textarea' ) ) {
 					'id'               => '',
 					'logics'           => '',
 					'tooltip'          => '',
+					'value'            => '',
 				];
 			}
 
@@ -74,7 +75,9 @@ if ( fusion_is_element_enabled( 'fusion_form_textarea' ) ) {
 					$element_data['label'] .= $this->get_field_tooltip( $this->args );
 				}
 
-				$content = $content ? $content : ( isset( $element_data['value'] ) ? $element_data['value'] : '' );
+				if ( ! $content ) {
+					$content = $this->args['value'] ? $this->args['value'] : ( isset( $element_data['value'] ) ? $element_data['value'] : '' );
+				}
 
 				if ( isset( $this->args['minlength'] ) && is_numeric( $this->args['minlength'] ) ) {
 					$min_lenght = ' minlength="' . $this->args['minlength'] . '"';
@@ -141,6 +144,14 @@ function fusion_form_textarea() {
 						'param_name'  => 'name',
 						'value'       => '',
 						'placeholder' => true,
+					],
+					[
+						'type'         => 'textarea',
+						'heading'      => esc_attr__( 'Field Value', 'fusion-builder' ),
+						'description'  => esc_attr__( 'Enter a starting value for the element. Usually this should be empty and a placeholder used instead.', 'fusion-builder' ),
+						'param_name'   => 'value',
+						'value'        => '',
+						'dynamic_data' => true,
 					],
 					[
 						'type'        => 'radio_button_set',

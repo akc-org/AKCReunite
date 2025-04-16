@@ -71,6 +71,18 @@
   margin-left: 0;
   margin-right: 0;
 }
+.fusion-builder-live .width-100 .fusion-fullwidth.fusion-absolute-container {
+  width: 100%;
+}
+.fusion-builder-live.awb-le-viewport-large .width-100 #fusion_builder_container > .fusion-builder-flex-container:not(:hover):not(.fusion-builder-element-edited) .fusion-fullwidth.fusion-absolute-position-large {
+  width: calc( 100% - 2 * (var(--hundredp_padding-hundred_percent_negative_margin)) );
+}
+.fusion-builder-live.awb-le-viewport-medium .width-100 #fusion_builder_container > .fusion-builder-flex-container:not(:hover):not(.fusion-builder-element-edited) .fusion-fullwidth.fusion-absolute-position-medium {
+  width: calc( 100% - 2 * (var(--hundredp_padding-hundred_percent_negative_margin)) );
+}
+.fusion-fullwidth.fusion-absolute-position-small.fusion-builder-live.awb-le-viewport-small .width-100 #fusion_builder_container > .fusion-builder-flex-container:not(:hover):not(.fusion-builder-element-edited) {
+  width: calc( 100% - 2 * (var(--hundredp_padding-hundred_percent_negative_margin)) );
+}
 .fusion-builder-column-inner {
   position: relative;
 }
@@ -344,6 +356,7 @@
   transition: opacity 0.15s ease, width 0.25s ease, color 0.1s ease;
   text-align: center;
   color: #fff;
+  border: none;
 }
 .fusion-builder-live .fusion-builder-module-controls-container:hover a {
   transition: opacity 0.15s ease 0.15s, width 0.25s ease, color 0.1s ease;

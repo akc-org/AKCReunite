@@ -308,9 +308,14 @@ var FusionPageBuilder = FusionPageBuilder || {};
 					this.elementView.dynamicParams.removeParam( 'multiple_upload' );
 				}
 
-				const self = this;
+				const self = this,
+					sortableChildren = jQuery( `[data-option-id=${param}]` ).closest( '.fusion-tab-content' ).find( '.fusion-child-sortables' );
 				// Add dynamic class.
-				jQuery( `[data-option-id=${param}]` ).closest( '.fusion-tab-content' ).find( '.fusion-child-sortables' ).addClass( 'has-dynamic-data' );
+				sortableChildren.addClass( 'has-dynamic-data' );
+
+				if ( 'undefined' !== typeof this.elementView.dynamicParams.attributes.params.parent_dynamic_content.data && 'filebird_folder_parent' === this.elementView.dynamicParams.attributes.params.parent_dynamic_content.data ) {
+					sortableChildren.addClass( 'has-dynamic-data-no-children' );
+				}
 
 				// Remove children.
 				const children = FusionPageBuilderViewManager.getChildViews( this.model.get( 'cid' ) );
@@ -337,7 +342,7 @@ var FusionPageBuilder = FusionPageBuilder || {};
 
 				const self = this;
 				// Remove dynamic class.
-				jQuery( `[data-option-id=${param}]` ).closest( '.fusion-tab-content' ).find( '.fusion-child-sortables' ).removeClass( 'has-dynamic-data' );
+				jQuery( `[data-option-id=${param}]` ).closest( '.fusion-tab-content' ).find( '.fusion-child-sortables' ).removeClass( 'has-dynamic-data' ).removeClass( 'has-dynamic-data-no-children' );
 
 				// Remove children.
 				const children = FusionPageBuilderViewManager.getChildViews( this.model.get( 'cid' ) );

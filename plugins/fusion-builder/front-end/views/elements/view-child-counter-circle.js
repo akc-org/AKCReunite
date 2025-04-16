@@ -135,7 +135,6 @@ var FusionPageBuilder = FusionPageBuilder || {};
 				};
 
 				counterCircleWrapperShortcode[ 'data-originalsize' ] = values.size.toString();
-				console.log( 'Rendered', counterCircleWrapperShortcode );
 				this.model.set( 'selectors', counterCircleWrapperShortcode );
 				this.model.set( 'childSelectors', counterCircleShortcode );
 			},

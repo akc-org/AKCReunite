@@ -54,7 +54,7 @@ if ( $fusion_is_builder_frame || $fusion_is_preview_frame ) {
 	 *
 	 * @since 2.0.2
 	 */
-	add_filter( 'wp_smush_should_skip_parse', '__return_true', 999 );
+	add_filter( 'wp_smush_should_skip_lazy_load', '__return_true', 999 );
 
 	/**
 	 * Easy Social Share Buttons.

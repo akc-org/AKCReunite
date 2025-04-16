@@ -136,6 +136,7 @@ abstract class Fusion_Form_Component extends Fusion_Element {
 			if ( ! empty( $args['required_label_text'] ) ) {
 				$data['required_label_text'] = $args['required_label_text'];
 			}
+
 			$data['required_label']       = ' <abbr class="fusion-form-element-required" title="' . esc_attr( $data['required_label_text'] ) . '">*</abbr>';
 			$data['required_placeholder'] = '*';
 
@@ -156,9 +157,9 @@ abstract class Fusion_Form_Component extends Fusion_Element {
 
 		if ( isset( $args['placeholder'] ) && '' !== $args['placeholder'] ) {
 			if ( 'fusion_form_select' === $this->shortcode_handle ) {
-				$data['placeholder'] = [ $args['placeholder'] . $data['required_placeholder'] ];
+				$data['placeholder'] = [ $args['placeholder'] . ' ' . $data['required_placeholder'] ];
 			} else {
-				$data['placeholder'] = ' placeholder="' . esc_attr( $args['placeholder'] . $data['required_placeholder'] ) . '"';
+				$data['placeholder'] = ' placeholder="' . esc_attr( $args['placeholder'] . ' ' . $data['required_placeholder'] ) . '"';
 			}
 		}
 
@@ -320,7 +321,7 @@ abstract class Fusion_Form_Component extends Fusion_Element {
 			'number'             => '[0-9]+',
 			'credit_card_number' => '[0-9]{13,16}',
 			'phone'              => '[0-9()#&+*-=.]+',
-			'url'                => '(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)',
+			'url'                => '(http(s)?:\/\/.)?(www\.)?[\-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([\-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)',
 		];
 
 		return isset( $patterns[ $args['pattern'] ] ) ? ' pattern="' . $patterns[ $args['pattern'] ] . '" ' : ' pattern="' . fusion_decode_if_needed( $args['custom_pattern'] ) . '" ';

@@ -85,26 +85,8 @@
 .fusion-reading-box-container .fusion-mobile-button.continue-center {
   display: inline-block;
 }
-.element-bottomshadow {
-  position: relative;
-}
-.element-bottomshadow:before,
-.element-bottomshadow:after {
+.fusion-reading-box-container > svg {
   position: absolute;
-  bottom: 15px;
-  left: 10px;
-  z-index: -1;
-  height: 20%;
-  max-height: 100px;
-  max-width: 460px;
-  width: 60%;
-  content: "";
-  opacity: 0.7;
-  box-shadow: 0 17px 10px rgba(0, 0, 0, 0.7);
-  transform: rotate(-3deg);
-}
-.element-bottomshadow:after {
-  left: auto;
-  right: 10px;
-  transform: rotate(3deg);
+  top: 99.5%;
+  left: 0;
 }

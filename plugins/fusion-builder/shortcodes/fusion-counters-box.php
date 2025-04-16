@@ -327,7 +327,7 @@ if ( fusion_is_element_enabled( 'fusion_counters_box' ) ) {
 
 				$attr    = [];
 				$columns = 1;
-				if ( $this->parent_args['columns'] && ! empty( $this->parent_args['columns'] ) ) {
+				if ( ! empty( $this->parent_args['columns'] ) && 0 < $this->parent_args['columns'] ) {
 					$columns = 12 / (int) $this->parent_args['columns'];
 				}
 
@@ -387,10 +387,10 @@ if ( fusion_is_element_enabled( 'fusion_counters_box' ) ) {
 			public function counter_attr() {
 				return [
 					'class'          => 'display-counter',
-					'data-value'     => $this->child_args['value'],
-					'data-delimiter' => $this->child_args['delimiter'],
-					'data-direction' => $this->child_args['direction'],
-					'data-decimals'  => $this->child_args['decimals'],
+					'data-value'     => esc_attr( $this->child_args['value'] ),
+					'data-delimiter' => esc_attr( $this->child_args['delimiter'] ),
+					'data-direction' => esc_attr( $this->child_args['direction'] ),
+					'data-decimals'  => esc_attr( $this->child_args['decimals'] ),
 				];
 			}
 

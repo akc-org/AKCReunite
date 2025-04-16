@@ -50,7 +50,7 @@ class AWB_Studio {
 	 * @access private
 	 * @var boolean
 	 */
-	private $studio_url = 'https://avada.studio/';
+	private $studio_url = 'https://avada.studio';
 
 	/**
 	 * Class constructor.

@@ -28,6 +28,7 @@
 			<span class="preview" style="background-color:{{ colorData.color }};"></span>
 			<span class="label">{{{ colorData.label }}}</span>
 			<div class="actions">
+				<span class="fusiona-code"></span>
 				<span class="fusiona-pen"></span>
 				<# if ( isRemovableColor ) { #>
 					<span class="fusiona-trash-o"></span>

@@ -128,7 +128,7 @@ if ( fusion_is_element_enabled( 'fusion_video' ) ) {
 				if ( $this->args['start_time'] || $this->args['end_time'] ) {
 					$time = '#t=';
 					$time = $this->args['start_time'] ? $time . $this->args['start_time'] : $time . '0';
-					$time = $this->args['end_time'] ? $time . ',' . $this->args['end_time'] : $time;				
+					$time = $this->args['end_time'] ? $time . ',' . $this->args['end_time'] : $time;
 				}
 
 				if ( '' !== $this->args['video_webm'] ) {
@@ -148,7 +148,7 @@ if ( fusion_is_element_enabled( 'fusion_video' ) ) {
 
 				return apply_filters( 'fusion_element_video_content', $html, $args );
 			}
-			
+
 			/**
 			 * Adds the HTML track tags.
 			 *
@@ -157,13 +157,13 @@ if ( fusion_is_element_enabled( 'fusion_video' ) ) {
 			 * @return string
 			 */
 			public function add_track_tags() {
-				if (empty( $this->args['track_tags'] ) ) {
+				if ( empty( $this->args['track_tags'] ) ) {
 					return '';
 				}
-		
+
 				$tracks     = json_decode( base64_decode( $this->args['track_tags'] ), true );
 				$track_html = '';
-		
+
 				if ( is_array( $tracks ) && ! empty( $tracks ) ) {
 					foreach ( $tracks as $track ) {
 						if ( ! empty( $track['track_src'] ) ) {
@@ -466,17 +466,6 @@ function fusion_element_video() {
 					],
 					[
 						'type'        => 'radio_button_set',
-						'heading'     => esc_attr__( 'Loop Video', 'fusion-builder' ),
-						'description' => esc_attr__( 'Controls whether the video should loop or not.', 'fusion-builder' ),
-						'param_name'  => 'loop',
-						'value'       => [
-							'yes' => esc_attr__( 'Yes', 'fusion-builder' ),
-							'no'  => esc_attr__( 'No', 'fusion-builder' ),
-						],
-						'default'     => 'yes',
-					],
-					[
-						'type'        => 'radio_button_set',
 						'heading'     => esc_attr__( 'Autoplay Video', 'fusion-builder' ),
 						'description' => __( '<strong>IMPORTANT:</strong> In some modern browsers, videos with sound won\'t be autoplayed.', 'fusion-builder' ),
 						'param_name'  => 'autoplay',
@@ -491,6 +480,17 @@ function fusion_element_video() {
 						'heading'     => esc_attr__( 'Mute Video', 'fusion-builder' ),
 						'description' => __( '<strong>IMPORTANT:</strong> In some modern browsers, videos with sound won\'t be autoplayed.', 'fusion-builder' ),
 						'param_name'  => 'mute',
+						'value'       => [
+							'yes' => esc_attr__( 'Yes', 'fusion-builder' ),
+							'no'  => esc_attr__( 'No', 'fusion-builder' ),
+						],
+						'default'     => 'yes',
+					],
+					[
+						'type'        => 'radio_button_set',
+						'heading'     => esc_attr__( 'Loop Video', 'fusion-builder' ),
+						'description' => esc_attr__( 'Controls whether the video should loop or not.', 'fusion-builder' ),
+						'param_name'  => 'loop',
 						'value'       => [
 							'yes' => esc_attr__( 'Yes', 'fusion-builder' ),
 							'no'  => esc_attr__( 'No', 'fusion-builder' ),
@@ -515,7 +515,7 @@ function fusion_element_video() {
 								'value'        => '',
 								'data_type'    => 'text/vtt',
 								'dynamic_data' => true,
-							],								
+							],
 							[
 								'type'        => 'select',
 								'heading'     => esc_html__( 'Track Kind', 'fusion-builder' ),

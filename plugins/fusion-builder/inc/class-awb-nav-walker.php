@@ -359,7 +359,15 @@ class AWB_Nav_Walker extends Walker_Nav_Menu {
 				$css_var   = ! empty( $max_width ) ? Fusion_Sanitize::number( $max_width ) . 'px' : '1200px';
 			}
 
-			$megamenu .= '<div class="' . $this->class_base . '__mega-wrap" id="awb-mega-menu-' . $post->ID . '" data-width="' . $width . '" style="--awb-megamenu-width:' . $css_var . '">';
+			// Custom CSS.
+			$custom_css = '';
+			if ( ! fusion_is_preview_frame() ) { // Prevent override & duplicated custom CSS in LE.
+				$custom_css = get_post_meta( $post->ID, '_fusion_builder_custom_css', true );
+			}
+
+			$custom_css = $custom_css ? '<style>' . $custom_css . '</style>' : $custom_css;
+
+			$megamenu .= $custom_css . '<div class="' . $this->class_base . '__mega-wrap" id="awb-mega-menu-' . $post->ID . '" data-width="' . $width . '" style="--awb-megamenu-width:' . $css_var . '">';
 
 			FusionBuilder()->mega_menu_data = [
 				'is_rendering' => true,
@@ -1557,9 +1565,9 @@ class AWB_Nav_Walker extends Walker_Nav_Menu {
 					if ( isset( $_GET['login'] ) && 'failed' === $_GET['login'] ) { // phpcs:ignore WordPress.Security.NonceVerification
 						$output .= '<p class="' . $this->class_base . '__login-error">' . esc_html__( 'Login failed, please try again.', 'Avada' ) . '</p>';
 					}
-					$output .= '<form action="' . esc_attr( site_url( 'wp-login.php', 'login_post' ) ) . '" name="loginform" method="post">';
-					$output .= '<div class="' . $this->class_base . '__input-wrap"><label class="screen-reader-text hidden" for="username">' . esc_html__( 'Username:', 'Avada' ) . '</label><input type="text" class="input-text" name="log" id="username-' . esc_attr( $args['menu_id'] ) . '" value="" placeholder="' . esc_html__( 'Username', 'Avada' ) . '" /></div>';
-					$output .= '<div class="' . $this->class_base . '__input-wrap"><label class="screen-reader-text hidden" for="password">' . esc_html__( 'Password:', 'Avada' ) . '</label><input type="password" class="input-text" name="pwd" id="password-' . esc_attr( $args['menu_id'] ) . '" value="" placeholder="' . esc_html__( 'Password', 'Avada' ) . '" /></div>';
+					$output .= '<form action="' . esc_url( apply_filters( 'login_url', site_url( 'wp-login.php', 'login_post' ), '', false ) ) . '" name="loginform" method="post">';
+					$output .= '<div class="' . $this->class_base . '__input-wrap"><label class="screen-reader-text hidden" for="username-' . esc_attr( $args['menu_id'] ) . '">' . esc_html__( 'Username:', 'Avada' ) . '</label><input type="text" class="input-text" name="log" id="username-' . esc_attr( $args['menu_id'] ) . '" value="" placeholder="' . esc_html__( 'Username', 'Avada' ) . '" /></div>';
+					$output .= '<div class="' . $this->class_base . '__input-wrap"><label class="screen-reader-text hidden" for="password-' . esc_attr( $args['menu_id'] ) . '">' . esc_html__( 'Password:', 'Avada' ) . '</label><input type="password" class="input-text" name="pwd" id="password-' . esc_attr( $args['menu_id'] ) . '" value="" placeholder="' . esc_html__( 'Password', 'Avada' ) . '" /></div>';
 					$output .= '<label class="' . $this->class_base . '__login-remember" for="' . $this->class_base . '__remember-' . esc_attr( $args['menu_id'] ) . '"><input name="rememberme" type="checkbox" id="' . $this->class_base . '__remember-' . esc_attr( $args['menu_id'] ) . '" value="forever"> ' . esc_html__( 'Remember Me', 'Avada' ) . '</label>';
 					$output .= '<input type="hidden" name="fusion_woo_login_box" value="true" />';
 					$output .= '<div class="' . $this->class_base . '__login-links">';

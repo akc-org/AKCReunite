@@ -286,7 +286,7 @@ var FusionPageBuilder = FusionPageBuilder || {};
 				if ( ! jQuery( 'body' ).hasClass( 'fusion-tb-section-edit' ) && false === is_content_override_active ) {
 
 					// Check the post type.
-					if ( 'undefined' !== typeof currentPostWidth || 'fusion_element' === fusionBuilderConfig.post_type || 'fusion_template' === fusionBuilderConfig.post_type ) {
+					if ( 'undefined' !== typeof currentPostWidth || 'fusion_element' === fusionBuilderConfig.post_type || 'fusion_template' === fusionBuilderConfig.post_type || 'awb_off_canvas' === fusionBuilderConfig.post_type ) {
 
 						// Blog post.
 						if ( 'no' === currentPostWidth || ( 'default' === currentPostWidth && '' === FusionPageBuilderApp.fullWidth ) ) {

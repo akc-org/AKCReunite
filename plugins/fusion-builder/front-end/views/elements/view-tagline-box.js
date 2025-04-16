@@ -202,10 +202,6 @@ var FusionPageBuilder = FusionPageBuilder || {};
 					attrReadingBox[ 'class' ] += ' reading-box-center';
 				}
 
-				if ( 'yes' === values.shadow ) {
-					attrReadingBox[ 'class' ] += ' element-bottomshadow';
-				}
-
 				attrReadingBox.style  = 'background-color:' + values.backgroundcolor + ';';
 				attrReadingBox.style += 'border-width:' + values.border + ';';
 				attrReadingBox.style += 'border-color:' + values.bordercolor + ';';

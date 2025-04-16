@@ -127,6 +127,9 @@ var FusionPageBuilder = FusionPageBuilder || {};
 			// Post Id
 			this.postID = false;
 
+			// Dummy text area to decode text encoded by the builder.
+			this.dummyTextArea = document.createElement( 'textarea' );
+			
 			// Listen for new elements
 			this.listenTo( this.collection, 'add', this.addBuilderElement );
 
@@ -1832,11 +1835,9 @@ var FusionPageBuilder = FusionPageBuilder || {};
 					}
 
 					if ( 'fusion_alert' === shortcodeName ) {
-						console.log( shortcodeAttributes.named.dismissable );
 						if ( 'undefined' !== typeof shortcodeAttributes.named.dismissable && 'yes' === shortcodeAttributes.named.dismissable ) {
 							prefixedAttributes.params.dismissable = 'boxed';
 						}
-						console.log( shortcodeAttributes.named.dismissable );
 					}
 
 					elementSettings = _.extend( elementSettings, prefixedAttributes );
@@ -2793,7 +2794,11 @@ var FusionPageBuilder = FusionPageBuilder || {};
 				return data;
 			}
 
-			data = unescape( encodeURIComponent( data ) );
+			try {
+				data = unescape( encodeURIComponent( data ) );
+			} catch ( e ) {
+				data = unescape( data );
+			}			
 
 			do {
 
@@ -2908,6 +2913,35 @@ var FusionPageBuilder = FusionPageBuilder || {};
 			return string;
 		},
 
+		/**
+		 * Decodes headings if encoded.
+		 *
+		 * @since 3.11.0
+		 * @param {string} html - The data to decode.
+		 * @return {string}
+		 */
+		maybeDecode: function( text ) {
+			if ( ! this.needsDecoding( text ) ) {
+				return text;
+			}
+			this.dummyTextArea.innerHTML = text;
+			if ( '' !== this.dummyTextArea.value ) {
+				return this.dummyTextArea.value;
+			}
+			return text;
+		},
+
+		/**
+		 * Checks if encoded.
+		 *
+		 * @since 3.11.0
+		 * @param {string} html - The data to decode.
+		 * @return {string}
+		 */
+		needsDecoding( text ) {
+			const entityPattern = /&[#A-Za-z0-9]+;/;
+			return entityPattern.test( text );
+		},
 		setContent: function( textareaID, content ) {
 			if ( 'undefined' !== typeof window.tinyMCE && window.tinyMCE.get( textareaID ) && ! window.tinyMCE.get( textareaID ).isHidden() ) {
 

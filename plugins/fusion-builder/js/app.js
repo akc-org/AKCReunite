@@ -126,6 +126,7 @@ var FusionPageBuilderEvents = _.extend( {}, Backbone.Events );
 				'click .fusion-builder-layout-button-delete': 'deleteLayout',
 				'click .fusion-builder-layout-buttons-clear': 'clearLayout',
 				'click .fusion-builder-demo-button-load': 'loadDemoPage',
+				'click .fusion-builder-layout-code-fields': 'toggleCodeFields',
 				'click .fusion-builder-layout-custom-css': 'customCSS',
 				'click .fusion-builder-template-buttons-save': 'saveTemplateDialog',
 				'click #fusion-builder-layouts .fusion-builder-modal-close': 'hideLibrary',
@@ -216,7 +217,12 @@ var FusionPageBuilderEvents = _.extend( {}, Backbone.Events );
 				// Toggled Containers
 				this.toggledContainers = true;
 
+				// for HTML decoding.
+				this.dummyTextArea = document.createElement( 'textarea' ); 
+
 				this.render();
+
+				this.codeFields();
 
 				if ( ! jQuery( 'body' ).hasClass( 'gutenberg-editor-page' ) ) {
 					if ( $( '#fusion_toggle_builder' ).hasClass( 'fusion_builder_is_active' ) ) {
@@ -396,7 +402,11 @@ var FusionPageBuilderEvents = _.extend( {}, Backbone.Events );
 					return data;
 				}
 
-				data = unescape( encodeURIComponent( data ) );
+				try {
+					data = unescape( encodeURIComponent( data ) );
+				} catch ( e ) {
+					data = unescape( data );
+				}
 
 				do {
 
@@ -490,7 +500,35 @@ var FusionPageBuilderEvents = _.extend( {}, Backbone.Events );
 				}
 				return string;
 			},
+			/**
+			 * Decodes headings if encoded.
+			 *
+			 * @since 3.11.0
+			 * @param {string} html - The data to decode.
+			 * @return {string}
+			 */
+			maybeDecode: function( text ) {
+				if ( ! this.needsDecoding( text ) ) {
+					return text;
+				}
+				this.dummyTextArea.innerHTML = text;
+				if ( '' !== this.dummyTextArea.value ) {
+					return this.dummyTextArea.value;
+				}
+				return text;
+			},
 
+			/**
+			 * Checks if encoded.
+			 *
+			 * @since 3.11.0
+			 * @param {string} html - The data to decode.
+			 * @return {string}
+			 */
+			needsDecoding( text ) {
+				const entityPattern = /&[#A-Za-z0-9]+;/;
+				return entityPattern.test( text );
+			},
 			fusionBuilderMCEremoveEditor: function( id ) {
 				if ( 'undefined' !== typeof window.tinyMCE ) {
 					window.tinyMCE.execCommand( 'mceRemoveEditor', false, id );
@@ -522,34 +560,48 @@ var FusionPageBuilderEvents = _.extend( {}, Backbone.Events );
 			},
 
 			fusion_builder_connected_sortable: function( $element ) {
-				var $sortable;
-				$sortable = $element.find( '.fusion-connected-sortable' );
+				var self      = this,
+					$sortable = $element.find( '.fusion-connected-sortable' );
 
 				$sortable.sortable( {
 					connectWith: '.fusion-connected-sortable',
 
 					stop: function() {
-						var $enabled   = $element.find( '.fusion-connected-sortable-enabled' ),
-							$container = $element.find( '.fusion-builder-option-container' ),
-							sortOrder  = '';
-
-						$enabled.children( '.fusion-connected-sortable-option' ).each( function() {
-							sortOrder += jQuery( this ).data( 'value' ) + ',';
-						} );
-
-						$container.find( '.fusion-connected-sortable' ).each( function() {
-							if ( jQuery( this ).find( 'li' ).length ) {
-								jQuery( this ).removeClass( 'empty' );
-							} else {
-								jQuery( this ).addClass( 'empty' );
-							}
-						} );
-
-						sortOrder = sortOrder.slice( 0, -1 );
-
-						$container.find( '.sort-order' ).val( sortOrder ).trigger( 'change' );
+						self.updateConnectedSortables( $element );
 					}
 				} ).disableSelection();
+
+				$sortable.find( 'li' ).on( 'dblclick', function() {
+					if ( jQuery( this ).parent().hasClass( 'fusion-connected-sortable-enabled' ) ) {
+						$element.find( '.fusion-connected-sortable-disabled' ).prepend( this );
+					} else {
+						$element.find( '.fusion-connected-sortable-enabled' ).append( this );
+					}
+		
+					self.updateConnectedSortables( $element );
+				} );				
+			},
+
+			updateConnectedSortables: function( $element ) {
+				var $enabled   = $element.find( '.fusion-connected-sortable-enabled' ),
+					$container = $element.find( '.fusion-builder-option-container' ),
+					sortOrder  = '';
+
+				$enabled.children( '.fusion-connected-sortable-option' ).each( function() {
+					sortOrder += jQuery( this ).data( 'value' ) + ',';
+				} );
+
+				$container.find( '.fusion-connected-sortable' ).each( function() {
+					if ( jQuery( this ).find( 'li' ).length ) {
+						jQuery( this ).removeClass( 'empty' );
+					} else {
+						jQuery( this ).addClass( 'empty' );
+					}
+				} );
+
+				sortOrder = sortOrder.slice( 0, -1 );
+
+				$container.find( '.sort-order' ).val( sortOrder ).trigger( 'change' );
 			},
 
 			fusion_builder_sortable_text: function( $element ) {
@@ -993,7 +1045,26 @@ var FusionPageBuilderEvents = _.extend( {}, Backbone.Events );
 				}
 
 				// Add icon container and icon navigation.
-				$container.html( output ).before( '<div class="fusion-icon-picker-nav">' + outputNav + '</div>' );
+				//$container.html( output ).before( '<div class="fusion-icon-picker-nav">' + outputNav + '</div>' );
+				$container.html( output ).before( '<div class="fusion-icon-picker-nav-wrapper"><a href="#" class="fusion-icon-picker-nav-left fusiona-arrow-left"></a><div class="fusion-icon-picker-nav">' + outputNav + '</div><a href="#" class="fusion-icon-picker-nav-right fusiona-arrow-right"></a></div>' );
+
+				// Scroll nav div to right.
+				$containerParent.find( '.fusion-icon-picker-nav-wrapper > .fusion-icon-picker-nav-right' ).on( 'click', function( e ) {
+					e.preventDefault();
+
+					$containerParent.find( '.fusion-icon-picker-nav' ).animate( {
+						scrollLeft: '+=100'
+					}, 250 );
+				} );
+
+				// Scroll nav div to left.
+				$containerParent.find( '.fusion-icon-picker-nav-wrapper > .fusion-icon-picker-nav-left' ).on( 'click', function( e ) {
+					e.preventDefault();
+
+					$containerParent.find( '.fusion-icon-picker-nav' ).animate( {
+						scrollLeft: '-=100'
+					}, 250 );
+				} );
 
 				// Icon navigation link is clicked.
 				$containerParent.find( '.fusion-icon-picker-nav > a' ).on( 'click', function( e ) {
@@ -4970,12 +5041,28 @@ var FusionPageBuilderEvents = _.extend( {}, Backbone.Events );
 				return false;
 			},
 
+			toggleCodeFields: function( event ) {
+				event.preventDefault();
+
+				jQuery( '.awb-po-code-fields' ).slideToggle();
+				jQuery( '.fusion-custom-css' ).slideUp();
+			},
+			
+			codeFields: function() {
+				console.log( "here0", jQuery( '.awb-po-code-field .awb-code' ) );
+				jQuery( '.awb-po-code-field textarea' ).on( 'change keyup paste', function() {
+					console.log("here", jQuery( '#pyre_tab_code_fields' ).find( '#pyre_' + jQuery( this ).attr( 'id' ) ) );
+					jQuery( '#pyre_tab_code_fields' ).find( '#pyre_' + jQuery( this ).attr( 'id' ) ).val( jQuery( this ).val() );
+				} );
+			},
+
 			customCSS: function( event ) {
 				if ( event ) {
 					event.preventDefault();
 				}
 
-				$( '.fusion-custom-css' ).slideToggle();
+				jQuery( '.fusion-custom-css' ).slideToggle();
+				jQuery( '.awb-po-code-fields' ).slideUp();
 			},
 
 			toggleAllContainers: function( event ) {
@@ -5898,6 +5985,30 @@ var FusionPageBuilderEvents = _.extend( {}, Backbone.Events );
 			}
 		} );
 
+		// Copy icon name to clipboard.
+		jQuery( 'body' ).on( 'contextmenu', '.icon_select_container .icon_preview', function( event ) {
+			const iconName = jQuery( this ).children( 'i' ).attr( 'class' );
+
+			if ( 'clipboard' in navigator ) {
+				navigator.clipboard.writeText( iconName );
+			} else {
+				const textArea = document.createElement('textarea');
+				textArea.value = iconName;
+				textArea.style.opacity = 0;
+				document.body.appendChild( textArea );
+				textArea.focus();
+				textArea.select();
+
+				const success = document.execCommand( 'copy' );
+				document.body.removeChild( textArea );
+			}
+
+			jQuery( this ).fadeOut( 100 );
+			jQuery( this ).fadeIn( 100 );
+
+			return false;
+		} );		
+
 		// Open shortcode generator.
 		$( document ).on( 'click', '#qt_content_fusion_shortcodes_text_mode, #qt_excerpt_fusion_shortcodes_text_mode, #qt_element_content_fusion_shortcodes_text_mode', function() {
 			openShortcodeGenerator( $( this ) );
@@ -6004,7 +6115,7 @@ var FusionPageBuilderEvents = _.extend( {}, Backbone.Events );
 			outputNav += '</div>';
 			output    += '</div>';
 
-			$( 'body' ).append( output + outputNav );
+			$( 'body' ).append( output + outputNav ).trigger( 'awb-icon-picker-init' );
 
 		}
 

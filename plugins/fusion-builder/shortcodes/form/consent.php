@@ -80,7 +80,7 @@ if ( fusion_is_element_enabled( 'fusion_form_consent' ) ) {
 					$option .= $this->args['description'] . '</label>';
 					$option .= '</div>';
 				} else {
-					$option = '<p>' . $this->args['description'] . '</p><input name="' . $this->args['name'] . '" type="hidden" value="1"/>';
+					$option = '<p class="label">' . $this->args['description'] . '</p><input name="' . $this->args['name'] . '" type="hidden" value="1"/>';
 				}
 				$element_html = $option;
 

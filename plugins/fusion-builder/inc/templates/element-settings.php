@@ -37,8 +37,11 @@
 				</h2>
 		<# }; #>
 		<div class="fusion-builder-modal-close fusiona-plus2"></div>
-		<#  group_options = {}, group_options['general'] = {};
-			var	menuLabel = '';
+		<#  group_options = {};
+			var	menuLabel = '',
+				generalGroupTag  = '<?php esc_attr_e( 'General', 'fusion-builder' ); ?>'.toLowerCase().replace(/ /g, '-');
+			
+			group_options[ generalGroupTag ] = {};
 		#>
 
 		<!-- Move options to groups -->
@@ -60,7 +63,7 @@
 					group_options[ group_tag ][ param.param_name ] = param;
 				}
 			} else {
-				group_options['general'][ param.param_name ] = param;
+				group_options[ generalGroupTag ][ param.param_name ] = param;
 			}
 
 		} ); #>
@@ -153,6 +156,10 @@
 
 					if ( dynamicData.parent_dynamic_content ) {
 						dynamicClass = 'has-dynamic-data';
+
+						if ( 'undefined' !== dynamicData.parent_dynamic_content.data && 'filebird_folder_parent' === dynamicData.parent_dynamic_content.data ) {
+							dynamicClass += ' has-dynamic-data-no-children';
+						}
 					}
 				}
 			#>

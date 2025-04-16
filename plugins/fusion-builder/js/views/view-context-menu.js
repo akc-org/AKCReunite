@@ -4,6 +4,18 @@ var FusionPageBuilder = FusionPageBuilder || {};
 ( function() {
 
 	jQuery( document ).ready( function() {
+		let isClipboardEnabled;
+		if ( 'clipboard' in navigator ) {
+			navigator.clipboard.readText().then( ( clipboardContent ) => {
+				isClipboardEnabled = true;
+
+			} ).catch( error => {
+				isClipboardEnabled = false;
+				console.log( error );
+			} )
+		} else {
+			isClipboardEnabled = false;
+		}
 
 		// Builder Container View
 		FusionPageBuilder.ContextMenuView = window.wp.Backbone.View.extend( {
@@ -45,13 +57,44 @@ var FusionPageBuilder = FusionPageBuilder || {};
 			 * @return {Object} this
 			 */
 			render: function() {
+
+				if ( isClipboardEnabled ) {
+					const self = this;
+
+					navigator.clipboard.readText().then( ( clipboardContent ) => {
+						if ( 'string' === typeof clipboardContent && '' !== clipboardContent ) {
+							const data = JSON.parse( clipboardContent )
+
+							if ( 'object' === typeof data && 'undefined' !== typeof data.type && 'undefined' !== typeof data.content ) {
+								self.copyData.data.type = data.type
+								self.copyData.data.content = data.content
+							}
+						}
+
+						self.doRender()
+					} ).catch( error => {
+						console.error( 'Error storing content from clipboard: ' + error )
+						self.doRender()
+					} )
+				} else {
+					this.doRender();
+				}
+
+				return this;
+			},
+
+			/**
+			 * Do the rendering of the view.
+			 *
+			 * @since 3.11.10
+			 * @return {Object} this
+			 */
+			doRender: function() {
 				var offset = jQuery( '#fusion_builder_layout .inside' ).offset();
 
 				this.$el.html( this.template( jQuery.extend( true, this.copyData, this.model.parent.attributes, { pageType: this.model.pageType } ) ) );
 
 				this.$el.css( { top: ( this.model.event.pageY - offset.top  ) + 'px', left: ( this.model.event.pageX - offset.left ) + 'px' } );
-
-				return this;
 			},
 
 			/**
@@ -155,16 +198,20 @@ var FusionPageBuilder = FusionPageBuilder || {};
 					break;
 				}
 
-				// Copy to actual clipboard, handy for pasting.
-				jQuery( 'body' ).append( $temp );
-				$temp.val( content ).select();
-				document.execCommand( 'copy' );
-				$temp.remove();
-
 				data = {
 					type: type,
 					content: content
 				};
+
+				// Copy to actual clipboard.
+				if ( isClipboardEnabled ) {
+					navigator.clipboard.writeText( JSON.stringify( data ) );
+				} else {
+					jQuery( 'body' ).append( $temp );
+					$temp.val( content ).select();
+					document.execCommand( 'copy' );
+					$temp.remove();
+				}
 
 				this.storeCopy( data );
 			},

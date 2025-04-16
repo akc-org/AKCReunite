@@ -281,12 +281,19 @@ if ( fusion_is_element_enabled( 'fusion_images' ) ) {
 				$html .= '<div ' . FusionBuilder::attributes( 'image-carousel-shortcode-carousel-wrapper' ) . '>';
 
 				$acf_repeater_html = '';
-
 				if ( $this->parent_args['dynamic_params'] ) {
 					$dynamic_data = json_decode( fusion_decode_if_needed( $this->parent_args['dynamic_params'] ), true );
 
-					if ( isset( $dynamic_data['parent_dynamic_content'] ) ) {
-						$acf_repeater_html = self::get_acf_repeater( $dynamic_data['parent_dynamic_content'], $this->parent_args, $content );
+					if ( isset( $dynamic_data['parent_dynamic_content']['data'] ) ) {
+						if ( 'filebird_folder_parent' === $dynamic_data['parent_dynamic_content']['data'] ) {
+							$image_ids = Fusion_Dynamic_Data_Callbacks::get_filebird_folder_image_ids( $dynamic_data['parent_dynamic_content'] );
+							$content   = '';
+							foreach ( $image_ids as $image_id ) {
+								$content .= '[fusion_image image_id="' . $image_id . '" /]';
+							}
+						} elseif ( 'acf_repeater_parent' === $dynamic_data['parent_dynamic_content']['data'] ) {
+							$acf_repeater_html = self::get_acf_repeater( $dynamic_data['parent_dynamic_content'], $this->parent_args, $content );
+						}
 					}
 				}
 
@@ -792,7 +799,7 @@ function fusion_element_images() {
 						'heading'         => esc_attr__( 'Dynamic Content', 'fusion-builder' ),
 						'param_name'      => 'parent_dynamic_content',
 						'dynamic_data'    => true,
-						'dynamic_options' => [ 'acf_repeater_parent' ],
+						'dynamic_options' => [ 'acf_repeater_parent', 'filebird_folder_parent' ],
 						'group'           => esc_attr__( 'children', 'fusion-builder' ),
 					],
 					[
@@ -835,7 +842,7 @@ function fusion_element_images() {
 							'fixed' => esc_attr__( 'Fixed', 'fusion-builder' ),
 							'auto'  => esc_attr__( 'Auto', 'fusion-builder' ),
 						],
-						'default'     => 'fixed',
+						'default'     => 'auto',
 						'callback'    => [
 							'function' => 'fusion_carousel_images',
 							'action'   => 'get_fusion_image_carousel_children_data',

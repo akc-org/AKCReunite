@@ -102,7 +102,7 @@ class Fusion_Languages_Updater_API {
 		}
 
 		// Get the custom API response.
-		$this->vendor_api = $this->get_vendor_api();
+		add_action( 'after_setup_theme ', [ $this, 'get_vendor_api' ] );
 
 		// Change the hook for themes/plugins.
 		$hook = ( 'theme' === $type ) ? 'site_transient_update_themes' : 'site_transient_update_plugins';
@@ -182,11 +182,11 @@ class Fusion_Languages_Updater_API {
 	/**
 	 * Get the vendor API response.
 	 *
-	 * @access private
+	 * @access public
 	 * @since 4.1
 	 * @return array|false Returns the array, or false on failure.
 	 */
-	private function get_vendor_api() {
+	public function get_vendor_api() {
 
 		// Try to get the response from cache.
 		$transient_name = 'fusion_l10n_api_' . sanitize_key( $this->slug );

@@ -53,11 +53,13 @@ if ( fusion_is_element_enabled( 'fusion_youtube' ) ) {
 					'autoplay'          => 'false',
 					'mute'              => 'false',
 					'alignment'         => '',
+					'controls'          => '',
 					'center'            => 'no',
 					'class'             => '',
 					'css_id'            => '',
 					'end_time'          => '',
 					'height'            => 360,
+					'loop'              => 'false',
 					'margin_top'        => '',
 					'margin_bottom'     => '',
 					'hide_on_mobile'    => fusion_builder_default_visibility( 'string' ),
@@ -118,7 +120,7 @@ if ( fusion_is_element_enabled( 'fusion_youtube' ) ) {
 				// Structured Data attributes.
 				$ds_attr = '';
 				if ( 'on' === $this->args['structured_data'] ) {
-					$ds_attr = ' itemprop="video" itemscope itemtype="http://schema.org/VideoObject"';
+					$ds_attr = ' itemscope itemtype="http://schema.org/VideoObject"';
 				}
 
 				$html = '<div ' . FusionBuilder::attributes( 'youtube-shortcode' ) . $ds_attr . '>';
@@ -144,6 +146,18 @@ if ( fusion_is_element_enabled( 'fusion_youtube' ) ) {
 					}
 				}
 
+				if ( 'true' === $this->args['loop'] ) {
+					if ( false === strpos( $this->args['api_params'], 'loop=1' ) ) {
+						$this->args['api_params'] .= '&loop=1&playlist=' . $id;
+					}
+				}
+
+				if ( 'false' === $this->args['controls'] ) {
+					if ( false === strpos( $this->args['api_params'], 'controls=0' ) ) {
+						$this->args['api_params'] .= '&controls=0';
+					}
+				}
+
 				if ( $this->args['start_time'] ) {
 					if ( false === strpos( $this->args['api_params'], 'start=' ) ) {
 						$this->args['api_params'] .= '&start=' . $this->args['start_time'];
@@ -154,7 +168,7 @@ if ( fusion_is_element_enabled( 'fusion_youtube' ) ) {
 					if ( false === strpos( $this->args['api_params'], 'end=' ) ) {
 						$this->args['api_params'] .= '&end=' . $this->args['end_time'];
 					}
-				}				
+				}
 
 				if ( 'on' === $this->args['video_facade'] ) {
 					$api_params = ( false === strpos( $this->args['api_params'], 'enablejsapi=1' ) ? $this->args['api_params'] . '&enablejsapi=1' : $this->args['api_params'] );
@@ -377,8 +391,8 @@ function fusion_element_youtube() {
 						'description' => esc_attr__( 'Set to yes to make video autoplaying. Muted video required for autoplay video.', 'fusion-builder' ),
 						'param_name'  => 'autoplay',
 						'value'       => [
-							'false' => esc_attr__( 'No', 'fusion-builder' ),
 							'true'  => esc_attr__( 'Yes', 'fusion-builder' ),
+							'false' => esc_attr__( 'No', 'fusion-builder' ),
 						],
 						'default'     => 'false',
 					],
@@ -388,10 +402,33 @@ function fusion_element_youtube() {
 						'description' => esc_attr__( 'Set to yes to make video muted.', 'fusion-builder' ),
 						'param_name'  => 'mute',
 						'value'       => [
-							'false' => esc_attr__( 'No', 'fusion-builder' ),
 							'true'  => esc_attr__( 'Yes', 'fusion-builder' ),
+							'false' => esc_attr__( 'No', 'fusion-builder' ),
+
 						],
 						'default'     => 'false',
+					],
+					[
+						'type'        => 'radio_button_set',
+						'heading'     => esc_attr__( 'Loop Video', 'fusion-builder' ),
+						'description' => esc_attr__( 'Set to yes to let the video loop.', 'fusion-builder' ),
+						'param_name'  => 'loop',
+						'value'       => [
+							'true'  => esc_attr__( 'Yes', 'fusion-builder' ),
+							'false' => esc_attr__( 'No', 'fusion-builder' ),
+						],
+						'default'     => 'false',
+					],
+					[
+						'type'        => 'radio_button_set',
+						'heading'     => esc_attr__( 'Player Controls', 'fusion-builder' ),
+						'description' => esc_attr__( 'Set to yes to display the player controls.', 'fusion-builder' ),
+						'param_name'  => 'controls',
+						'value'       => [
+							'true'  => esc_attr__( 'Yes', 'fusion-builder' ),
+							'false' => esc_attr__( 'No', 'fusion-builder' ),
+						],
+						'default'     => 'true',
 					],
 					[
 						'type'        => 'textfield',
@@ -440,8 +477,8 @@ function fusion_element_youtube() {
 								'value'    => 'on',
 								'operator' => '==',
 							],
-						],						
-					],					
+						],
+					],
 					'fusion_margin_placeholder' => [
 						'param_name' => 'margin',
 						'group'      => esc_attr__( 'General', 'fusion-builder' ),

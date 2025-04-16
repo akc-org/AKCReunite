@@ -1,1 +1,1 @@
-jQuery(window).on("load",function(){cssua.ua.ios&&7===parseInt(cssua.ua.ios,10)&&jQuery(".button-icon-divider-left, .button-icon-divider-right").each(function(){var i=jQuery(this).parent().outerHeight();jQuery(this).css("height",i)})});
+jQuery(document).ready(function(){jQuery('.fusion-button[role="button"]').on("keydown",function(e){" "!==e.key&&"Enter"!==e.key||(e.preventDefault(),jQuery(this).trigger("click"))})});

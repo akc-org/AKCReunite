@@ -95,41 +95,21 @@
 			</li>
 
 			<li>
-				<label><?php esc_html_e( 'Mobile View Potrait', 'fusion-builder' ); ?></label>
+				<label><?php esc_html_e( 'Mobile View', 'fusion-builder' ); ?></label>
 				<ul>
 					<li> <p>CMD / CTRL</p> </li>
 					<li> + </li>
 					<li> <p>2</p> </li>
 				</ul>
 			</li>
-
 			<li>
-				<label><?php esc_html_e( 'Mobile View Landscape', 'fusion-builder' ); ?></label>
+				<label><?php esc_html_e( 'Tablet View', 'fusion-builder' ); ?></label>
 				<ul>
 					<li> <p>CMD / CTRL</p> </li>
 					<li> + </li>
 					<li> <p>3</p> </li>
 				</ul>
 			</li>
-
-			<li>
-				<label><?php esc_html_e( 'Tablet View Potrait', 'fusion-builder' ); ?></label>
-				<ul>
-					<li> <p>CMD / CTRL</p> </li>
-					<li> + </li>
-					<li> <p>4</p> </li>
-				</ul>
-			</li>
-
-			<li>
-				<label><?php esc_html_e( 'Tablet View Landscape', 'fusion-builder' ); ?></label>
-				<ul>
-					<li> <p>CMD / CTRL</p> </li>
-					<li> + </li>
-					<li> <p>5</p> </li>
-				</ul>
-			</li>
-
 			<li>
 				<label><?php esc_html_e( 'Clear Layout', 'fusion-builder' ); ?></label>
 				<ul>
@@ -160,7 +140,7 @@
 			</li>
 
 			<li>
-				<label><?php esc_html_e( 'Exit Builder To Back-End', 'fusion-builder' ); ?></label>
+				<label><?php esc_html_e( 'Open Backend Builder In New Tab', 'fusion-builder' ); ?></label>
 				<ul>
 					<li> <p>CMD / CTRL</p> </li>
 					<li> + </li>

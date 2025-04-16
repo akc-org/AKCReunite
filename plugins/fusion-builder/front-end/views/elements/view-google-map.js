@@ -30,7 +30,6 @@ var FusionPageBuilder = FusionPageBuilder || {};
 						marker_icon: this.jsVars.icon,
 						overlay_color: this.jsVars.overlay_color,
 						overlay_color_hsl: this.jsVars.overlay_color_hsl,
-						pan_control: this.jsVars.zoom_pancontrol,
 						show_address: this.jsVars.popup,
 						scale_control: this.jsVars.scale,
 						scrollwheel: this.jsVars.scrollwheel,

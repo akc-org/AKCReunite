@@ -1188,7 +1188,7 @@ class Fusion_Builder_Library {
 					<div class="fusion-builder-layouts-header">
 						<div class="fusion-builder-layouts-header-fields fusion-builder-layouts-header-element-fields"></div>
 						<div class="fusion-builder-layouts-header-info">
-							<h2><?php esc_html_e( 'Saved Containers12', 'fusion-builder' ); ?></h2>
+							<h2><?php esc_html_e( 'Saved Containers', 'fusion-builder' ); ?></h2>
 							<span class="fusion-builder-layout-info">
 								<?php
 								printf(
